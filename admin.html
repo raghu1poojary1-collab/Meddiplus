@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MediPulse — Hospital Desk Management Portal (Page 2)</title>
+  <meta name="description" content="Hospital staff admin portal to update doctor duty rosters, pharmacy inventory, and vaccine batches in real time." />
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E8622C'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>" />
+
+  <!-- Google Fonts: Fraunces & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- MediPulse Design System Stylesheet -->
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <style>
+    /* Dedicated Page 2 Admin Styles */
+    .admin-page-header {
+      background-color: var(--ink);
+      color: var(--paper);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-badge-role {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background-color: rgba(232, 98, 44, 0.18);
+      border: 1px solid rgba(232, 98, 44, 0.4);
+      color: #ffaa88;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .admin-container {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 24px 64px 24px;
+      width: 100%;
+    }
+
+    .admin-facility-selector-card {
+      background-color: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      box-shadow: var(--card-shadow);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .admin-stat-card {
+      background-color: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      padding: 18px 20px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .admin-stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background-color: var(--paper);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+    }
+
+    .admin-stat-val {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .admin-stat-label {
+      font-size: 13px;
+      color: var(--slate);
+      margin-top: 2px;
+    }
+
+    .admin-main-card {
+      background-color: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .admin-nav-bar {
+      display: flex;
+      gap: 4px;
+      padding: 12px 20px;
+      background-color: var(--paper);
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+    }
+
+    .admin-tab-button {
+      background: transparent;
+      border: none;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--slate);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s var(--ease-standard);
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .admin-tab-button.active {
+      background-color: var(--ink);
+      color: var(--paper);
+    }
+
+    .admin-tab-content {
+      padding: 24px;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .admin-table th {
+      text-align: start;
+      padding: 12px 14px;
+      background-color: var(--paper);
+      color: var(--ink);
+      font-weight: 600;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .admin-table td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(221, 213, 199, 0.6);
+      color: var(--ink);
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover {
+      background-color: #faf7f2;
+    }
+
+    /* Low Stock Warning State */
+    .stock-badge-low {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background-color: #fef3e9;
+      color: #b85c18;
+      border: 1px solid rgba(184, 92, 24, 0.3);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .stock-badge-out {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background-color: #fdf2f1;
+      color: var(--danger-soft);
+      border: 1px solid rgba(196, 69, 58, 0.3);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .stock-badge-good {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background-color: #f1f8f3;
+      color: var(--sage);
+      border: 1px solid rgba(107, 143, 113, 0.3);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .quick-qty-btn {
+      background-color: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+
+    .quick-qty-btn:hover {
+      background-color: var(--ink);
+      color: var(--paper);
+    }
+
+    /* Login Box Container */
+    .login-wrapper-card {
+      max-width: 460px;
+      margin: 64px auto;
+      background-color: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      box-shadow: var(--card-shadow);
+      padding: 36px 32px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       PAGE 2 HEADER: HOSPITAL DESK PORTAL
+       ========================================================================== -->
+  <header class="admin-page-header">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <a href="./index.html" class="brand-wrapper" title="Back to public patient portal">
+        <div class="brand-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div>
+          <span class="brand-title">MediPulse</span>
+          <span class="brand-tagline">Page 2 — Hospital Staff Management Portal</span>
+        </div>
+      </a>
+      <span class="admin-badge-role">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Staff Verified Desk
+      </span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="./index.html" class="btn-nav-portal" style="background: rgba(255, 255, 255, 0.12);">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Back to Patient Portal (Page 1)</span>
+      </a>
+      <button id="btn-admin-logout" class="btn-nav-portal" style="display: none; background: rgba(196, 69, 58, 0.25); border-color: rgba(196, 69, 58, 0.4);">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT: AUTHENTICATION OR DASHBOARD
+       ========================================================================== -->
+  <main class="admin-container">
+
+    <!-- 10. Login View (with Horizontal Shake Animation on Error) -->
+    <div id="page2-login-section">
+      <div class="login-wrapper-card form-login-box" id="page2-login-box">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--paper); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; color: var(--ink); margin-bottom: 12px;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h2 style="font-size: 24px; margin-bottom: 6px;">Hospital Staff Authentication</h2>
+          <p style="font-size: 14px; color: var(--slate);">Access live desk controls to toggle doctor shifts, update medicine inventories, and sync vaccine batches.</p>
+        </div>
+
+        <form id="page2-login-form">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--ink);">Staff Identification Number</label>
+            <input type="text" id="page2-input-username" value="admin" required style="width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; outline: none; font-family: inherit;" />
+          </div>
+
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--ink);">Secure Passkey / Access PIN</label>
+            <input type="password" id="page2-input-password" value="medipulse2025" required style="width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; outline: none; font-family: inherit;" />
+          </div>
+
+          <div class="login-error-msg" id="page2-login-error">
+            Invalid staff ID or access PIN. Please check your credentials.
+          </div>
+
+          <button type="submit" class="btn-search-submit" style="width: 100%; margin-top: 16px; padding: 13px;">
+            <span>Authenticate and Open Dashboard</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <div style="margin-top: 20px; padding: 12px; background: var(--paper); border-radius: 8px; font-size: 13px; text-align: center; color: var(--slate); border: 1px dashed var(--line);">
+            <strong>Demo Credentials:</strong> ID: <code>admin</code> / PIN: <code>medipulse2025</code>
+            <div style="margin-top: 6px;">
+              <button type="button" id="btn-quick-fill-creds" style="background: none; border: none; color: var(--pulse); font-weight: 600; cursor: pointer; text-decoration: underline;">
+                Auto-fill credentials
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 11. Authenticated Management Dashboard -->
+    <div id="page2-dashboard-section" style="display: none;">
+      
+      <!-- Facility Switcher Header -->
+      <div class="admin-facility-selector-card">
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--slate); margin-bottom: 4px;">Active Health Facility Desk</label>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <select id="page2-facility-select" style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--line); font-size: 16px; font-weight: 600; color: var(--ink); font-family: inherit; background: var(--paper); cursor: pointer;">
+              <option value="hosp-alvas">Alva's Health Centre & Multi-Specialty Hospital</option>
+              <option value="hosp-chc">Government Community Health Centre (CHC) Moodbidri</option>
+              <option value="hosp-prasad">Prasad Hospital & Trauma Care</option>
+              <option value="hosp-yenepoya">Yenepoya Rural Health & Training Centre</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; background: #eef6f0; padding: 8px 16px; border-radius: var(--radius-pill); border: 1px solid rgba(107,143,113,0.3); font-size: 13px; color: var(--ink); font-weight: 500;">
+          <span class="pulse-dot-live"></span>
+          <span>Live Broadcaster Active — edits reflect on public map immediately</span>
+        </div>
+      </div>
+
+      <!-- Quick KPI Stats Grid -->
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="admin-stat-val" id="stat-doctors-duty">0</div>
+            <div class="admin-stat-label">Doctors on shift now</div>
+          </div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div>
+            <div class="admin-stat-val" id="stat-medicines-instock">0</div>
+            <div class="admin-stat-label">In-stock essential drugs</div>
+          </div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/></svg>
+          </div>
+          <div>
+            <div class="admin-stat-val" id="stat-vaccines-doses">0</div>
+            <div class="admin-stat-label">Available vaccine doses</div>
+          </div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div>
+            <div class="admin-stat-val" style="color: var(--sage);">Normal</div>
+            <div class="admin-stat-label">Cold chain status (2-8°C)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Management Tabs Card -->
+      <div class="admin-main-card">
+        <div class="admin-nav-bar">
+          <button class="admin-tab-button active" data-tab="doctors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Doctor Roster (On/Off Duty Toggle)</span>
+          </button>
+          <button class="admin-tab-button" data-tab="medicines">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <span>Medicine Inventory & Stock Controls</span>
+          </button>
+          <button class="admin-tab-button" data-tab="vaccines">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/></svg>
+            <span>Vaccine Batches & Cold Chain</span>
+          </button>
+          <button class="admin-tab-button" data-tab="audit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Live Audit Log</span>
+          </button>
+        </div>
+
+        <!-- 1. Doctor Roster Pane -->
+        <div class="admin-tab-content" id="tab-pane-doctors">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <p style="font-size: 14px; color: var(--slate); margin: 0;">
+              Clicking a switch animates the toggle (0.2s), flashes the row with a soft coral-amber highlight (0.6s), and updates the patient view immediately.
+            </p>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Doctor Name & Qualifications</th>
+                <th>Specialization</th>
+                <th>Shift Timings</th>
+                <th>Assigned Room</th>
+                <th>Patient Queue</th>
+                <th>Duty Status</th>
+              </tr>
+            </thead>
+            <tbody id="page2-doctors-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 2. Medicine Inventory Pane -->
+        <div class="admin-tab-content" id="tab-pane-medicines" style="display: none;">
+          <p style="font-size: 14px; color: var(--slate); margin-bottom: 16px;">
+            Medicines below threshold automatically flag with amber (Low Stock) or red (Out of Stock) warnings. Use quick increments (+10, +50) or edit directly.
+          </p>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Medicine Name</th>
+                <th>Category</th>
+                <th>Pricing Tier</th>
+                <th>Current Stock</th>
+                <th>Threshold</th>
+                <th>Stock Status</th>
+                <th>Quick Actions</th>
+              </tr>
+            </thead>
+            <tbody id="page2-meds-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 3. Vaccine Batches Pane -->
+        <div class="admin-tab-content" id="tab-pane-vaccines" style="display: none;">
+          <p style="font-size: 14px; color: var(--slate); margin-bottom: 16px;">
+            Real-time cold chain verified storage (2-8°C). Update remaining dose counts directly.
+          </p>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Vaccine Name</th>
+                <th>Lot / Batch No.</th>
+                <th>Expiry Date</th>
+                <th>Cold Chain Integrity</th>
+                <th>Available Doses</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="page2-vacs-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- 4. Live Audit Log Pane -->
+        <div class="admin-tab-content" id="tab-pane-audit" style="display: none;">
+          <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--ink);">Facility Operational Audit Trail</h3>
+          <ul id="page2-audit-list" style="list-style: none; padding: 0;"></ul>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Toast Notification Container with 3s shrinking progress bar -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Shared Data Store Module -->
+  <script src="./js/data.js"></script>
+
+  <script>
+    /**
+     * Page 2 — Hospital Admin Dashboard Controller
+     * Handles authentication, shake-on-error, roster toggling with row flash,
+     * medicine stock warning states, vaccine management, and live sync.
+     */
+    class AdminPageController {
+      constructor() {
+        this.currentHospitalId = 'hosp-alvas';
+        this.isAuthenticated = localStorage.getItem('medipulse_admin_auth') === 'true';
+
+        this.init();
+      }
+
+      init() {
+        this.setupAuth();
+        this.setupTabs();
+        this.setupFacilitySelector();
+
+        // Subscribe to shared DataStore for live sync
+        window.dataStore.subscribe(() => {
+          this.renderDashboard();
+        });
+
+        if (this.isAuthenticated) {
+          this.showDashboard();
+        } else {
+          this.showLogin();
+        }
+      }
+
+      setupAuth() {
+        const form = document.getElementById('page2-login-form');
+        const errorMsg = document.getElementById('page2-login-error');
+        const loginBox = document.getElementById('page2-login-box');
+        const quickFillBtn = document.getElementById('btn-quick-fill-creds');
+        const logoutBtn = document.getElementById('btn-admin-logout');
+
+        quickFillBtn?.addEventListener('click', () => {
+          document.getElementById('page2-input-username').value = 'admin';
+          document.getElementById('page2-input-password').value = 'medipulse2025';
+        });
+
+        form?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const user = document.getElementById('page2-input-username').value.trim();
+          const pass = document.getElementById('page2-input-password').value.trim();
+
+          if (user === 'admin' && pass === 'medipulse2025') {
+            this.isAuthenticated = true;
+            localStorage.setItem('medipulse_admin_auth', 'true');
+            errorMsg.classList.remove('visible');
+            loginBox.classList.remove('shake-error');
+            this.showDashboard();
+            this.showToast("Authenticated as Hospital Administrator!");
+          } else {
+            // 10. Horizontal shake animation on invalid credentials
+            loginBox.classList.remove('shake-error');
+            void loginBox.offsetWidth; // trigger reflow
+            loginBox.classList.add('shake-error');
+            errorMsg.classList.add('visible');
+          }
+        });
+
+        logoutBtn?.addEventListener('click', () => {
+          this.isAuthenticated = false;
+          localStorage.removeItem('medipulse_admin_auth');
+          this.showLogin();
+          this.showToast("Logged out from Hospital Admin Portal.");
+        });
+      }
+
+      showLogin() {
+        document.getElementById('page2-login-section').style.display = 'block';
+        document.getElementById('page2-dashboard-section').style.display = 'none';
+        document.getElementById('btn-admin-logout').style.display = 'none';
+      }
+
+      showDashboard() {
+        document.getElementById('page2-login-section').style.display = 'none';
+        document.getElementById('page2-dashboard-section').style.display = 'block';
+        document.getElementById('btn-admin-logout').style.display = 'inline-flex';
+        this.renderDashboard();
+      }
+
+      setupTabs() {
+        const tabBtns = document.querySelectorAll('.admin-tab-button');
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const tab = btn.dataset.tab;
+            document.querySelectorAll('.admin-tab-content').forEach(pane => pane.style.display = 'none');
+            const target = document.getElementById(`tab-pane-${tab}`);
+            if (target) target.style.display = 'block';
+          });
+        });
+      }
+
+      setupFacilitySelector() {
+        const select = document.getElementById('page2-facility-select');
+        select?.addEventListener('change', (e) => {
+          this.currentHospitalId = e.target.value;
+          this.renderDashboard();
+        });
+      }
+
+      renderDashboard() {
+        const hospital = window.dataStore.getById(this.currentHospitalId);
+        if (!hospital) return;
+
+        // Update KPIs
+        const onDutyCount = hospital.doctors.filter(d => d.onDuty).length;
+        const inStockCount = hospital.medicines.filter(m => m.stock > 0).length;
+        const totalDoses = hospital.vaccines.reduce((acc, v) => acc + v.doses, 0);
+
+        document.getElementById('stat-doctors-duty').textContent = onDutyCount;
+        document.getElementById('stat-medicines-instock').textContent = inStockCount;
+        document.getElementById('stat-vaccines-doses').textContent = totalDoses;
+
+        // Render Doctors Table
+        const docsTbody = document.getElementById('page2-doctors-tbody');
+        if (docsTbody) {
+          docsTbody.innerHTML = hospital.doctors.map(d => `
+            <tr id="row-doc-${d.id}">
+              <td>
+                <strong>${d.name}</strong><br>
+                <small style="color: var(--slate);">${d.qualification}</small>
+              </td>
+              <td>${d.specialty}</td>
+              <td>${d.shift}</td>
+              <td><code>${d.room}</code></td>
+              <td><strong>${d.queueCount} patients</strong></td>
+              <td>
+                <label class="toggle-switch-label">
+                  <input type="checkbox" ${d.onDuty ? 'checked' : ''} onchange="window.adminPage.toggleDuty('${hospital.id}', '${d.id}')">
+                  <span class="toggle-slider"></span>
+                </label>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // Render Medicines Table with Low-Stock Color Warning States
+        const medsTbody = document.getElementById('page2-meds-tbody');
+        if (medsTbody) {
+          medsTbody.innerHTML = hospital.medicines.map(m => {
+            let statusBadge = `<span class="stock-badge-good">✓ In Stock</span>`;
+            if (m.stock === 0) {
+              statusBadge = `<span class="stock-badge-out">⚠ Out of Stock</span>`;
+            } else if (m.stock < m.threshold) {
+              statusBadge = `<span class="stock-badge-low">⚠ Low Stock Alert</span>`;
+            }
+
+            return `
+              <tr id="row-med-${m.id}">
+                <td><strong>${m.name}</strong></td>
+                <td>${m.category}</td>
+                <td><small>${m.price}</small></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="number" min="0" value="${m.stock}" id="stock-val-${m.id}" style="width: 76px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; font-weight: 600; font-family: inherit;">
+                    <span style="font-size: 13px; color: var(--slate);">${m.unit}</span>
+                  </div>
+                </td>
+                <td><small style="color: var(--slate);">${m.threshold} ${m.unit}</small></td>
+                <td>${statusBadge}</td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <button class="quick-qty-btn" onclick="window.adminPage.addStock('${hospital.id}', '${m.id}', 10)">+10</button>
+                    <button class="quick-qty-btn" onclick="window.adminPage.addStock('${hospital.id}', '${m.id}', 50)">+50</button>
+                    <button class="btn-search-submit" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;" onclick="window.adminPage.saveStock('${hospital.id}', '${m.id}')">Save</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // Render Vaccine Batches
+        const vacsTbody = document.getElementById('page2-vacs-tbody');
+        if (vacsTbody) {
+          vacsTbody.innerHTML = hospital.vaccines.map(v => `
+            <tr id="row-vac-${v.id}">
+              <td><strong>${v.name}</strong></td>
+              <td><code>${v.batch}</code></td>
+              <td>${v.expiry}</td>
+              <td><span style="color: var(--sage); font-weight: 600;">✓ ${v.coldChainStatus}</span></td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <input type="number" min="0" value="${v.doses}" id="dose-val-${v.id}" style="width: 76px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; font-weight: 600; font-family: inherit;">
+                  <span>doses</span>
+                </div>
+              </td>
+              <td>
+                <button class="btn-search-submit" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;" onclick="window.adminPage.saveVaccine('${hospital.id}', '${v.id}')">Save</button>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // Render Audit Log
+        const auditList = document.getElementById('page2-audit-list');
+        if (auditList) {
+          auditList.innerHTML = window.dataStore.auditLog.map(log => `
+            <li style="padding: 12px 14px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+              <div>
+                <strong style="color: var(--ink);">${log.action}</strong>
+                <div style="color: var(--slate); font-size: 12px; margin-top: 2px;">Recorded by ${log.user} • ${log.facility}</div>
+              </div>
+              <span style="background: var(--paper); border: 1px solid var(--line); padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; color: var(--slate);">${log.time}</span>
+            </li>
+          `).join('');
+        }
+      }
+
+      /* 11. Toggle doctor duty with row pulse highlight flash */
+      toggleDuty(hospitalId, doctorId) {
+        const updated = window.dataStore.toggleDoctorDuty(hospitalId, doctorId);
+        if (!updated) return;
+
+        const row = document.getElementById(`row-doc-${doctorId}`);
+        if (row) {
+          row.classList.remove('row-pulse-flash');
+          void row.offsetWidth; // trigger reflow
+          row.classList.add('row-pulse-flash');
+        }
+
+        this.showToast(`${updated.name} status updated to ${updated.onDuty ? 'ON DUTY' : 'OFF DUTY'}! Synced live with Patient Portal.`);
+      }
+
+      addStock(hospitalId, medicineId, amount) {
+        const input = document.getElementById(`stock-val-${medicineId}`);
+        if (input) {
+          input.value = (parseInt(input.value) || 0) + amount;
+          this.saveStock(hospitalId, medicineId);
+        }
+      }
+
+      saveStock(hospitalId, medicineId) {
+        const input = document.getElementById(`stock-val-${medicineId}`);
+        if (!input) return;
+
+        const updated = window.dataStore.updateMedicineStock(hospitalId, medicineId, input.value);
+        if (updated) {
+          const row = document.getElementById(`row-med-${medicineId}`);
+          if (row) {
+            row.classList.remove('row-pulse-flash');
+            void row.offsetWidth;
+            row.classList.add('row-pulse-flash');
+          }
+          this.showToast(`Saved: ${updated.name} stock updated to ${updated.stock} ${updated.unit}.`);
+        }
+      }
+
+      saveVaccine(hospitalId, vaccineId) {
+        const input = document.getElementById(`dose-val-${vaccineId}`);
+        if (!input) return;
+
+        const updated = window.dataStore.updateVaccineDoses(hospitalId, vaccineId, input.value);
+        if (updated) {
+          const row = document.getElementById(`row-vac-${vaccineId}`);
+          if (row) {
+            row.classList.remove('row-pulse-flash');
+            void row.offsetWidth;
+            row.classList.add('row-pulse-flash');
+          }
+          this.showToast(`Saved: ${updated.name} available doses updated to ${updated.doses}.`);
+        }
+      }
+
+      showToast(message) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-message-card';
+        toast.innerHTML = `
+          <div>${message}</div>
+          <div class="toast-progress-bar"></div>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(10px)';
+          toast.style.transition = 'all 0.2s';
+          setTimeout(() => toast.remove(), 250);
+        }, 3000);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      window.adminPage = new AdminPageController();
+    });
+  </script>
+</body>
+</html>

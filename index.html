@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MediPulse — Real-Time Healthcare & Hospital Availability</title>
+  <meta name="description" content="Check real-time doctor on-duty rosters, medicine stock, and vaccine dose availability across South Indian health centres before leaving home." />
+  
+  <!-- Favicon / PWA -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E8622C'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>" />
+
+  <!-- Google Fonts: Fraunces (Display) + Inter (UI/Body) + Noto Sans Indic variants + Noto Sans Arabic for Urdu -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Sans+Bengali:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&family=Noto+Sans+Malayalam:wght@400;500;600&family=Noto+Sans+Tamil:wght@400;500;600&family=Noto+Sans+Telugu:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet.js CSS (Free, OpenStreetMap & CartoDB tiles) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+
+  <!-- MediPulse Design System Stylesheet -->
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+
+  <!-- ==========================================================================
+       APP HEADER
+       ========================================================================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <!-- Brand Logo / Wordmark -->
+      <a href="./" class="brand-wrapper" aria-label="MediPulse Home">
+        <div class="brand-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-title" data-i18n="navBrand">MediPulse</span>
+          <span class="brand-tagline" data-i18n="navTagline">Real-time healthcare availability</span>
+        </div>
+      </a>
+
+      <!-- Header Actions: Language Switcher, Network Pulse, Staff Login -->
+      <div class="header-actions">
+        <!-- Live Signal Indicator -->
+        <div class="header-network-pill">
+          <span class="pulse-dot-live"></span>
+          <span data-i18n="navLiveIndicator">Live network active</span>
+        </div>
+
+        <!-- 10-Language Native Dropdown -->
+        <div class="lang-selector-wrap">
+          <select id="global-lang-select" class="lang-select" aria-label="Select language">
+            <option value="en">English</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="tcy">Tulu (ತುಳು)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="ml">മലയാളം (Malayalam)</option>
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="ur">اردو (Urdu)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+          </select>
+          <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <!-- Hospital Admin Portal Button (Page 2) -->
+        <a href="./admin.html" id="btn-hospital-portal" class="btn-nav-portal" aria-label="Hospital staff portal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span data-i18n="navStaffPortal">Hospital staff portal</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="main-wrapper">
+
+    <!-- HERO SECTION (Left-aligned, Asymmetric, Animated EKG Heartbeat) -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-pill-badge">
+          <span class="pulse-dot-live"></span>
+          <span data-i18n="verifiedBadge">Verified by hospital desk</span>
+        </div>
+
+        <h1 data-i18n="heroTitle">Know before you go</h1>
+        <p class="hero-subhead" data-i18n="heroSubhead">
+          Check real-time doctor on-duty rosters, medicine stocks, and vaccine dose counts at nearby health centres across South India before leaving home.
+        </p>
+      </div>
+
+      <!-- 1. Signature SVG Heartbeat / EKG Line Entrance -->
+      <div class="ekg-signature-box">
+        <svg viewBox="0 0 1200 48" preserveAspectRatio="none" style="width: 100%; height: 48px;">
+          <path class="ekg-svg-path" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+        </svg>
+      </div>
+
+      <!-- SEARCH CARD CONTAINER (Fades/scales in as EKG settles into underline) -->
+      <div class="search-card-container">
+        <!-- 3. Search Mode Switcher Tabs -->
+        <div class="search-mode-tabs" role="tablist">
+          <div class="mode-indicator-pill"></div>
+          <button class="search-tab-btn active" data-mode="type" role="tab" aria-selected="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span data-i18n="searchTabType">Type search</span>
+          </button>
+          <button class="search-tab-btn" data-mode="speak" role="tab" aria-selected="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            <span data-i18n="searchTabSpeak">Speak query</span>
+          </button>
+          <button class="search-tab-btn" data-mode="upload" role="tab" aria-selected="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span data-i18n="searchTabUpload">Upload prescription</span>
+          </button>
+        </div>
+
+        <!-- Mode 1: Text Search Inputs -->
+        <div class="search-input-row" id="search-input-row">
+          <div class="search-input-group">
+            <svg class="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-main-input" class="search-main-input" data-i18n-placeholder="searchPlaceholder" placeholder="Search doctor, medicine or vaccine (e.g. Paracetamol, Pediatrician, Covaxin)..." aria-label="Search medical availability" />
+          </div>
+
+          <div class="search-divider"></div>
+
+          <!-- Location Selector -->
+          <div class="location-selector-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <select class="location-select" id="location-select" aria-label="Select taluk or town">
+              <option value="moodbidri">Moodbidri Town (Center)</option>
+              <option value="belvai">Belvai Village (5 km)</option>
+              <option value="kaikamba">Kaikamba Road (3 km)</option>
+              <option value="alangar">Alangar (2 km)</option>
+              <option value="mangaluru">Mangaluru District Hub</option>
+            </select>
+          </div>
+
+          <button class="btn-search-submit" id="btn-search-action" aria-label="Execute search">
+            <span data-i18n="searchBtn">Check availability</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <!-- Mode 2: Voice Search Panel (Web Speech API) -->
+        <div class="voice-search-panel" id="voice-search-panel">
+          <div class="mic-wrapper">
+            <button class="mic-btn" id="mic-action-btn" aria-label="Voice search microphone">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+            <div class="mic-ring"></div>
+          </div>
+          <p class="voice-status-text" id="voice-status-text" data-i18n="speechPrompt">Click microphone and speak medicine or doctor specialty in your language</p>
+          <div class="voice-transcript-text" id="voice-transcript-text"></div>
+        </div>
+
+        <!-- Mode 3: Prescription Upload Panel (OCR Simulation) -->
+        <div class="upload-search-panel" id="upload-search-panel">
+          <input type="file" id="rx-file-input" accept="image/*" style="display: none;" />
+          <div class="upload-dropzone" id="upload-dropzone">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>
+              <strong style="color: var(--ink); display: block;" data-i18n="uploadPrompt">Drag & drop prescription photo or choose a sample</strong>
+              <small style="color: var(--slate);">Supports JPG, PNG, camera capture</small>
+            </div>
+          </div>
+
+          <div class="sample-prescriptions-wrap">
+            <button class="btn-sample-rx" id="btn-sample-fever" data-i18n="uploadSampleFever">
+              📋 Sample 1: Fever & Infection (Paracetamol 650mg, Amoxicillin 500mg)
+            </button>
+            <button class="btn-sample-rx" id="btn-sample-diabetes" data-i18n="uploadSampleDiabetes">
+              📋 Sample 2: Chronic Care (Metformin 500mg, Insulin Glargine)
+            </button>
+          </div>
+          <div id="upload-status-result"></div>
+        </div>
+
+        <!-- Settling flat underline -->
+        <div class="search-bottom-indicator"></div>
+      </div>
+
+      <!-- Filter Chips Row -->
+      <div class="filter-chips-row">
+        <button class="chip-btn active" data-filter="all" data-i18n="filterAll">All facilities</button>
+        <button class="chip-btn" data-filter="doctor" data-i18n="filterDoctor">Doctors on duty</button>
+        <button class="chip-btn" data-filter="medicine" data-i18n="filterMedicine">In-stock medicines</button>
+        <button class="chip-btn" data-filter="vaccine" data-i18n="filterVaccine">Vaccines ready</button>
+        <button class="chip-btn" data-filter="emergency" data-i18n="filterEmergency">24/7 Emergency</button>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         RESULTS LIST + LEAFLET MAP (2-COLUMN BIDIRECTIONAL SYNC)
+         ========================================================================== -->
+    <section class="results-map-layout">
+      <!-- Left Column: Hospital Cards List -->
+      <div class="cards-column">
+        <div class="results-header-bar">
+          <div class="results-counter" id="results-counter">4 verified health facilities near Moodbidri</div>
+          <div class="results-legend">
+            <span class="legend-item">
+              <span class="pulse-dot-live"></span>
+              <span data-i18n="legendLive">Live signal active</span>
+            </span>
+            <span class="legend-item">
+              <span class="dot-static-off"></span>
+              <span data-i18n="legendStatic">Unavailable / Off duty</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Container for dynamically rendered result cards with staggered entrance -->
+        <div class="cards-list-wrap" id="results-cards-list"></div>
+      </div>
+
+      <!-- Right Column: Sticky Leaflet Map -->
+      <div class="map-column">
+        <div class="map-sticky-wrapper">
+          <div class="map-header-banner">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="pulse-dot-live"></span>
+              <span>Live Geographic Radar — Moodbidri Taluk</span>
+            </div>
+            <span style="font-size: 11px; opacity: 0.8;">CartoDB Voyager</span>
+          </div>
+          <!-- Leaflet Map Mount Point -->
+          <div id="leaflet-map"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         HOW IT WORKS (3-Step Sequence with Animated SVG Connecting Line)
+         ========================================================================== -->
+    <section class="how-it-works-section">
+      <div class="section-head-center">
+        <h2 data-i18n="howItWorksTitle">How MediPulse protects your journey</h2>
+        <p data-i18n="howItWorksSubhead">Three simple steps to save precious hours and eliminate futile travel to distant clinics.</p>
+      </div>
+
+      <div class="how-steps-grid">
+        <!-- Connecting SVG Line (Draws in via IntersectionObserver) -->
+        <svg class="how-connecting-svg" viewBox="0 0 600 24" preserveAspectRatio="none">
+          <path class="how-line-path" d="M 0,12 L 600,12" />
+        </svg>
+
+        <!-- Step 1 -->
+        <div class="how-step-card">
+          <div class="how-step-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <h3 class="how-step-title" data-i18n="step1Title">1. Search before travel</h3>
+          <p data-i18n="step1Desc">Search by medicine name, doctor specialty, or vaccine dose in your preferred mother tongue.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="how-step-card">
+          <div class="how-step-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3 class="how-step-title" data-i18n="step2Title">2. Verify live signals</h3>
+          <p data-i18n="step2Desc">See heartbeat-verified pulses directly from hospital pharmacy counters and duty logbooks.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="how-step-card">
+          <div class="how-step-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3 class="how-step-title" data-i18n="step3Title">3. Go with confidence</h3>
+          <p data-i18n="step3Desc">Hold your slot or medicine token for 60 minutes while traveling to the health centre.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         ACCESSIBILITY STRIP (Rural & Low-literacy features)
+         ========================================================================== -->
+    <section class="a11y-strip-section">
+      <div class="a11y-inner">
+        <div class="a11y-header">
+          <h2 class="a11y-title" data-i18n="a11yTitle">Built for every patient across South India</h2>
+        </div>
+
+        <div class="a11y-grid">
+          <div class="a11y-item">
+            <div class="a11y-icon-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <strong class="a11y-item-title" data-i18n="a11yOcr">OCR Prescription Scan</strong>
+            <p class="a11y-item-desc" data-i18n="a11yOcrDesc">Photograph handwriting to extract medicines automatically</p>
+          </div>
+
+          <div class="a11y-item">
+            <div class="a11y-icon-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+            <strong class="a11y-item-title" data-i18n="a11yVoice">Voice Search in 10 Languages</strong>
+            <p class="a11y-item-desc" data-i18n="a11yVoiceDesc">Speak naturally in your native regional language</p>
+          </div>
+
+          <div class="a11y-item">
+            <div class="a11y-icon-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <strong class="a11y-item-title" data-i18n="a11yLangs">10 South Asian Languages</strong>
+            <p class="a11y-item-desc" data-i18n="a11yLangsDesc">Native phrasing and full Urdu RTL mirroring</p>
+          </div>
+
+          <div class="a11y-item">
+            <div class="a11y-icon-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <strong class="a11y-item-title" data-i18n="a11ySms">SMS & WhatsApp Fallback</strong>
+            <p class="a11y-item-desc" data-i18n="a11ySmsDesc">Works on basic feature phones without high-speed internet</p>
+          </div>
+
+          <div class="a11y-item">
+            <div class="a11y-icon-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            </div>
+            <strong class="a11y-item-title" data-i18n="a11yTele">Telemedicine Fallback</strong>
+            <p class="a11y-item-desc" data-i18n="a11yTeleDesc">Instant video triage when specialists are off-duty</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       FOOTER
+       ========================================================================== -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div>
+        <div class="emergency-disclaimer-pill" data-i18n="footerDisclaimer">
+          MediPulse is an availability tracking platform, not a substitute for emergency medical care. In critical situations, dial 108 or 112 immediately.
+        </div>
+        <p style="margin-top: 10px; font-size: 12px; color: var(--slate);" data-i18n="footerPrivacy">
+          Data updated directly by participating Taluk, CHC, and private health facilities.
+        </p>
+      </div>
+      <div style="font-size: 12px; color: var(--slate);" data-i18n="footerGovtAligned">
+        Aligned with Ayushman Bharat Digital Mission (ABDM) standards.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       HOSPITAL ADMIN DASHBOARD MODAL (Page 2)
+       ========================================================================== -->
+  <div class="admin-modal-overlay" id="admin-modal-overlay">
+    <div class="admin-modal-window">
+      <div class="admin-modal-header">
+        <div>
+          <h2 style="color: var(--paper); font-size: 18px; margin: 0;" data-i18n="adminTitle">Hospital Desk Management Portal</h2>
+          <small style="color: rgba(250,246,239,0.7);" data-i18n="adminSubtitle">Update on-duty doctors, pharmacy stock, and vaccine batches in real time.</small>
+        </div>
+        <button id="btn-close-admin-modal" style="background: none; border: none; color: var(--paper); font-size: 24px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div class="admin-modal-body">
+        <!-- 10. Login Section (with shake on error animation) -->
+        <div id="admin-login-section">
+          <div class="form-login-box" id="admin-login-box" style="max-width: 440px; margin: 24px auto; padding: 28px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px;">
+            <h3 style="margin-bottom: 8px;" data-i18n="adminLoginTitle">Staff authentication</h3>
+            <p style="font-size: 13px; color: var(--slate); margin-bottom: 20px;" data-i18n="adminLoginPrompt">Enter your hospital staff credentials to manage live availability.</p>
+
+            <form id="admin-login-form">
+              <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--ink);" data-i18n="adminUsernameLabel">Hospital staff ID</label>
+                <input type="text" id="admin-username" value="admin" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;" />
+              </div>
+
+              <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--ink);" data-i18n="adminPasswordLabel">Secure access PIN / Password</label>
+                <input type="password" id="admin-password" value="medipulse2025" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;" />
+              </div>
+
+              <div class="login-error-msg" id="admin-login-error" data-i18n="adminLoginError">
+                Invalid staff ID or access PIN. Please check your credentials.
+              </div>
+
+              <button type="submit" class="btn-search-submit" style="width: 100%; margin-top: 14px;">
+                <span data-i18n="adminLoginBtn">Access staff dashboard</span>
+              </button>
+
+              <div style="margin-top: 16px; padding: 8px; background: var(--white); border-radius: 6px; font-size: 12px; text-align: center; color: var(--slate); border: 1px dashed var(--line);" data-i18n="adminDemoCreds">
+                Demo credentials: ID: admin / PIN: medipulse2025
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 11. Authenticated Dashboard Section -->
+        <div id="admin-dashboard-section" style="display: none;">
+          <div class="admin-facility-bar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <label style="font-weight: 600; font-size: 14px; color: var(--ink);" data-i18n="adminHospitalSelect">Select health facility:</label>
+              <select id="admin-facility-select" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 14px; font-family: inherit;">
+                <option value="hosp-alvas">Alva's Health Centre & Multi-Specialty</option>
+                <option value="hosp-chc">Government Community Health Centre (CHC)</option>
+                <option value="hosp-prasad">Prasad Hospital & Trauma Care</option>
+                <option value="hosp-yenepoya">Yenepoya Rural Health Centre</option>
+              </select>
+            </div>
+            <div style="font-size: 12px; color: var(--sage); font-weight: 600;" data-i18n="adminSyncNotice">
+              ✓ Changes update the patient map and search listings instantly.
+            </div>
+          </div>
+
+          <!-- Admin Tabs -->
+          <div class="admin-tabs-nav">
+            <button class="admin-nav-tab active" data-view="doctors" data-i18n="adminTabDoctors">Doctor roster</button>
+            <button class="admin-nav-tab" data-view="medicines" data-i18n="adminTabMedicines">Medicine stock</button>
+            <button class="admin-nav-tab" data-view="vaccines" data-i18n="adminTabVaccines">Vaccine batches</button>
+            <button class="admin-nav-tab" data-view="audit" data-i18n="adminTabAudit">Live audit log</button>
+          </div>
+
+          <!-- Doctors Pane -->
+          <div class="admin-tab-pane" id="admin-pane-doctors">
+            <table class="detail-table-card">
+              <thead>
+                <tr>
+                  <th>Doctor</th>
+                  <th>Specialty</th>
+                  <th>Shift</th>
+                  <th>Duty Status (Toggle)</th>
+                </tr>
+              </thead>
+              <tbody id="admin-doctors-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Medicines Pane -->
+          <div class="admin-tab-pane" id="admin-pane-medicines" style="display: none;">
+            <table class="detail-table-card">
+              <thead>
+                <tr>
+                  <th>Medicine</th>
+                  <th>Category</th>
+                  <th>Stock Count</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-meds-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Vaccines Pane -->
+          <div class="admin-tab-pane" id="admin-pane-vaccines" style="display: none;">
+            <table class="detail-table-card">
+              <thead>
+                <tr>
+                  <th>Vaccine</th>
+                  <th>Batch</th>
+                  <th>Available Doses</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-vacs-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Audit Pane -->
+          <div class="admin-tab-pane" id="admin-pane-audit" style="display: none;">
+            <h4 style="margin-bottom: 12px; color: var(--ink);" data-i18n="adminAuditTitle">Recent availability updates</h4>
+            <ul id="admin-audit-list" style="list-style: none;"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Leaflet Library (Free, OpenStreetMap & CartoDB) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+  <!-- Application Modules -->
+  <script src="./js/i18n.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
