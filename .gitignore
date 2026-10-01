@@ -9,3 +9,17 @@ dist-ssr
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Java & Maven
+target/
+**/target/
+backend/bin/
+*.class
+
+# Eclipse / VS Code / IntelliJ
+.settings/
+.project
+.classpath
+.vscode/
+.idea/
+*.iml

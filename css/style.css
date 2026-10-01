@@ -1292,23 +1292,41 @@ small, .text-label {
   font-weight: 500;
 }
 
-#leaflet-map {
+#leaflet-map,
+#google-map {
   width: 100%;
   flex: 1;
   min-height: 480px;
   z-index: 10;
+  background-color: var(--paper);
 }
 
-/* Custom Marker Styling */
-.custom-pin-marker {
+/* Custom Google Maps & Leaflet Marker Styling */
+.custom-pin-marker,
+.google-pin-marker {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   transition: transform 0.2s var(--ease-standard);
   cursor: pointer;
-  /* Stagger scale in */
-  transform: scale(0);
+  transform-origin: 17px 44px;
+}
+
+.google-pin-marker:hover,
+.custom-pin-marker:hover {
+  transform: scale(1.15) translateY(-4px);
+}
+
+.google-pin-marker.pin-drop-anim {
+  animation: markerDropBounce 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes markerDropBounce {
+  0% { transform: translateY(-36px) scale(0.6); opacity: 0; }
+  60% { transform: translateY(4px) scale(1.05); opacity: 1; }
+  80% { transform: translateY(-2px) scale(0.98); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .custom-pin-marker.pin-scaled {
@@ -1321,7 +1339,10 @@ small, .text-label {
   filter: drop-shadow(0 2px 6px rgba(18, 49, 46, 0.3));
 }
 
-.nearest-pulse-ring {
+/* Nearest Hospital Marker Pulsing Ring */
+.nearest-pulse-ring,
+.nearest-hospital-pin .nearest-pulse-ring,
+.nearest-hospital-pin::after {
   position: absolute;
   top: 4px;
   left: 5px;
@@ -1329,13 +1350,220 @@ small, .text-label {
   height: 24px;
   border-radius: 50%;
   border: 2px solid var(--pulse);
-  animation: markerPulseRing 1.8s ease-in-out infinite;
+  animation: markerPulseRing 1.6s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes markerPulseRing {
   0% { transform: scale(0.8); opacity: 0.8; }
+  50% { transform: scale(1.8); opacity: 0.25; }
   100% { transform: scale(2.2); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nearest-pulse-ring,
+  .nearest-hospital-pin .nearest-pulse-ring,
+  .nearest-hospital-pin::after,
+  .google-pin-marker.pin-drop-anim {
+    animation: none !important;
+  }
+}
+
+/* Custom Google Maps InfoWindow Overrides */
+.gm-style .gm-style-iw-c {
+  background-color: var(--white) !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 10px 30px rgba(18, 49, 46, 0.16) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  font-family: var(--font-body) !important;
+}
+
+.gm-style .gm-style-iw-d {
+  overflow: hidden !important;
+  padding: 0 !important;
+  max-width: 310px !important;
+}
+
+.gm-style .gm-style-iw-tc::after {
+  background-color: var(--white) !important;
+}
+
+.gm-style .gm-ui-hover-effect {
+  top: 8px !important;
+  right: 8px !important;
+  border-radius: 50% !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.gm-style .gm-ui-hover-effect span {
+  background-color: var(--slate) !important;
+}
+
+/* Card Pulse Flash Highlight on Marker Click */
+@keyframes cardFlashHighlight {
+  0% {
+    background-color: rgba(232, 98, 44, 0.22);
+    border-color: var(--pulse);
+    box-shadow: 0 0 0 2px rgba(232, 98, 44, 0.4);
+  }
+  100% {
+    background-color: var(--white);
+    border-color: var(--line);
+    box-shadow: var(--card-shadow);
+  }
+}
+
+.hospital-card.card-pulse-flash {
+  animation: cardFlashHighlight 0.6s var(--ease-out) forwards !important;
+}
+
+/* Static Fallback Radar View */
+.map-fallback-container {
+  width: 100%;
+  flex: 1;
+  min-height: 480px;
+  background-color: var(--paper);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.fallback-radar-banner {
+  background-color: #f7ede2;
+  border-bottom: 1px solid var(--line);
+  color: #843b17;
+  padding: 8px 14px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 5;
+}
+
+.fallback-radar-canvas {
+  flex: 1;
+  position: relative;
+  background:
+    radial-gradient(circle at center, rgba(107, 143, 113, 0.08) 0%, transparent 70%),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(221, 213, 199, 0.4) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(221, 213, 199, 0.4) 40px);
+  min-height: 380px;
+  overflow: hidden;
+}
+
+.fallback-radar-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px dashed rgba(107, 143, 113, 0.35);
+  pointer-events: none;
+}
+
+.fallback-radar-circle.c1 { width: 120px; height: 120px; }
+.fallback-radar-circle.c2 { width: 220px; height: 220px; }
+.fallback-radar-circle.c3 { width: 320px; height: 320px; }
+
+.fallback-radar-axis-x {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(221, 213, 199, 0.8);
+  pointer-events: none;
+}
+
+.fallback-radar-axis-y {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(221, 213, 199, 0.8);
+  pointer-events: none;
+}
+
+.fallback-patient-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.fallback-patient-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--ink);
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 4px rgba(18, 49, 46, 0.2);
+  position: relative;
+}
+
+.fallback-patient-dot::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--sage);
+  animation: markerPulseRing 1.6s infinite;
+}
+
+.fallback-patient-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.fallback-pin-node {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 20;
+}
+
+.fallback-pin-node:hover {
+  transform: translate(-50%, -100%) scale(1.15);
+  z-index: 30;
+}
+
+.fallback-pin-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 2px 5px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  margin-top: 2px;
 }
 
 /* Leaflet Popup Override to match app design */

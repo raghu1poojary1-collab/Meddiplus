@@ -218,7 +218,7 @@
         <div class="cards-list-wrap" id="results-cards-list"></div>
       </div>
 
-      <!-- Right Column: Sticky Leaflet Map -->
+      <!-- Right Column: Sticky Google Maps Section -->
       <div class="map-column">
         <div class="map-sticky-wrapper">
           <div class="map-header-banner">
@@ -226,10 +226,12 @@
               <span class="pulse-dot-live"></span>
               <span>Live Geographic Radar — Moodbidri Taluk</span>
             </div>
-            <span style="font-size: 11px; opacity: 0.8;">CartoDB Voyager</span>
+            <span id="map-engine-label" style="font-size: 11px; opacity: 0.9; font-weight: 600;">Google Maps</span>
           </div>
-          <!-- Leaflet Map Mount Point -->
-          <div id="leaflet-map"></div>
+          <!-- Google Maps Mount Point -->
+          <div id="google-map" style="width: 100%; flex: 1; min-height: 480px;"></div>
+          <!-- Fallback View (gracefully displayed if API key is unconfigured or over quota) -->
+          <div id="map-fallback-view" class="map-fallback-container" style="display: none;"></div>
         </div>
       </div>
     </section>
@@ -481,12 +483,12 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toast-container"></div>
 
-  <!-- Leaflet Library (Free, OpenStreetMap & CartoDB) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-
   <!-- Application Modules -->
   <script src="./js/i18n.js"></script>
   <script src="./js/data.js"></script>
   <script src="./js/app.js"></script>
+
+  <!-- Google Maps JavaScript API with marker and geometry libraries -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap&libraries=marker,geometry" async defer id="google-maps-script"></script>
 </body>
 </html>

@@ -1,14 +1,64 @@
 /**
- * MediPulse — Core Application Logic
- * Implements 12 animations, Leaflet map with CartoDB Voyager,
- * bidirectional map-card sync, Web Speech API, OCR simulation,
- * reserve slot morphing flow, telemedicine fallback, and live Admin sync.
+ * ============================================================================
+ * GOOGLE MAPS CONFIGURATION
+ * Get your API key from https://console.cloud.google.com/
+ * ============================================================================
  */
+const GOOGLE_MAPS_API_KEY = "YOUR_API_KEY_HERE"; // get this from console.cloud.google.com
 
+// Global Google Maps Auth Failure Handler (Graceful Fallback Mode)
+window.gm_authFailure = function() {
+  console.warn("⚠️ Google Maps Authentication Failed (API Key missing or invalid). Activating graceful fallback view.");
+  if (window.mediPulseApp) {
+    window.mediPulseApp.showMapFallback();
+  } else {
+    window._mapAuthFailed = true;
+  }
+};
+
+// Global initMap callback invoked by Google Maps API script
+window.initMap = function() {
+  if (window.mediPulseApp) {
+    window.mediPulseApp.initGoogleMap();
+  } else {
+    window._pendingInitMap = true;
+  }
+};
+
+/**
+ * Custom Desaturated Map Style Palette
+ * Mutes roads/land to soft neutral tones complementing --paper (#FAF6EF) and --ink (#12312E).
+ * Hides commercial POI business icons/labels while keeping road labels and water visible.
+ */
+const GOOGLE_MAPS_STYLES = [
+  { elementType: "geometry", stylers: [{ color: "#FAF6EF" }] },
+  { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+  { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
+  { featureType: "poi.medical", elementType: "geometry", stylers: [{ color: "#F0EAE1" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#DDEBE7" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#46524F" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#FFFFFF" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#E8E2D5" }] },
+  { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#DDD5C7" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#46524F" }] },
+  { featureType: "road", elementType: "labels.text.stroke", stylers: [{ color: "#FAF6EF" }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#DDD5C7" }] },
+  { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#12312E" }] },
+  { featureType: "transit", stylers: [{ visibility: "off" }] }
+];
+
+/**
+ * MediPulse — Core Application Logic
+ * Implements Google Maps JavaScript API with AdvancedMarkerElement,
+ * custom SVG teardrop pins, animated dashed polyline, bidirectional sync,
+ * Web Speech API, OCR simulation, and live Admin sync.
+ */
 class MediPulseApp {
   constructor() {
     this.map = null;
     this.markers = {};
+    this.infoWindows = {};
     this.routePolyline = null;
     this.selectedHospitalId = null;
     this.currentSearchMode = 'type'; // 'type', 'speak', 'upload'
@@ -18,6 +68,15 @@ class MediPulseApp {
     this.isListening = false;
     this.adminLoggedIn = false;
     this.adminCurrentHospitalId = "hosp-alvas";
+
+    // Patient location: Default centered on Moodbidri, Karnataka (13.0733° N, 74.9958° E)
+    this.patientLocation = {
+      lat: 13.0733,
+      lng: 74.9958,
+      name: "Moodbidri Town Bus Stand, Karnataka"
+    };
+    this.patientMarker = null;
+    this.mapEngine = 'google'; // 'google' | 'fallback'
 
     this.init();
   }
@@ -38,13 +97,16 @@ class MediPulseApp {
     this.setupHowItWorksObserver();
     this.setupAdminDashboard();
 
-    // 3. Initialize Leaflet Map
-    this.initLeafletMap();
+    // 3. Recenter with HTML5 Geolocation (fallback to default Moodbidri coordinates)
+    this.setupGeolocation();
 
-    // 4. Initial Render
+    // 4. Initialize Google Maps Engine
+    this.initMapEngine();
+
+    // 5. Initial Render
     this.renderResults();
 
-    // 5. Subscribe to DataStore updates
+    // 6. Subscribe to DataStore updates
     window.dataStore.subscribe(() => {
       this.renderResults();
       this.renderAdminView();
@@ -53,6 +115,60 @@ class MediPulseApp {
 
     // Run signature load animation transition
     this.runSignatureLoadTransition();
+  }
+
+  /* ==========================================================================
+     GEOLOCATION & RECENTERING
+     ========================================================================== */
+  setupGeolocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          this.patientLocation.lat = pos.coords.latitude;
+          this.patientLocation.lng = pos.coords.longitude;
+          this.patientLocation.name = "Your Live Location";
+
+          if (this.map) {
+            this.map.panTo({ lat: this.patientLocation.lat, lng: this.patientLocation.lng });
+            if (this.patientMarker) {
+              if (this.patientMarker.setPosition) {
+                this.patientMarker.setPosition(this.patientLocation);
+              } else if (this.patientMarker.position) {
+                this.patientMarker.position = this.patientLocation;
+              }
+            }
+            this.fitBoundsWithPatient();
+          }
+        },
+        (err) => {
+          console.info("Geolocation declined or unavailable. Centered on Moodbidri default coordinates.", err.message);
+        },
+        { timeout: 6000, maximumAge: 60000 }
+      );
+    }
+  }
+
+  /* ==========================================================================
+     MAP ENGINE INITIALIZATION & FALLBACK
+     ========================================================================== */
+  initMapEngine() {
+    if (window._mapAuthFailed) {
+      this.showMapFallback();
+      return;
+    }
+
+    if (window._pendingInitMap || (typeof google !== 'undefined' && google.maps && google.maps.Map)) {
+      this.initGoogleMap();
+      return;
+    }
+
+    // Safety timeout: If Google Maps script hasn't loaded (e.g. invalid key or network block), activate fallback
+    setTimeout(() => {
+      if (!this.map) {
+        console.info("Google Maps not ready after timeout. Activating graceful fallback view.");
+        this.showMapFallback();
+      }
+    }, 2200);
   }
 
   /* ==========================================================================
@@ -299,109 +415,221 @@ class MediPulseApp {
   }
 
   /* ==========================================================================
-     LEAFLET MAP INTEGRATION (CartoDB Voyager, Custom SVG Pins, Polyline Route)
+     GOOGLE MAPS PLATFORM INTEGRATION
+     AdvancedMarkerElement, Custom SVG Teardrop Pins, Custom InfoWindows,
+     Dashed Growing Polyline, Bidirectional Sync, and Fallback Radar.
      ========================================================================== */
-  initLeafletMap() {
-    const mapContainer = document.getElementById('leaflet-map');
-    if (!mapContainer || typeof L === 'undefined') return;
+  initGoogleMap() {
+    const mapContainer = document.getElementById('google-map');
+    if (!mapContainer || typeof google === 'undefined' || !google.maps) {
+      this.showMapFallback();
+      return;
+    }
 
-    // Centered on Moodbidri, Karnataka
-    this.map = L.map('leaflet-map', {
-      center: [DEFAULT_PATIENT_LOCATION.lat, DEFAULT_PATIENT_LOCATION.lng],
-      zoom: 13,
-      zoomControl: false,
-      scrollWheelZoom: false
-    });
+    try {
+      this.mapEngine = 'google';
+      const fallbackView = document.getElementById('map-fallback-view');
+      if (fallbackView) fallbackView.style.display = 'none';
+      mapContainer.style.display = 'block';
 
-    L.control.zoom({ position: 'topright' }).addTo(this.map);
+      const engineLabel = document.getElementById('map-engine-label');
+      if (engineLabel) engineLabel.textContent = 'Google Maps Platform';
 
-    // CartoDB Voyager tile layer (clean, desaturated palette matching --paper / --ink)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap © CARTO',
-      maxZoom: 19
-    }).addTo(this.map);
+      // Centered on patient location (Moodbidri default or live GPS)
+      this.map = new google.maps.Map(mapContainer, {
+        center: { lat: this.patientLocation.lat, lng: this.patientLocation.lng },
+        zoom: 13,
+        styles: GOOGLE_MAPS_STYLES,
+        mapId: "MEDIPULSE_MAP_ID",
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+        zoomControl: true,
+        zoomControlOptions: {
+          position: google.maps.ControlPosition.RIGHT_TOP
+        }
+      });
 
-    // Add Patient Marker ("You Are Here")
-    const patientIcon = L.divIcon({
-      className: 'patient-location-pin',
-      html: `
-        <div style="background-color: var(--ink); color: var(--white); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid var(--white);">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </div>
-      `,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
-    });
+      // Add Patient Location Pin ("You Are Here")
+      this.addPatientMarker();
 
-    L.marker([DEFAULT_PATIENT_LOCATION.lat, DEFAULT_PATIENT_LOCATION.lng], { icon: patientIcon })
-      .addTo(this.map)
-      .bindPopup(`<div style="padding: 8px; font-weight: 600; font-size: 13px;">${DEFAULT_PATIENT_LOCATION.name} (You are here)</div>`);
-
-    this.refreshMapMarkers();
+      // Render Hospital Markers
+      this.refreshMapMarkers();
+    } catch (e) {
+      console.error("Error creating Google Map instance:", e);
+      this.showMapFallback();
+    }
   }
 
+  addPatientMarker() {
+    if (!this.map || typeof google === 'undefined' || !google.maps) return;
+
+    const patientPinHtml = `
+      <div style="background-color: var(--ink); color: var(--white); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(18, 49, 46, 0.35); border: 2.5px solid var(--white);">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+    `;
+
+    if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+      const pinContainer = document.createElement('div');
+      pinContainer.innerHTML = patientPinHtml;
+      this.patientMarker = new google.maps.marker.AdvancedMarkerElement({
+        map: this.map,
+        position: { lat: this.patientLocation.lat, lng: this.patientLocation.lng },
+        title: this.patientLocation.name,
+        content: pinContainer
+      });
+    } else {
+      this.patientMarker = new google.maps.Marker({
+        map: this.map,
+        position: { lat: this.patientLocation.lat, lng: this.patientLocation.lng },
+        title: this.patientLocation.name
+      });
+    }
+  }
+
+  /* ==========================================================================
+     CUSTOM ADVANCED MARKERS & AUTO-FIT BOUNDS
+     ========================================================================== */
   refreshMapMarkers() {
-    if (!this.map) return;
+    if (this.mapEngine === 'fallback' || !this.map) {
+      this.renderFallbackRadar();
+      return;
+    }
 
     // Remove existing markers
-    Object.values(this.markers).forEach(m => this.map.removeLayer(m));
+    Object.values(this.markers).forEach(m => {
+      if (m.setMap) m.setMap(null);
+      if (m.map) m.map = null;
+    });
     this.markers = {};
+    this.infoWindows = {};
 
-    const hospitals = window.dataStore.getAll();
-    const bounds = L.latLngBounds([[DEFAULT_PATIENT_LOCATION.lat, DEFAULT_PATIENT_LOCATION.lng]]);
+    if (this.routePolyline) {
+      this.routePolyline.setMap(null);
+      this.routePolyline = null;
+    }
 
-    hospitals.forEach((h, index) => {
-      bounds.extend([h.lat, h.lng]);
+    const hospitals = this.getFilteredHospitals();
+    const bounds = new google.maps.LatLngBounds();
+    bounds.extend(new google.maps.LatLng(this.patientLocation.lat, this.patientLocation.lng));
 
-      // Calculate availability flags
+    // Sort by distance rank
+    const sortedHospitals = [...hospitals].sort((a, b) => a.distanceKm - b.distanceKm);
+
+    sortedHospitals.forEach((h, index) => {
+      bounds.extend(new google.maps.LatLng(h.lat, h.lng));
+
+      // Check live availability flags
       const hasOnDutyDoctor = h.doctors.some(d => d.onDuty);
       const hasInStockMed = h.medicines.some(m => m.stock > 0);
       const hasVaccines = h.vaccines.some(v => v.doses > 0);
       const isAvailable = hasOnDutyDoctor && (hasInStockMed || hasVaccines);
 
-      const dotBadgeColor = isAvailable ? 'var(--pulse)' : '#8c9794';
+      const dotBadgeColor = isAvailable ? '#E8622C' : '#8c9794'; // var(--pulse) or muted gray
 
-      // SVG teardrop pin with status badge
-      const markerHtml = `
-        <div class="custom-pin-marker" id="pin-${h.id}">
-          ${h.isNearest ? '<div class="nearest-pulse-ring"></div>' : ''}
-          <svg class="pin-svg-body" viewBox="0 0 34 44" fill="none">
-            <path d="M17 0C7.61 0 0 7.61 0 17C0 29.75 17 44 17 44C17 44 34 29.75 34 17C34 7.61 26.39 0 17 0Z" fill="var(--ink)"/>
-            <circle cx="17" cy="16" r="10" fill="var(--paper)"/>
-            <circle cx="17" cy="16" r="6" fill="${dotBadgeColor}"/>
-          </svg>
-        </div>
+      // Custom HTML Pin container with SVG Teardrop in var(--ink)
+      const pinContainer = document.createElement('div');
+      pinContainer.className = `google-pin-marker ${h.isNearest ? 'nearest-hospital-pin' : ''} pin-drop-anim`;
+      pinContainer.id = `gpin-${h.id}`;
+      pinContainer.innerHTML = `
+        ${h.isNearest ? '<div class="nearest-pulse-ring"></div>' : ''}
+        <svg class="pin-svg-body" viewBox="0 0 34 44" fill="none">
+          <path d="M17 0C7.61 0 0 7.61 0 17C0 29.75 17 44 17 44C17 44 34 29.75 34 17C34 7.61 26.39 0 17 0Z" fill="var(--ink)"/>
+          <circle cx="17" cy="16" r="10" fill="var(--paper)"/>
+          <circle cx="17" cy="16" r="6" fill="${dotBadgeColor}"/>
+        </svg>
       `;
 
-      const customIcon = L.divIcon({
-        className: 'hospital-marker-icon',
-        html: markerHtml,
-        iconSize: [34, 44],
-        iconAnchor: [17, 44],
-        popupAnchor: [0, -40]
-      });
-
-      const marker = L.marker([h.lat, h.lng], { icon: customIcon }).addTo(this.map);
-
-      // Popup Content
-      marker.bindPopup(this.createPopupContent(h));
-
-      // Click Marker -> Highlight matching card & animate polyline
-      marker.on('click', () => {
-        this.selectHospital(h.id, false);
-      });
-
-      this.markers[h.id] = marker;
-
-      // Staggered CSS scale-in animation on load (150ms stagger per rank)
+      // 150ms Staggered Entrance Animation
       setTimeout(() => {
-        const pinEl = document.getElementById(`pin-${h.id}`);
-        if (pinEl) pinEl.classList.add('pin-scaled');
-      }, index * 150 + 100);
+        let marker;
+        if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+          marker = new google.maps.marker.AdvancedMarkerElement({
+            map: this.map,
+            position: { lat: h.lat, lng: h.lng },
+            title: h.name,
+            content: pinContainer
+          });
+        } else {
+          marker = new google.maps.Marker({
+            map: this.map,
+            position: { lat: h.lat, lng: h.lng },
+            title: h.name,
+            animation: google.maps.Animation.DROP
+          });
+          setTimeout(() => marker.setAnimation(null), 750);
+        }
+
+        // Custom InfoWindow matching design system (16px radius, var(--line) border)
+        const infoWindow = new google.maps.InfoWindow({
+          content: this.createPopupContent(h),
+          disableAutoPan: false
+        });
+
+        // Click Marker Listener -> Syncs with results list
+        const clickHandler = () => {
+          this.closeAllInfoWindows();
+          if (infoWindow.open) {
+            infoWindow.open({
+              map: this.map,
+              anchor: marker
+            });
+          }
+          this.selectHospital(h.id, true);
+        };
+
+        if (marker.addListener) {
+          marker.addListener('click', clickHandler);
+        } else if (marker.addEventListener) {
+          marker.addEventListener('gmp-click', clickHandler);
+        }
+        pinContainer.addEventListener('click', clickHandler);
+
+        this.markers[h.id] = marker;
+        this.infoWindows[h.id] = infoWindow;
+      }, index * 150);
     });
 
-    // Fit all markers in view initially
-    this.map.fitBounds(bounds, { padding: [40, 40] });
+    // Auto-fit bounds on every new search
+    if (this.map && sortedHospitals.length > 0) {
+      setTimeout(() => {
+        this.map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
+      }, sortedHospitals.length * 150 + 60);
+    }
+  }
+
+  fitBoundsWithPatient() {
+    if (!this.map || typeof google === 'undefined' || !google.maps) return;
+    const bounds = new google.maps.LatLngBounds();
+    bounds.extend(new google.maps.LatLng(this.patientLocation.lat, this.patientLocation.lng));
+    const hospitals = this.getFilteredHospitals();
+    hospitals.forEach(h => bounds.extend(new google.maps.LatLng(h.lat, h.lng)));
+    this.map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
+  }
+
+  getFilteredHospitals() {
+    let hospitals = window.dataStore.getAll();
+    if (this.activeFilter === 'doctor') {
+      hospitals = hospitals.filter(h => h.doctors.some(d => d.onDuty));
+    } else if (this.activeFilter === 'medicine') {
+      hospitals = hospitals.filter(h => h.medicines.some(m => m.stock > 0));
+    } else if (this.activeFilter === 'vaccine') {
+      hospitals = hospitals.filter(h => h.vaccines.some(v => v.doses > 0));
+    } else if (this.activeFilter === 'emergency') {
+      hospitals = hospitals.filter(h => h.emergency24x7);
+    }
+
+    if (this.searchQuery) {
+      hospitals = hospitals.filter(h => {
+        const matchesName = h.name.toLowerCase().includes(this.searchQuery);
+        const matchesDoctor = h.doctors.some(d => d.name.toLowerCase().includes(this.searchQuery) || d.specialty.toLowerCase().includes(this.searchQuery));
+        const matchesMed = h.medicines.some(m => m.name.toLowerCase().includes(this.searchQuery) || m.category.toLowerCase().includes(this.searchQuery));
+        const matchesVac = h.vaccines.some(v => v.name.toLowerCase().includes(this.searchQuery));
+        return matchesName || matchesDoctor || matchesMed || matchesVac;
+      });
+    }
+    return hospitals;
   }
 
   createPopupContent(hospital) {
@@ -423,28 +651,44 @@ class MediPulseApp {
     `;
   }
 
-  updateMapPopups() {
-    const hospitals = window.dataStore.getAll();
-    hospitals.forEach(h => {
-      if (this.markers[h.id]) {
-        this.markers[h.id].setPopupContent(this.createPopupContent(h));
-      }
+  closeAllInfoWindows() {
+    Object.values(this.infoWindows).forEach(iw => {
+      if (iw && iw.close) iw.close();
     });
   }
 
+  updateMapPopups() {
+    const hospitals = window.dataStore.getAll();
+    hospitals.forEach(h => {
+      if (this.infoWindows[h.id]) {
+        this.infoWindows[h.id].setContent(this.createPopupContent(h));
+      }
+    });
+    if (this.mapEngine === 'fallback') {
+      this.renderFallbackRadar();
+    }
+  }
+
   /* ==========================================================================
-     BIDIRECTIONAL CARD-MAP SYNC & GROWING POLYLINE
+     BIDIRECTIONAL CARD-MAP SYNC & GROWING POLYLINE ROUTE
      ========================================================================== */
   selectHospital(hospitalId, scrollToCard = true) {
     this.selectedHospitalId = hospitalId;
     const hospital = window.dataStore.getById(hospitalId);
     if (!hospital) return;
 
-    // 1. Highlight Card
+    // 1. Highlight matching card in results list & apply 0.6s pulse flash
     document.querySelectorAll('.hospital-card').forEach(card => {
       if (card.dataset.id === hospitalId) {
         card.classList.add('card-selected');
         card.classList.add('expanded');
+
+        // Apply brief background flash using var(--pulse) at low opacity fading over 0.6s
+        card.classList.remove('card-pulse-flash');
+        void card.offsetWidth; // Force CSS reflow to replay animation
+        card.classList.add('card-pulse-flash');
+        setTimeout(() => card.classList.remove('card-pulse-flash'), 650);
+
         if (scrollToCard) {
           card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -453,49 +697,174 @@ class MediPulseApp {
       }
     });
 
-    // 2. Pan/Fly Map to marker and open popup
+    // 2. Pan/Zoom Google Map and open InfoWindow
     if (this.map && this.markers[hospitalId]) {
-      this.map.flyTo([hospital.lat, hospital.lng], 14, { duration: 0.8 });
-      this.markers[hospitalId].openPopup();
-    }
+      const targetPos = { lat: hospital.lat, lng: hospital.lng };
+      this.map.panTo(targetPos);
+      this.map.setZoom(14);
 
-    // 3. Draw animated polyline from patient to hospital marker
-    this.drawAnimatedPolyline([DEFAULT_PATIENT_LOCATION.lat, DEFAULT_PATIENT_LOCATION.lng], [hospital.lat, hospital.lng]);
+      this.closeAllInfoWindows();
+      if (this.infoWindows[hospitalId]) {
+        this.infoWindows[hospitalId].open({
+          map: this.map,
+          anchor: this.markers[hospitalId]
+        });
+      }
+
+      // 3. Draw animated thin dashed route polyline in var(--sage)
+      this.drawAnimatedPolyline(this.patientLocation, targetPos);
+    } else if (this.mapEngine === 'fallback') {
+      this.highlightFallbackPin(hospitalId);
+    }
   }
 
-  drawAnimatedPolyline(startCoord, endCoord) {
-    if (!this.map) return;
+  /**
+   * Draws a google.maps.Polyline from patient to selected hospital.
+   * Styled as a thin dashed line in var(--sage) using strokeOpacity: 0 and icons pattern.
+   * Incrementally extends path array over ~0.6s.
+   */
+  drawAnimatedPolyline(startPos, destPos) {
+    if (!this.map || typeof google === 'undefined' || !google.maps) return;
 
-    // Remove previous polyline
     if (this.routePolyline) {
-      this.map.removeLayer(this.routePolyline);
+      this.routePolyline.setMap(null);
+      this.routePolyline = null;
     }
 
-    // Generate intermediate points to simulate smooth growing line
-    const steps = 12;
+    const lineSymbol = {
+      path: 'M 0,-1 0,1',
+      strokeOpacity: 1,
+      strokeColor: '#6B8F71', // var(--sage)
+      scale: 3
+    };
+
+    const startLatLng = new google.maps.LatLng(startPos.lat, startPos.lng);
+
+    this.routePolyline = new google.maps.Polyline({
+      path: [startLatLng],
+      strokeColor: '#6B8F71',
+      strokeOpacity: 0,
+      icons: [{
+        icon: lineSymbol,
+        offset: '0',
+        repeat: '10px'
+      }],
+      map: this.map
+    });
+
+    // Interpolate 18 intermediate points for 600ms growth duration
+    const steps = 18;
     const points = [];
     for (let i = 0; i <= steps; i++) {
-      const lat = startCoord[0] + (endCoord[0] - startCoord[0]) * (i / steps);
-      const lng = startCoord[1] + (endCoord[1] - startCoord[1]) * (i / steps);
-      points.push([lat, lng]);
+      const lat = startPos.lat + (destPos.lat - startPos.lat) * (i / steps);
+      const lng = startPos.lng + (destPos.lng - startPos.lng) * (i / steps);
+      points.push(new google.maps.LatLng(lat, lng));
     }
 
-    this.routePolyline = L.polyline([startCoord], {
-      color: 'var(--sage)',
-      weight: 3,
-      dashArray: '6, 8',
-      opacity: 0.9
-    }).addTo(this.map);
-
-    let currentStep = 1;
+    let step = 1;
     const interval = setInterval(() => {
-      if (currentStep <= steps) {
-        this.routePolyline.setLatLngs(points.slice(0, currentStep + 1));
-        currentStep++;
+      if (step <= steps && this.routePolyline) {
+        this.routePolyline.setPath(points.slice(0, step + 1));
+        step++;
       } else {
         clearInterval(interval);
       }
-    }, 50); // 12 * 50ms = 600ms growth duration
+    }, 33); // 18 * 33ms ~ 600ms
+  }
+
+  /* ==========================================================================
+     GRACEFUL STATIC FALLBACK VIEW (When Google Maps key is missing/unconfigured)
+     ========================================================================== */
+  showMapFallback() {
+    this.mapEngine = 'fallback';
+    const googleMapEl = document.getElementById('google-map');
+    const fallbackEl = document.getElementById('map-fallback-view');
+    const engineLabel = document.getElementById('map-engine-label');
+
+    if (googleMapEl) googleMapEl.style.display = 'none';
+    if (fallbackEl) fallbackEl.style.display = 'flex';
+    if (engineLabel) engineLabel.textContent = 'Calibrated Radar (Fallback)';
+
+    this.renderFallbackRadar();
+  }
+
+  renderFallbackRadar() {
+    const fallbackEl = document.getElementById('map-fallback-view');
+    if (!fallbackEl) return;
+
+    const hospitals = this.getFilteredHospitals();
+    const centerLat = this.patientLocation.lat;
+    const centerLng = this.patientLocation.lng;
+
+    let maxDeltaLat = 0.025;
+    let maxDeltaLng = 0.025;
+    hospitals.forEach(h => {
+      const dLat = Math.abs(h.lat - centerLat);
+      const dLng = Math.abs(h.lng - centerLng);
+      if (dLat > maxDeltaLat) maxDeltaLat = dLat;
+      if (dLng > maxDeltaLng) maxDeltaLng = dLng;
+    });
+
+    const scale = Math.max(maxDeltaLat, maxDeltaLng) * 1.35;
+
+    fallbackEl.innerHTML = `
+      <div class="fallback-radar-banner">
+        <span>📍 <strong>Calibrated Geographic Radar (Offline Fallback)</strong></span>
+        <span style="opacity: 0.85; font-size: 11px;">Syncs live with cards</span>
+      </div>
+      <div class="fallback-radar-canvas" id="fallback-canvas">
+        <div class="fallback-radar-circle c1" title="1.5 km radius"></div>
+        <div class="fallback-radar-circle c2" title="3.0 km radius"></div>
+        <div class="fallback-radar-circle c3" title="5.0 km radius"></div>
+        <div class="fallback-radar-axis-x"></div>
+        <div class="fallback-radar-axis-y"></div>
+
+        <div class="fallback-patient-center">
+          <div class="fallback-patient-dot"></div>
+          <span class="fallback-patient-label">You (Moodbidri)</span>
+        </div>
+
+        ${hospitals.map(h => {
+          const deltaLat = h.lat - centerLat;
+          const deltaLng = h.lng - centerLng;
+          const leftPercent = Math.min(90, Math.max(10, 50 + (deltaLng / scale) * 42));
+          const topPercent = Math.min(90, Math.max(10, 50 - (deltaLat / scale) * 42));
+
+          const hasOnDuty = h.doctors.some(d => d.onDuty);
+          const hasMeds = h.medicines.some(m => m.stock > 0);
+          const hasVacs = h.vaccines.some(v => v.doses > 0);
+          const isAvailable = hasOnDuty && (hasMeds || hasVacs);
+          const dotColor = isAvailable ? '#E8622C' : '#8c9794';
+
+          return `
+            <div class="fallback-pin-node ${h.isNearest ? 'nearest-hospital-pin' : ''} ${this.selectedHospitalId === h.id ? 'pin-active-target' : ''}"
+                 id="fpin-${h.id}"
+                 style="top: ${topPercent}%; left: ${leftPercent}%;"
+                 onclick="window.mediPulseApp.selectHospital('${h.id}', true)">
+              ${h.isNearest ? '<div class="nearest-pulse-ring"></div>' : ''}
+              <svg class="pin-svg-body" style="width: 28px; height: 36px;" viewBox="0 0 34 44" fill="none">
+                <path d="M17 0C7.61 0 0 7.61 0 17C0 29.75 17 44 17 44C17 44 34 29.75 34 17C34 7.61 26.39 0 17 0Z" fill="var(--ink)"/>
+                <circle cx="17" cy="16" r="10" fill="var(--paper)"/>
+                <circle cx="17" cy="16" r="6" fill="${dotColor}"/>
+              </svg>
+              <div class="fallback-pin-label">${h.distanceKm} km • ${h.name.split(' ')[0]}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  highlightFallbackPin(hospitalId) {
+    document.querySelectorAll('.fallback-pin-node').forEach(pin => {
+      if (pin.id === `fpin-${hospitalId}`) {
+        pin.style.transform = 'translate(-50%, -100%) scale(1.3)';
+        pin.style.zIndex = '50';
+      } else {
+        pin.style.transform = 'translate(-50%, -100%) scale(1)';
+        pin.style.zIndex = '20';
+      }
+    });
   }
 
   /* ==========================================================================

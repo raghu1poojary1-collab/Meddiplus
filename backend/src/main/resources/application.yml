@@ -1,0 +1,130 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: medipulse-backend
+
+  # ===================================================================
+  # DATASOURCE (MySQL 8.0 by default, override via ENV variables)
+  # ===================================================================
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/medipulse?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:admin123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: MediPulseHikariPool
+      maximum-pool-size: 15
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 20000
+
+  # ===================================================================
+  # JPA & HIBERNATE CONFIGURATION
+  # ===================================================================
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate # Flyway executes and tracks all schema migrations
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: false
+
+  # ===================================================================
+  # FLYWAY DATABASE MIGRATIONS
+  # ===================================================================
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
+
+  # ===================================================================
+  # CAFFEINE IN-MEMORY CACHE
+  # ===================================================================
+  cache:
+    type: caffeine
+    cache-names:
+      - hospitalSearchResults
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=15s,recordStats
+
+# ===================================================================
+# MEDIPULSE DOMAIN CONFIGURATIONS
+# ===================================================================
+medipulse:
+  # Phase 2: Freshness-Weighted Ranking Algorithm Configuration
+  # score = (1 / (1 + distanceKm)) * distanceWeight + (1 / (1 + minutesSinceUpdate)) * freshnessWeight
+  ranking:
+    distance-weight: 0.6
+    freshness-weight: 0.4
+
+  # Phase 8: JWT Authentication
+  jwt:
+    secret: MedPulseSecretKeyForJwtAuthenticationSuperSecure32BytesLongMinimumKey!
+    expiration-ms: 86400000 # 24 Hours in milliseconds
+
+  # Phase 4 & Phase 9: Mock Mode Toggles
+  # Allows full out-of-the-box demo without paid Twilio/SendGrid/WhatsApp keys
+  mock-mode:
+    notifications: true
+    ocr: true
+
+  # Notification Outbox Poller configuration
+  outbox:
+    fixed-delay-ms: 2500
+    batch-size: 10
+    max-retries: 3
+
+# ===================================================================
+# RESILIENCE4J (Circuit Breakers & Rate Limiters)
+# ===================================================================
+resilience4j:
+  circuitbreaker:
+    instances:
+      ocrService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50.0
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+      notificationService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50.0
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 2
+
+  ratelimiter:
+    instances:
+      searchRateLimiter:
+        limitForPeriod: 30
+        limitRefreshPeriod: 60s
+        timeoutDuration: 0ms
+
+# ===================================================================
+# ACTUATOR & LOGGING
+# ===================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers,caches
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.medipulse: DEBUG
+    org.springframework.cache: DEBUG
+    io.github.resilience4j: INFO

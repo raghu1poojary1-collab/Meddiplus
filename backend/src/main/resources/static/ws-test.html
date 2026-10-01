@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MediPulse — Real-Time WebSocket Tester</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #FAF6EF;
+      color: #12312E;
+      margin: 0;
+      padding: 24px;
+    }
+    .card {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #FFF;
+      border: 1px solid #DDD5C7;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    }
+    h1 {
+      margin-top: 0;
+      color: #12312E;
+      font-size: 22px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-disconnected { background: #fee2e2; color: #991b1b; }
+    .badge-connected { background: #dcfce7; color: #166534; }
+    .controls {
+      margin: 16px 0;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    button {
+      background: #12312E;
+      color: #FFF;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: #1e4f4b; }
+    #log {
+      height: 350px;
+      overflow-y: auto;
+      background: #12312E;
+      color: #A3E635;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+      padding: 16px;
+      border-radius: 8px;
+    }
+    .msg-item {
+      margin-bottom: 8px;
+      border-bottom: 1px dashed rgba(255,255,255,0.15);
+      padding-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🏥 MediPulse Live WebSocket Monitor</h1>
+    <p>Subscribes to <code>/topic/hospital/1/availability</code> and <code>/topic/availability</code> to stream real-time doctor, medicine, and vaccine inventory events.</p>
+    
+    <div class="controls">
+      <span id="status" class="badge badge-disconnected">DISCONNECTED</span>
+      <button onclick="connect()">Connect STOMP</button>
+      <button onclick="disconnect()">Disconnect</button>
+      <button onclick="clearLogs()" style="background: #46524F;">Clear Log</button>
+    </div>
+
+    <div id="log">Logs will appear here once connected...</div>
+  </div>
+
+  <script>
+    let stompClient = null;
+
+    function connect() {
+      const socket = new SockJS('/ws');
+      stompClient = Stomp.over(socket);
+      stompClient.debug = null; // suppress internal console logs
+
+      stompClient.connect({}, function (frame) {
+        document.getElementById('status').className = 'badge badge-connected';
+        document.getElementById('status').innerText = 'CONNECTED';
+        logMessage("Connected to MediPulse WebSocket broker: " + frame);
+
+        // Subscribe to Hospital 1 (Alva's Health Centre)
+        stompClient.subscribe('/topic/hospital/1/availability', function (msg) {
+          logMessage("🔔 [Hospital 1 Topic] Received: " + msg.body);
+        });
+
+        // Subscribe to Global Availability Topic
+        stompClient.subscribe('/topic/availability', function (msg) {
+          logMessage("🌐 [Global Topic] Received: " + msg.body);
+        });
+      }, function (err) {
+        document.getElementById('status').className = 'badge badge-disconnected';
+        document.getElementById('status').innerText = 'DISCONNECTED';
+        logMessage("❌ STOMP Error: " + err);
+      });
+    }
+
+    function disconnect() {
+      if (stompClient !== null) {
+        stompClient.disconnect();
+      }
+      document.getElementById('status').className = 'badge badge-disconnected';
+      document.getElementById('status').innerText = 'DISCONNECTED';
+      logMessage("Disconnected from WebSocket broker.");
+    }
+
+    function logMessage(text) {
+      const logDiv = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      const item = document.createElement('div');
+      item.className = 'msg-item';
+      item.innerText = `[${time}] ${text}`;
+      logDiv.appendChild(item);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function clearLogs() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    // Auto-connect on load
+    window.onload = connect;
+  </script>
+</body>
+</html>

@@ -41,7 +41,7 @@ MediPulse is a real-time healthcare availability platform engineered for semi-ur
 ## 📂 Architecture
 
 ```
-├── index.html         # Page 1: Public Patient Portal
+├── index.html         # Page 1: Public Patient Portal (Web Speech, Leaflet, OCR)
 ├── admin.html         # Page 2: Hospital Staff Admin Dashboard
 ├── css/
 │   └── style.css      # Design tokens, responsive grid, 12 animations, RTL rules
@@ -49,6 +49,20 @@ MediPulse is a real-time healthcare availability platform engineered for semi-ur
 │   ├── i18n.js        # 10-language translation dictionary & Web Speech mapping
 │   ├── data.js        # Moodbidri health facilities mock store & live event bus
 │   └── app.js         # Leaflet map, polyline route, voice search, OCR & reservations
+├── backend/           # Production-Grade Spring Boot 3.3 Modular Monolith
+│   ├── pom.xml        # Maven build (Java 21, Spring Boot 3.3.4, Resilience4j, Caffeine)
+│   ├── src/main/java/com/medipulse/
+│   │   ├── availability/  # Freshness-Weighted Ranking Algorithm + Search
+│   │   ├── booking/       # Optimistic Locking (@Version) + Outbox Writer
+│   │   ├── notification/  # Transactional Outbox Poller + Resilience4j Circuit Breaker
+│   │   ├── admin/         # Hospital Staff Portal + Decoupled Event Listeners
+│   │   ├── ocr/           # Prescription OCR with Circuit Breaker
+│   │   ├── realtime/      # Spring WebSocket + STOMP Live Availability Broadcast
+│   │   └── common/        # Haversine distance, Security, JWT, Error Handling
+│   └── src/main/resources/
+│       ├── application.yml
+│       ├── db/migration/  # Flyway V1 schema & V2 realistic Moodbidri seed data
+│       └── static/ws-test.html # Built-in WebSocket tester
 └── README.md
 ```
 
@@ -56,6 +70,7 @@ MediPulse is a real-time healthcare availability platform engineered for semi-ur
 
 ## 🚀 Running Locally
 
+### 1. Frontend (Static Web Portal)
 You can run MediPulse using any standard static file server or Python:
 
 ```bash
@@ -70,9 +85,32 @@ Open your browser at:
 - **Patient Portal (Page 1):** [http://localhost:3000/](http://localhost:3000/)
 - **Staff Admin Portal (Page 2):** [http://localhost:3000/admin.html](http://localhost:3000/admin.html)
 
+### 2. Backend (Spring Boot 3.3.4 Modular Monolith)
+Navigate to the `backend/` directory:
+
+```bash
+cd backend
+
+# Option A: Run with local MySQL 8.0 (Flyway auto-migrates V1 schema + V2 seed data)
+mvn clean spring-boot:run
+
+# Option B: Run with zero-setup In-Memory H2 Mode
+mvn clean spring-boot:run -Dspring-boot.run.profiles=test
+
+# Run full test suite (Concurrency test, Ranking proof, Cache eviction, Circuit breakers)
+mvn test
+```
+
+- **Backend REST API:** [http://localhost:8080/api/search](http://localhost:8080/api/search)
+- **Live WebSocket Test Page:** [http://localhost:8080/ws-test.html](http://localhost:8080/ws-test.html)
+
 ### Hospital Staff Demo Credentials
-- **Staff ID:** `admin`
-- **PIN / Password:** `medipulse2025`
+- **Frontend Demo:** Staff ID: `admin` | PIN: `medipulse2025`
+- **Backend JWT Auth:**
+  - Alva's Health Centre: `alvas_admin` / `admin123`
+  - Government CHC Moodbidri: `chc_admin` / `admin123`
+  - Prasad Hospital: `prasad_admin` / `admin123`
+  - Super Admin: `super_admin` / `admin123`
 
 ---
 
