@@ -44,16 +44,18 @@ jobs:
 
       # ── Embarko auto-deploy ──────────────────────────────────────────────────
       # Every push to main also updates https://medipulse-live.embarko.app
-      # Add your token: repo Settings → Secrets → Actions → New secret
-      #   Name:  EMBARKO_TOKEN
-      #   Value: emb_8c678fa4d6eeed3000...  (your token from the email)
+      # Requires secret: Settings → Secrets → Actions → EMBARKO_TOKEN
+      # This step is optional — it never blocks the GitHub Pages deploy above.
       - name: Package static files for Embarko
+        if: ${{ secrets.EMBARKO_TOKEN != '' }}
         run: |
           tar -czf /tmp/medipulse.tar.gz \
             index.html hospital.html admin.html \
             css/ js/
 
       - name: Deploy to Embarko
+        if: ${{ secrets.EMBARKO_TOKEN != '' }}
+        continue-on-error: true
         run: |
           curl -sS -X POST "https://ship.embarko.ai/apps" \
             -H "X-App-Name: medipulse-live" \
