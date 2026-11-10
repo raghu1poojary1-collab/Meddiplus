@@ -646,7 +646,7 @@ class MediPulseApp {
           <div><strong style="color: ${inStockCount > 0 ? 'var(--pulse)' : 'var(--danger-soft)'};">●</strong> ${inStockCount} ${window.i18n.get('medicinesAvailable')}</div>
           <div><strong style="color: ${totalDoses > 0 ? 'var(--pulse)' : 'var(--danger-soft)'};">●</strong> ${totalDoses} ${window.i18n.get('dosesAvailable')}</div>
         </div>
-        <button class="map-popup-btn" onclick="window.mediPulseApp.selectHospital('${hospital.id}', true)">${window.i18n.get('expandDetails')}</button>
+        <a href="./hospital.html?id=${hospital.id}" class="map-popup-btn" style="text-decoration:none;display:block;">${window.i18n.get('expandDetails')}</a>
       </div>
     `;
   }
@@ -920,10 +920,8 @@ class MediPulseApp {
       const inStockMeds = h.medicines.filter(m => m.stock > 0);
       const totalVaccineDoses = h.vaccines.reduce((acc, v) => acc + v.doses, 0);
 
-      const isExpanded = this.selectedHospitalId === h.id;
-
       return `
-        <article class="hospital-card ${isExpanded ? 'expanded card-selected' : ''}" data-id="${h.id}" style="animation-delay: ${idx * 60}ms;">
+        <article class="hospital-card" data-id="${h.id}" style="animation-delay: ${idx * 60}ms;">
           <div class="card-top-row">
             <div>
               <h2 class="card-hospital-title">${h.name}</h2>
@@ -942,7 +940,6 @@ class MediPulseApp {
 
           <!-- 3 Availability Badges Strip -->
           <div class="badges-container">
-            <!-- Doctor Badge -->
             <div class="badge-item ${onDutyCount > 0 ? 'badge-live' : 'badge-off'}">
               <span class="${onDutyCount > 0 ? 'pulse-dot-live' : 'dot-static-off'}"></span>
               <div>
@@ -951,16 +948,14 @@ class MediPulseApp {
               </div>
             </div>
 
-            <!-- Medicine Badge -->
             <div class="badge-item ${inStockMeds.length > 0 ? 'badge-live' : 'badge-off'}">
               <span class="${inStockMeds.length > 0 ? 'pulse-dot-live' : 'dot-static-off'}"></span>
               <div>
                 <span class="badge-text-title">${inStockMeds.length > 0 ? `${inStockMeds.length} ${window.i18n.get('inStock')}` : window.i18n.get('outOfStock')}</span>
-                <span class="badge-text-desc">${inStockMeds.slice(0, 2).map(m => m.name.split(' ')[0]).join(', ')}...</span>
+                <span class="badge-text-desc">${inStockMeds.slice(0, 2).map(m => m.name.split(' ')[0]).join(', ')}${inStockMeds.length > 0 ? '...' : ''}</span>
               </div>
             </div>
 
-            <!-- Vaccine Badge -->
             <div class="badge-item ${totalVaccineDoses > 0 ? 'badge-live' : 'badge-off'}">
               <span class="${totalVaccineDoses > 0 ? 'pulse-dot-live' : 'dot-static-off'}"></span>
               <div>
@@ -970,159 +965,21 @@ class MediPulseApp {
             </div>
           </div>
 
-          <!-- Toggle details button -->
-          <button class="card-expand-toggle-btn" aria-label="Toggle details">
-            <span class="expand-btn-text">${isExpanded ? window.i18n.get('collapseDetails') : window.i18n.get('expandDetails')}</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-
-          <!-- 6. Inline Expandable Details Accordion -->
-          <div class="card-details-accordion">
-            <!-- Doctor Roster -->
-            <div class="detail-section-title">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>${window.i18n.get('dutyRosterTitle')}</span>
-            </div>
-            <table class="detail-table-card">
-              <thead>
-                <tr>
-                  <th>Doctor & Qualification</th>
-                  <th>Specialty</th>
-                  <th>Shift Hours</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${h.doctors.map(d => `
-                  <tr>
-                    <td><strong>${d.name}</strong><br><small style="color: var(--slate);">${d.qualification}</small></td>
-                    <td>${d.specialty}</td>
-                    <td>${d.shift}</td>
-                    <td>
-                      <span style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: ${d.onDuty ? 'var(--pulse)' : 'var(--danger-soft)'};">
-                        <span class="${d.onDuty ? 'pulse-dot-live' : 'dot-static-off'}"></span>
-                        ${d.onDuty ? window.i18n.get('onDuty') : window.i18n.get('offDuty')}
-                      </span>
-                    </td>
-                    <td>
-                      ${!d.onDuty ? `
-                        <!-- 8. Telemedicine Fallback Button with one-time attention pulse -->
-                        <button class="btn-telemedicine" onclick="event.stopPropagation(); window.mediPulseApp.openTelemedicineModal('${d.name}', '${d.specialty}', '${h.name}')">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                          ${window.i18n.get('telemedicineBtn')}
-                        </button>
-                      ` : `<span style="font-size: 12px; color: var(--slate);">Queue: ${d.queueCount}</span>`}
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-
-            <!-- Medicine Inventory -->
-            <div class="detail-section-title">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              <span>${window.i18n.get('medicineTitle')}</span>
-            </div>
-            <table class="detail-table-card">
-              <thead>
-                <tr>
-                  <th>Medicine</th>
-                  <th>Category</th>
-                  <th>Stock Available</th>
-                  <th>Subsidized Pricing</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${h.medicines.map(m => `
-                  <tr>
-                    <td><strong>${m.name}</strong></td>
-                    <td>${m.category}</td>
-                    <td>
-                      <span style="font-weight: 600; color: ${m.stock === 0 ? 'var(--danger-soft)' : m.stock < m.threshold ? '#b85c18' : 'var(--ink)'};">
-                        ${m.stock} ${m.unit}
-                        ${m.stock === 0 ? `(${window.i18n.get('outOfStock')})` : m.stock < m.threshold ? `(${window.i18n.get('lowStock')})` : ''}
-                      </span>
-                    </td>
-                    <td>${m.price}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-
-            <!-- Vaccine Batches -->
-            <div class="detail-section-title">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/></svg>
-              <span>${window.i18n.get('vaccineTitle')}</span>
-            </div>
-            <table class="detail-table-card">
-              <thead>
-                <tr>
-                  <th>Vaccine</th>
-                  <th>Batch Number</th>
-                  <th>Available Doses</th>
-                  <th>Expiry Date</th>
-                  <th>Cold Chain Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${h.vaccines.map(v => `
-                  <tr>
-                    <td><strong>${v.name}</strong></td>
-                    <td><code>${v.batch}</code></td>
-                    <td><strong style="color: ${v.doses > 0 ? 'var(--ink)' : 'var(--danger-soft)'};">${v.doses} doses</strong></td>
-                    <td>${v.expiry}</td>
-                    <td><span style="color: var(--sage); font-weight: 600;">✓ ${v.coldChainStatus}</span></td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-
-            <!-- 7. Reserve Slot Action Bar (Morphing button flow) -->
-            <div class="card-action-bar">
-              <button class="btn-reserve-slot" id="btn-reserve-${h.id}" onclick="event.stopPropagation(); window.mediPulseApp.handleReserveSlot('${h.id}')">
-                <span class="slot-spinner"></span>
-                <span class="btn-reserve-label">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="19" y2="10"/></svg>
-                  ${window.i18n.get('reserveSlot')}
-                </span>
-              </button>
-
-              <div class="secondary-action-group">
-                <a href="https://maps.google.com/?q=${h.lat},${h.lng}" target="_blank" rel="noopener" class="btn-secondary-link" onclick="event.stopPropagation();">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 8 8 12 12 16 12 8"/></svg>
-                  ${window.i18n.get('directionsBtn')}
-                </a>
-                <a href="tel:${h.phone}" class="btn-secondary-link" onclick="event.stopPropagation();">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  ${window.i18n.get('callHospitalBtn')}
-                </a>
-              </div>
-            </div>
-
-            <!-- Confirmation Strip (Slides down after reservation) -->
-            <div class="reserve-confirm-strip" id="confirm-strip-${h.id}">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              <span>${window.i18n.get('smsSentNotice')}</span>
-            </div>
-          </div>
+          <!-- View Full Details Link -->
+          <a href="./hospital.html?id=${h.id}" class="card-view-details-btn" onclick="event.stopPropagation();">
+            <span>${window.i18n.get('expandDetails')}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
         </article>
       `;
     }).join('');
 
-    // Attach card click handlers for accordion expand and map sync
+    // Clicking anywhere on the card navigates to the detail page
     container.querySelectorAll('.hospital-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        // Prevent toggle if clicking interactive elements inside
-        if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) return;
+        if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
         const id = card.dataset.id;
-        const willExpand = !card.classList.contains('expanded');
-        if (willExpand) {
-          this.selectHospital(id, false);
-        } else {
-          card.classList.remove('expanded');
-          card.classList.remove('card-selected');
-        }
+        window.location.href = './hospital.html?id=' + id;
       });
     });
   }

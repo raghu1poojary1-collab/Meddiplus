@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Hospital Details — MediPulse</title>
+  <meta name="description" content="Real-time doctor roster, medicine stock, and vaccine availability at this health centre." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E8622C'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Sans+Bengali:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600&family=Noto+Sans+Malayalam:wght@400;500;600&family=Noto+Sans+Tamil:wght@400;500;600&family=Noto+Sans+Telugu:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- MediPulse Design System -->
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <style>
+    /* =====================================================================
+       HOSPITAL DETAIL PAGE — SUPPLEMENTARY STYLES
+       ===================================================================== */
+
+    .back-nav-bar { padding: 16px 0 0 0; }
+
+    .btn-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--sage); font-size: 14px; font-weight: 600;
+      text-decoration: none; padding: 8px 0;
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-body); transition: color 0.2s;
+    }
+    .btn-back:hover { color: var(--ink); }
+    .btn-back:hover svg { transform: translateX(-3px); }
+    .btn-back svg { transition: transform 0.2s; }
+
+    /* Hero card */
+    .hospital-hero {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius-card); padding: 28px 32px;
+      margin-top: 16px; box-shadow: var(--card-shadow);
+      animation: hd-entrance 0.4s var(--ease-out) forwards;
+    }
+    @keyframes hd-entrance {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-top-row {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 16px;
+      margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .hero-title-block h1 { font-size: clamp(22px, 3.5vw, 32px); margin-bottom: 6px; }
+
+    .hero-meta-row {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap; font-size: 13px; color: var(--slate); margin-bottom: 10px;
+    }
+    .hero-meta-row .meta-distance-badge {
+      background: var(--sage-15); color: var(--ink);
+      padding: 3px 10px; border-radius: var(--radius-pill);
+      font-weight: 600; font-size: 12px;
+    }
+
+    .hero-badges-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: var(--radius-pill);
+      font-size: 12px; font-weight: 600; border: 1px solid;
+    }
+    .hero-pill.emergency { background: #fff9f6; border-color: rgba(232,98,44,0.3); color: var(--pulse); }
+    .hero-pill.last-updated { background: var(--paper); border-color: var(--line); color: var(--slate); }
+    .hero-pill.type-pill { background: var(--paper); border-color: var(--line); color: var(--ink); }
+
+    .hero-phone-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 10px; font-size: 14px; color: var(--slate);
+    }
+    .hero-phone-row svg { color: var(--sage); }
+    .hero-phone-row a { color: var(--ink); font-weight: 600; text-decoration: none; }
+    .hero-phone-row a:hover { text-decoration: underline; }
+
+    .live-status-indicator {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: var(--radius-pill);
+      font-weight: 600; font-size: 14px; border: 1px solid;
+      white-space: nowrap; align-self: flex-start;
+    }
+    .live-status-indicator.online  { background: #fff9f6; border-color: rgba(232,98,44,0.3); color: var(--pulse); }
+    .live-status-indicator.offline { background: #fff6f5; border-color: rgba(196,69,58,0.2); color: var(--danger-soft); }
+
+    /* Summary badges */
+    .summary-badges-section {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px; margin-top: 20px;
+    }
+    .summary-badge-card {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius-card); padding: 16px 18px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: var(--card-shadow);
+      animation: hd-entrance 0.4s var(--ease-out) 0.1s both;
+    }
+    .summary-badge-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .summary-badge-icon.doctors  { background: rgba(232,98,44,0.1); color: var(--pulse); }
+    .summary-badge-icon.medicines{ background: rgba(107,143,113,0.15); color: var(--sage); }
+    .summary-badge-icon.vaccines { background: rgba(18,49,46,0.08); color: var(--ink); }
+    .summary-badge-info strong { display: block; font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+    .summary-badge-info span   { font-size: 12px; color: var(--slate); }
+
+    /* Quick action bar */
+    .detail-action-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 20px; flex-wrap: wrap;
+      animation: hd-entrance 0.4s var(--ease-out) 0.15s both;
+    }
+
+    /* Section cards */
+    .detail-section-card {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius-card); box-shadow: var(--card-shadow);
+      margin-bottom: 20px; overflow: hidden;
+      animation: hd-entrance 0.35s var(--ease-out) both;
+    }
+    .detail-section-card:nth-child(1){ animation-delay: 0.1s; }
+    .detail-section-card:nth-child(2){ animation-delay: 0.18s; }
+    .detail-section-card:nth-child(3){ animation-delay: 0.26s; }
+
+    .section-card-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 20px; border-bottom: 1px solid var(--line);
+      background: var(--paper);
+    }
+    .section-card-header-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ink); background: var(--white); border: 1px solid var(--line); flex-shrink: 0;
+    }
+    .section-card-header h2 { font-size: 16px; font-weight: 700; color: var(--ink); margin: 0; }
+    .section-count-badge {
+      margin-left: auto; background: var(--ink); color: var(--paper);
+      font-size: 11px; font-weight: 700; padding: 2px 8px;
+      border-radius: var(--radius-pill); white-space: nowrap;
+    }
+    .section-card-body { padding: 0; overflow-x: auto; }
+
+    /* Responsive table */
+    .detail-table-card { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 520px; }
+    .detail-table-card thead th {
+      text-align: start; padding: 10px 16px; background: var(--paper);
+      color: var(--slate); font-weight: 600; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--line); white-space: nowrap;
+    }
+    .detail-table-card tbody td {
+      padding: 12px 16px; border-bottom: 1px solid rgba(221,213,199,0.5);
+      color: var(--ink); vertical-align: middle;
+    }
+    .detail-table-card tbody tr:last-child td { border-bottom: none; }
+    .detail-table-card tbody tr:hover { background: rgba(250,246,239,0.6); }
+
+    /* Status chips */
+    .status-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-weight: 600; font-size: 12px; padding: 3px 10px;
+      border-radius: var(--radius-pill);
+    }
+    .status-chip.on-duty  { background: rgba(232,98,44,0.1); color: var(--pulse); }
+    .status-chip.off-duty { background: rgba(196,69,58,0.1); color: var(--danger-soft); }
+
+    .room-chip {
+      display: inline-block; font-size: 11px; color: var(--sage);
+      background: rgba(107,143,113,0.1); border-radius: 4px; padding: 1px 6px; margin-top: 2px;
+    }
+
+    /* Stock values */
+    .stock-value { font-weight: 700; font-size: 14px; }
+    .stock-value.stock-normal { color: var(--ink); }
+    .stock-value.stock-low    { color: #b85c18; }
+    .stock-value.stock-out    { color: var(--danger-soft); }
+    .stock-badge {
+      display: inline-block; font-size: 10px; font-weight: 600;
+      padding: 1px 6px; border-radius: 4px; margin-left: 4px;
+    }
+    .stock-badge.low { background: rgba(184,92,24,0.1); color: #b85c18; }
+    .stock-badge.out { background: rgba(196,69,58,0.1); color: var(--danger-soft); }
+
+    .cold-chain-ok   { color: var(--sage); font-weight: 600; }
+    .cold-chain-warn { color: #b85c18; font-weight: 600; }
+
+    /* Reserve section */
+    .reserve-section {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius-card); padding: 24px 28px;
+      box-shadow: var(--card-shadow); margin-bottom: 20px;
+      animation: hd-entrance 0.35s var(--ease-out) 0.3s both;
+    }
+    .reserve-section h2 { font-size: 18px; margin-bottom: 6px; }
+    .reserve-section > p { font-size: 14px; color: var(--slate); margin-bottom: 20px; }
+    .reserve-actions-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .reserve-confirm-strip {
+      display: none; background: #f1f8f3;
+      border: 1px solid rgba(107,143,113,0.4); color: #2b5534;
+      padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
+      margin-top: 14px; align-items: center; gap: 8px;
+      transform: translateY(-6px); opacity: 0;
+      transition: transform 0.25s var(--ease-out), opacity 0.25s;
+    }
+    .reserve-confirm-strip.visible {
+      display: flex; transform: translateY(0); opacity: 1;
+    }
+    .reserve-confirm-strip svg { color: var(--sage); flex-shrink: 0; }
+
+    /* Telemedicine video screen */
+    .tele-video-screen {
+      background: #0b1a18; border-radius: 12px; height: 240px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; color: var(--paper);
+      position: relative; overflow: hidden; margin-bottom: 16px;
+    }
+
+    /* Not found */
+    .not-found-box {
+      text-align: center; padding: 80px 32px; background: var(--white);
+      border-radius: var(--radius-card); border: 1px solid var(--line); margin-top: 24px;
+    }
+    .not-found-box h2 { margin-bottom: 12px; }
+    .not-found-box p { color: var(--slate); margin-bottom: 24px; }
+
+    .detail-main-content { margin-top: 24px; }
+
+    @media (max-width: 600px) {
+      .hospital-hero { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================================================================
+       HEADER
+       ====================================================================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="./" class="brand-wrapper" aria-label="MediPulse Home">
+        <div class="brand-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-title" data-i18n="navBrand">MediPulse</span>
+          <span class="brand-tagline" data-i18n="navTagline">Real-time healthcare availability</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <div class="header-network-pill">
+          <span class="pulse-dot-live"></span>
+          <span data-i18n="navLiveIndicator">Live network active</span>
+        </div>
+
+        <div class="lang-selector-wrap">
+          <select id="global-lang-select" class="lang-select" aria-label="Select language">
+            <option value="en">English</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="tcy">Tulu (ತುಳು)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="ml">മലയാളം (Malayalam)</option>
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="ur">اردو (Urdu)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+          </select>
+          <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <a href="./admin.html" class="btn-nav-portal" aria-label="Hospital staff portal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span data-i18n="navStaffPortal">Hospital staff portal</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       MAIN
+       ====================================================================== -->
+  <main class="main-wrapper">
+    <nav class="back-nav-bar">
+      <a href="./index.html" class="btn-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Back to all facilities
+      </a>
+    </nav>
+
+    <!-- JS renders into this -->
+    <div id="detail-root"></div>
+  </main>
+
+  <!-- ======================================================================
+       FOOTER
+       ====================================================================== -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div>
+        <div class="emergency-disclaimer-pill" data-i18n="footerDisclaimer">
+          MediPulse is an availability tracking platform, not a substitute for emergency medical care. In critical situations, dial 108 or 112 immediately.
+        </div>
+        <p style="margin-top:10px;font-size:12px;color:var(--slate);" data-i18n="footerPrivacy">
+          Data updated directly by participating Taluk, CHC, and private health facilities.
+        </p>
+      </div>
+      <div style="font-size:12px;color:var(--slate);" data-i18n="footerGovtAligned">
+        Aligned with Ayushman Bharat Digital Mission (ABDM) standards.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="./js/i18n.js"></script>
+  <script src="./js/data.js"></script>
+  <script>
+  /* ============================================================================
+     HOSPITAL DETAIL PAGE LOGIC
+     ============================================================================ */
+  (function () {
+
+    /* ── Utility ─────────────────────────────────────────────────────────── */
+    function esc(val) {
+      return String(val == null ? '' : val)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
+
+    function showToast(msg) {
+      var c = document.getElementById('toast-container');
+      if (!c) return;
+      var t = document.createElement('div');
+      t.className = 'toast-message-card';
+      t.innerHTML = '<div>' + msg + '</div><div class="toast-progress-bar"></div>';
+      c.appendChild(t);
+      setTimeout(function() {
+        t.style.opacity = '0';
+        t.style.transform = 'translateY(10px)';
+        t.style.transition = 'all 0.2s';
+        setTimeout(function(){ t.remove(); }, 250);
+      }, 3000);
+    }
+
+    /* ── Reserve Slot ────────────────────────────────────────────────────── */
+    window._reserveHospital = function(hospitalId, hospitalName) {
+      var btn = document.getElementById('btn-reserve-main');
+      var strip = document.getElementById('reserve-confirm-strip');
+      if (!btn) return;
+
+      btn.classList.add('loading');
+
+      setTimeout(function() {
+        var abbr = (hospitalId || '').substring(5,6).toUpperCase() || 'X';
+        var token = 'MP-' + Math.floor(1000 + Math.random() * 9000) + '-' + abbr;
+        btn.classList.remove('loading');
+        btn.classList.add('reserved');
+
+        var label = btn.querySelector('.btn-reserve-label');
+        if (label) {
+          label.style.display = 'inline-flex';
+          label.innerHTML = '&check; ';
+          var i = 0;
+          var iv = setInterval(function() {
+            if (i < token.length) { label.innerHTML += token[i]; i++; }
+            else {
+              clearInterval(iv);
+              if (strip) strip.classList.add('visible');
+              showToast('Token ' + token + ' held for 60 mins at ' + hospitalName + '!');
+            }
+          }, 40);
+        }
+      }, 700);
+    };
+
+    /* ── Telemedicine Modal ──────────────────────────────────────────────── */
+    window._openTeleModal = function(dName, spec, hName) {
+      var old = document.getElementById('tele-modal');
+      if (old) old.remove();
+
+      var d = document.createElement('div');
+      d.className = 'admin-modal-overlay active';
+      d.id = 'tele-modal';
+      d.addEventListener('click', function(e){ if (e.target === d) d.remove(); });
+      d.innerHTML =
+        '<div class="admin-modal-window" style="max-width:580px;">' +
+          '<div class="admin-modal-header" style="background:var(--ink);">' +
+            '<div style="display:flex;align-items:center;gap:8px;">' +
+              '<span class="pulse-dot-live"></span>' +
+              '<strong>MediPulse Remote Video Triage</strong>' +
+            '</div>' +
+            '<button onclick="document.getElementById(\'tele-modal\').remove()" style="background:none;border:none;color:var(--paper);font-size:20px;cursor:pointer;">&times;</button>' +
+          '</div>' +
+          '<div class="admin-modal-body" style="padding:24px;">' +
+            '<div class="tele-video-screen">' +
+              '<div class="pulse-dot-live" style="position:absolute;top:16px;left:16px;"></div>' +
+              '<div style="font-size:13px;position:absolute;top:14px;left:32px;color:#ff9d76;">Live Tele-Consultation Queue</div>' +
+              '<div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid var(--sage);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">' +
+                '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>' +
+              '</div>' +
+              '<h3 style="color:var(--paper);margin-bottom:4px;">Connecting to Dr. On-Call (' + esc(spec) + ')</h3>' +
+              '<p style="font-size:13px;color:rgba(250,246,239,0.7);text-align:center;max-width:380px;padding:0 16px;">' +
+                esc(dName) + ' is off-duty at ' + esc(hName) + ', but our regional digital health backup network is ready.' +
+              '</p>' +
+            '</div>' +
+            '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+              '<button onclick="document.getElementById(\'tele-modal\').remove()" class="btn-secondary-link">Cancel</button>' +
+              '<button onclick="alert(\'Joining secure WebRTC encrypted room...\'); document.getElementById(\'tele-modal\').remove();" class="btn-reserve-slot" style="min-width:160px;">Start video call now</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(d);
+    };
+
+    /* ── Build Doctor Row ────────────────────────────────────────────────── */
+    function buildDoctorRow(d, hName) {
+      var statusChip = d.onDuty
+        ? '<span class="status-chip on-duty"><span class="pulse-dot-live"></span> On Duty</span>'
+        : '<span class="status-chip off-duty"><span class="dot-static-off"></span> Off Duty</span>';
+
+      var action = d.onDuty
+        ? '<span style="font-size:12px;color:var(--slate);">Queue: <strong>' + d.queueCount + '</strong></span>'
+        : '<button class="btn-telemedicine" onclick="window._openTeleModal(\'' + esc(d.name).replace(/'/g,"&#39;") + '\',\'' + esc(d.specialty).replace(/'/g,"&#39;") + '\',\'' + esc(hName).replace(/'/g,"&#39;") + '\')">'
+            + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>'
+            + ' Video consult</button>';
+
+      return '<tr>'
+        + '<td><strong>' + esc(d.name) + '</strong><br><small style="color:var(--slate);">' + esc(d.qualification) + '</small></td>'
+        + '<td>' + esc(d.specialty) + '</td>'
+        + '<td style="white-space:nowrap;">' + esc(d.shift) + '</td>'
+        + '<td><span class="room-chip">' + esc(d.room) + '</span></td>'
+        + '<td>' + statusChip + '</td>'
+        + '<td>' + action + '</td>'
+        + '</tr>';
+    }
+
+    /* ── Build Medicine Row ──────────────────────────────────────────────── */
+    function buildMedRow(m) {
+      var cls = m.stock === 0 ? 'stock-out' : (m.stock < m.threshold ? 'stock-low' : 'stock-normal');
+      var badge = m.stock === 0
+        ? '<span class="stock-badge out">Out of stock</span>'
+        : (m.stock < m.threshold ? '<span class="stock-badge low">Low stock</span>' : '');
+      return '<tr>'
+        + '<td><strong>' + esc(m.name) + '</strong></td>'
+        + '<td>' + esc(m.category) + '</td>'
+        + '<td><span class="stock-value ' + cls + '">' + m.stock + ' ' + esc(m.unit) + '</span>' + badge + '</td>'
+        + '<td style="color:var(--slate);">' + esc(m.price) + '</td>'
+        + '</tr>';
+    }
+
+    /* ── Build Vaccine Row ───────────────────────────────────────────────── */
+    function buildVacRow(v) {
+      var coldOk = v.coldChainStatus.toLowerCase().indexOf('normal') !== -1;
+      return '<tr>'
+        + '<td><strong>' + esc(v.name) + '</strong></td>'
+        + '<td><code style="font-size:12px;background:var(--paper);padding:2px 6px;border-radius:4px;">' + esc(v.batch) + '</code></td>'
+        + '<td><strong style="color:' + (v.doses > 0 ? 'var(--ink)' : 'var(--danger-soft)') + ';">' + v.doses + ' doses</strong></td>'
+        + '<td style="color:var(--slate);">' + esc(v.expiry) + '</td>'
+        + '<td><span class="' + (coldOk ? 'cold-chain-ok' : 'cold-chain-warn') + '">&check; ' + esc(v.coldChainStatus) + '</span></td>'
+        + '</tr>';
+    }
+
+    /* ── Main Render ─────────────────────────────────────────────────────── */
+    function renderDetail(h) {
+      var onDuty      = h.doctors.filter(function(d){ return d.onDuty; });
+      var inStock     = h.medicines.filter(function(m){ return m.stock > 0; });
+      var totalDoses  = h.vaccines.reduce(function(s,v){ return s + v.doses; }, 0);
+      var vacsReady   = h.vaccines.filter(function(v){ return v.doses > 0; });
+      var isLive      = onDuty.length > 0;
+      var updated     = h.lastUpdatedMins === 0 ? 'just now' : h.lastUpdatedMins + ' min ago';
+
+      var hId   = esc(h.id);
+      var hName = esc(h.name);
+
+      var html = '';
+
+      /* Hero */
+      html += '<section class="hospital-hero">'
+        + '<div class="hero-top-row">'
+          + '<div class="hero-title-block">'
+            + '<h1>' + hName + '</h1>'
+            + '<div class="hero-meta-row">'
+              + '<span class="meta-distance-badge">' + h.distanceKm + ' km away</span>'
+              + '<span>&bull;</span>'
+              + '<span>' + esc(h.address) + '</span>'
+            + '</div>'
+            + '<div class="hero-badges-row">'
+              + '<span class="hero-pill type-pill">'
+                + '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'
+                + esc(h.type) + '</span>'
+              + (h.emergency24x7
+                ? '<span class="hero-pill emergency"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>24/7 Emergency</span>'
+                : '')
+              + '<span class="hero-pill last-updated">Updated ' + esc(updated) + '</span>'
+            + '</div>'
+            + '<div class="hero-phone-row">'
+              + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>'
+              + '<a href="tel:' + esc(h.phone) + '">' + esc(h.phone) + '</a>'
+            + '</div>'
+          + '</div>'
+          + '<div class="live-status-indicator ' + (isLive ? 'online' : 'offline') + '">'
+            + '<span class="' + (isLive ? 'pulse-dot-live' : 'dot-static-off') + '"></span>'
+            + (isLive ? onDuty.length + ' Doctor' + (onDuty.length !== 1 ? 's' : '') + ' On Duty' : 'No Doctors On Duty')
+          + '</div>'
+        + '</div>'
+      + '</section>';
+
+      /* Summary badges */
+      html += '<div class="summary-badges-section">'
+        + '<div class="summary-badge-card">'
+          + '<div class="summary-badge-icon doctors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>'
+          + '<div class="summary-badge-info"><strong style="color:' + (onDuty.length > 0 ? 'var(--pulse)' : 'var(--danger-soft)') + ';">' + onDuty.length + '</strong><span>Doctors on duty</span></div>'
+        + '</div>'
+        + '<div class="summary-badge-card">'
+          + '<div class="summary-badge-icon medicines"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>'
+          + '<div class="summary-badge-info"><strong style="color:' + (inStock.length > 0 ? 'var(--sage)' : 'var(--danger-soft)') + ';">' + inStock.length + '</strong><span>Medicines in stock</span></div>'
+        + '</div>'
+        + '<div class="summary-badge-card">'
+          + '<div class="summary-badge-icon vaccines"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/></svg></div>'
+          + '<div class="summary-badge-info"><strong style="color:' + (totalDoses > 0 ? 'var(--ink)' : 'var(--danger-soft)') + ';">' + totalDoses + '</strong><span>Vaccine doses</span></div>'
+        + '</div>'
+      + '</div>';
+
+      /* Quick actions */
+      html += '<div class="detail-action-bar">'
+        + '<a href="https://maps.google.com/?q=' + h.lat + ',' + h.lng + '" target="_blank" rel="noopener" class="btn-secondary-link">'
+          + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Get directions</a>'
+        + '<a href="tel:' + esc(h.phone) + '" class="btn-secondary-link">'
+          + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call desk</a>'
+      + '</div>';
+
+      /* Section cards */
+      html += '<div class="detail-main-content">';
+
+      /* Doctors */
+      html += '<div class="detail-section-card">'
+        + '<div class="section-card-header">'
+          + '<div class="section-card-header-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>'
+          + '<h2>Doctors currently on shift</h2>'
+          + '<span class="section-count-badge">' + h.doctors.length + ' doctors</span>'
+        + '</div>'
+        + '<div class="section-card-body">'
+          + '<table class="detail-table-card">'
+            + '<thead><tr><th>Doctor &amp; Qualification</th><th>Specialty</th><th>Shift Hours</th><th>Room</th><th>Status</th><th>Action</th></tr></thead>'
+            + '<tbody>' + h.doctors.map(function(d){ return buildDoctorRow(d, h.name); }).join('') + '</tbody>'
+          + '</table>'
+        + '</div>'
+      + '</div>';
+
+      /* Medicines */
+      html += '<div class="detail-section-card">'
+        + '<div class="section-card-header">'
+          + '<div class="section-card-header-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>'
+          + '<h2>Essential medicine availability</h2>'
+          + '<span class="section-count-badge">' + inStock.length + '/' + h.medicines.length + ' in stock</span>'
+        + '</div>'
+        + '<div class="section-card-body">'
+          + '<table class="detail-table-card">'
+            + '<thead><tr><th>Medicine</th><th>Category</th><th>Stock Available</th><th>Subsidized Pricing</th></tr></thead>'
+            + '<tbody>' + h.medicines.map(buildMedRow).join('') + '</tbody>'
+          + '</table>'
+        + '</div>'
+      + '</div>';
+
+      /* Vaccines */
+      html += '<div class="detail-section-card">'
+        + '<div class="section-card-header">'
+          + '<div class="section-card-header-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/></svg></div>'
+          + '<h2>Vaccine cold chain inventory</h2>'
+          + '<span class="section-count-badge">' + vacsReady.length + '/' + h.vaccines.length + ' available</span>'
+        + '</div>'
+        + '<div class="section-card-body">'
+          + '<table class="detail-table-card">'
+            + '<thead><tr><th>Vaccine</th><th>Batch Number</th><th>Available Doses</th><th>Expiry Date</th><th>Cold Chain Status</th></tr></thead>'
+            + '<tbody>' + h.vaccines.map(buildVacRow).join('') + '</tbody>'
+          + '</table>'
+        + '</div>'
+      + '</div>';
+
+      html += '</div>'; /* /detail-main-content */
+
+      /* Reserve section */
+      html += '<div class="reserve-section">'
+        + '<h2>Reserve a slot at this facility</h2>'
+        + '<p>Hold your appointment token for 60 minutes while you travel to this health centre. A confirmation will be sent via SMS &amp; WhatsApp.</p>'
+        + '<div class="reserve-actions-row">'
+          + '<button class="btn-reserve-slot" id="btn-reserve-main" onclick="window._reserveHospital(\'' + hId + '\', \'' + hName.replace(/'/g,"&#39;") + '\')">'
+            + '<span class="slot-spinner"></span>'
+            + '<span class="btn-reserve-label">'
+              + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="19" y2="10"/></svg>'
+              + ' Reserve slot'
+            + '</span>'
+          + '</button>'
+          + '<a href="https://maps.google.com/?q=' + h.lat + ',' + h.lng + '" target="_blank" rel="noopener" class="btn-secondary-link">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Get directions</a>'
+          + '<a href="tel:' + esc(h.phone) + '" class="btn-secondary-link">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call desk</a>'
+        + '</div>'
+        + '<div class="reserve-confirm-strip" id="reserve-confirm-strip">'
+          + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+          + '<span>Confirmation sent via SMS &amp; WhatsApp. Token valid for 60 minutes.</span>'
+        + '</div>'
+      + '</div>';
+
+      document.getElementById('detail-root').innerHTML = html;
+      document.title = h.name + ' — MediPulse';
+    }
+
+    /* ── Not found ───────────────────────────────────────────────────────── */
+    function renderNotFound(id) {
+      document.getElementById('detail-root').innerHTML =
+        '<div class="not-found-box">'
+          + '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--line)" stroke-width="1.5" style="margin-bottom:16px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+          + '<h2>Hospital not found</h2>'
+          + '<p>We could not find a facility with ID &ldquo;' + esc(id || '') + '&rdquo;. The link may be incorrect.</p>'
+          + '<a href="./index.html" class="btn-search-submit" style="display:inline-flex;text-decoration:none;margin-top:8px;">&larr; Back to all facilities</a>'
+        + '</div>';
+    }
+
+    /* ── Boot ────────────────────────────────────────────────────────────── */
+    function init() {
+      /* Language switcher */
+      var ls = document.getElementById('global-lang-select');
+      if (ls && window.i18n) {
+        ls.value = window.i18n.getLang();
+        ls.addEventListener('change', function(e){ window.i18n.setLang(e.target.value); });
+      }
+
+      var id = new URLSearchParams(window.location.search).get('id');
+      if (!id || !window.dataStore) { renderNotFound(id); return; }
+      var h = window.dataStore.getById(id);
+      if (!h) { renderNotFound(id); return; }
+      renderDetail(h);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+  })();
+  </script>
+</body>
+</html>
