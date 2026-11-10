@@ -2,6 +2,14 @@
 
 > **"Know before you go — turn a wasted trip into a confirmed one."**
 
+## 🌐 Live Demo
+
+| Link | Description |
+| :--- | :--- |
+| 🚀 **[medipulse-live.embarko.app](https://medipulse-live.embarko.app)** | Live app — patient portal, hospital detail pages, admin portal |
+
+> Auto-deploys to Embarko on every `git push` to `main`.
+
 MediPulse is a real-time healthcare availability platform engineered for semi-urban and rural patients across South India, including elderly and low-literacy users. It allows patients to check — before ever leaving home — whether a doctor is on duty, an essential medicine is in stock, or a vaccine dose is available at nearby health facilities.
 
 ---
@@ -42,7 +50,8 @@ MediPulse is a real-time healthcare availability platform engineered for semi-ur
 
 ```
 ├── index.html         # Page 1: Public Patient Portal (Web Speech, Leaflet, OCR)
-├── admin.html         # Page 2: Hospital Staff Admin Dashboard
+├── hospital.html      # Page 2: Hospital Detail — doctors, medicines, vaccines, reserve slot
+├── admin.html         # Page 3: Hospital Staff Admin Dashboard
 ├── css/
 │   └── style.css      # Design tokens, responsive grid, 12 animations, RTL rules
 ├── js/
