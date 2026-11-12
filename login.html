@@ -432,6 +432,270 @@
       .login-card { padding: 32px 22px 28px; }
       .login-heading { font-size: 22px; }
     }
+
+    /* ── Google Account Chooser Modal (Authentic Google Style) ────────── */
+    .g-chooser-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 49, 46, 0.65);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: gFadeIn 0.22s var(--ease-out);
+    }
+    .g-chooser-backdrop.visible { display: flex; }
+    @keyframes gFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .g-chooser-modal {
+      background: #202124;
+      color: #e8eaed;
+      border-radius: 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+      width: 100%;
+      max-width: 440px;
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: gSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    @keyframes gSlideUp {
+      from { transform: translateY(28px) scale(0.96); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .g-chooser-header {
+      padding: 22px 24px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+    .g-chooser-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .g-chooser-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .g-chooser-logo {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .g-chooser-close {
+      background: none;
+      border: none;
+      color: #9aa0a6;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .g-chooser-close:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+    .g-chooser-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: #ffffff;
+      margin: 0 0 4px 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      letter-spacing: -0.01em;
+    }
+    .g-chooser-sub {
+      font-size: 13px;
+      color: #9aa0a6;
+      margin: 0;
+    }
+    .g-chooser-sub strong {
+      color: #e8eaed;
+      font-weight: 600;
+    }
+
+    .g-account-list {
+      overflow-y: auto;
+      padding: 8px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 340px;
+    }
+    .g-account-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      color: inherit;
+      transition: background 0.15s, transform 0.1s;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .g-account-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .g-account-item:active {
+      background: rgba(255, 255, 255, 0.14);
+      transform: scale(0.99);
+    }
+    .g-account-item.active-primary {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .g-account-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .g-account-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .g-account-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .g-account-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .g-account-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: rgba(66, 133, 244, 0.22);
+      color: #8ab4f8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .g-account-email {
+      font-size: 12px;
+      color: #9aa0a6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .g-action-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      color: #8ab4f8;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .g-action-row:hover {
+      background: rgba(138, 180, 248, 0.09);
+    }
+    .g-action-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8ab4f8;
+      flex-shrink: 0;
+    }
+
+    .g-custom-account-box {
+      display: none;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      margin: 4px 6px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .g-custom-account-box.visible { display: block; }
+    .g-custom-input {
+      width: 100%;
+      background: #17181b;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+    }
+    .g-custom-input:focus {
+      outline: none;
+      border-color: #8ab4f8;
+    }
+    .g-custom-btn-submit {
+      width: 100%;
+      background: #8ab4f8;
+      color: #202124;
+      border: none;
+      padding: 9px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .g-custom-btn-submit:hover {
+      background: #aecbfa;
+    }
+
+    .g-chooser-footer {
+      padding: 12px 24px 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      color: #9aa0a6;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -590,6 +854,58 @@
   </div>
 
   <!-- ======================================================================
+       GOOGLE ACCOUNT CHOOSER MODAL (Authentic Google UI)
+       ====================================================================== -->
+  <div class="g-chooser-backdrop" id="google-chooser-modal" onclick="handleChooserBackdropClick(event)">
+    <div class="g-chooser-modal" role="dialog" aria-modal="true" aria-labelledby="g-chooser-title">
+      <!-- Header -->
+      <div class="g-chooser-header">
+        <div class="g-chooser-top-row">
+          <div class="g-chooser-logo-wrap">
+            <svg class="g-chooser-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              <path fill="none" d="M0 0h48v48H0z"/>
+            </svg>
+            <span style="font-size: 15px; font-weight: 500; color: #e8eaed;">Sign in with Google</span>
+          </div>
+          <button type="button" class="g-chooser-close" onclick="closeGoogleChooser()" aria-label="Close dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <h2 class="g-chooser-title" id="g-chooser-title">Choose an account</h2>
+        <p class="g-chooser-sub">to continue to <strong>MediPulse</strong></p>
+      </div>
+
+      <!-- Account List -->
+      <div class="g-account-list" id="g-account-list"></div>
+
+      <!-- Add another account -->
+      <div style="padding: 0 12px 6px;">
+        <button type="button" class="g-action-row" onclick="toggleCustomAccountInput()">
+          <div class="g-action-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <span>Add another account</span>
+        </button>
+
+        <div class="g-custom-account-box" id="g-custom-box">
+          <input type="text" id="g-custom-name" class="g-custom-input" placeholder="Full name (e.g. Raghu Poojary)" />
+          <input type="email" id="g-custom-email" class="g-custom-input" placeholder="Google email address (@gmail.com)" />
+          <button type="button" class="g-custom-btn-submit" onclick="submitCustomGoogleAccount()">Continue with this account</button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="g-chooser-footer">
+        To continue, Google will share your name, email address, and language preference with MediPulse.
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
        SUCCESS OVERLAY
        ====================================================================== -->
   <div class="login-success-overlay" id="success-overlay">
@@ -641,30 +957,186 @@
   }
 
   /* ============================================================
-     GOOGLE SIGN-IN (simulated — realistic demo)
+     GOOGLE SIGN-IN & ACCOUNT CHOOSER (Authentic Android / Chrome style)
      ============================================================ */
+  var GOOGLE_ACCOUNTS = [
+    {
+      name: 'Raghu Poojary',
+      email: 'raghu1poojary1@gmail.com',
+      badge: 'Current device',
+      initial: 'R',
+      avatarBg: 'linear-gradient(135deg, #1a73e8, #0d47a1)',
+      primary: true
+    },
+    {
+      name: 'Raghu Poojary',
+      email: 'raghu0poojary0@gmail.com',
+      badge: null,
+      initial: 'R',
+      avatarBg: 'linear-gradient(135deg, #2e7d32, #1b5e20)'
+    },
+    {
+      name: 'Raghu2 Poojary2',
+      email: 'raghu2poojary2@gmail.com',
+      badge: null,
+      initial: 'R',
+      avatarBg: '#e65100'
+    },
+    {
+      name: 'Raghu',
+      email: 'raghu5poojary5@gmail.com',
+      badge: null,
+      initial: 'R',
+      avatarBg: '#37474f'
+    },
+    {
+      name: 'Madhu jith',
+      email: 'madhujith077@gmail.com',
+      badge: null,
+      initial: 'M',
+      avatarBg: '#546e7a'
+    },
+    {
+      name: 'Raghavendra Poojary',
+      email: 'raghavendra21poojary@gmail.com',
+      badge: null,
+      initial: 'R',
+      avatarBg: '#0288d1'
+    },
+    {
+      name: 'Rai N',
+      email: 'raistarthe7770@gmail.com',
+      badge: null,
+      initial: 'R',
+      avatarBg: '#00897b'
+    },
+    {
+      name: 'Adnan.',
+      email: 'adnancarte@gmail.com',
+      badge: null,
+      initial: 'A',
+      avatarBg: '#3949ab'
+    },
+    {
+      name: 'Iam Raghu',
+      email: 'iamraghu31@gmail.com',
+      badge: null,
+      initial: 'I',
+      avatarBg: '#00acc1'
+    }
+  ];
+
   function handleGoogleSignIn() {
-    var btn = document.getElementById('btn-google');
-    btn.classList.add('loading');
-    document.getElementById('google-btn-label').textContent = 'Connecting to Google…';
+    openGoogleChooser();
+  }
 
-    // Simulate Google OAuth popup delay
+  function renderGoogleAccounts() {
+    var container = document.getElementById('g-account-list');
+    if (!container) return;
+    
+    var html = '';
+    GOOGLE_ACCOUNTS.forEach(function(acc, idx) {
+      var isPrimary = acc.primary ? ' active-primary' : '';
+      var badgeHtml = acc.badge ? '<span class="g-account-badge">' + acc.badge + '</span>' : '';
+      
+      html += '<button type="button" class="g-account-item' + isPrimary + '" onclick="selectGoogleAccount(' + idx + ')">'
+            +   '<div class="g-account-avatar" style="background:' + acc.avatarBg + ';">' + acc.initial + '</div>'
+            +   '<div class="g-account-info">'
+            +     '<div class="g-account-name-row">'
+            +       '<span class="g-account-name">' + acc.name + '</span>'
+            +       badgeHtml
+            +     '</div>'
+            +     '<div class="g-account-email">' + acc.email + '</div>'
+            +   '</div>'
+            + '</button>';
+    });
+    container.innerHTML = html;
+  }
+
+  function openGoogleChooser() {
+    renderGoogleAccounts();
+    var modal = document.getElementById('google-chooser-modal');
+    if (modal) {
+      modal.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeGoogleChooser() {
+    var modal = document.getElementById('google-chooser-modal');
+    if (modal) {
+      modal.classList.remove('visible');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function handleChooserBackdropClick(e) {
+    if (e.target && e.target.id === 'google-chooser-modal') {
+      closeGoogleChooser();
+    }
+  }
+
+  function selectGoogleAccount(idx) {
+    var acc = GOOGLE_ACCOUNTS[idx];
+    if (!acc) return;
+
+    // Visual selection feedback
+    var rows = document.querySelectorAll('.g-account-item');
+    if (rows[idx]) {
+      rows[idx].style.opacity = '0.75';
+      rows[idx].style.pointerEvents = 'none';
+      var emailEl = rows[idx].querySelector('.g-account-email');
+      if (emailEl) emailEl.innerHTML = '<span style="color:#8ab4f8;font-weight:600;">Authenticating…</span>';
+    }
+
     setTimeout(function() {
-      btn.classList.remove('loading');
-      document.getElementById('google-btn-label').textContent = 'Continue with Google';
-
-      // Simulate successful Google auth — fake a user profile
-      var googleUser = {
-        uid:     'g_' + Math.random().toString(36).substr(2,9),
-        name:    'Raghu Poojary',
-        email:   'raghu1poojary1@gmail.com',
-        photo:   null,
-        method:  'google',
+      closeGoogleChooser();
+      var user = {
+        uid:      'g_' + Math.random().toString(36).substr(2, 9),
+        name:     acc.name,
+        email:    acc.email,
+        initial:  acc.initial || acc.name[0].toUpperCase(),
+        photo:    null,
+        method:   'google',
         loggedAt: new Date().toISOString()
       };
-      saveUser(googleUser);
-      showSuccess('Raghu', 'Google sign-in successful ✓');
-    }, 1400);
+      saveUser(user);
+      showSuccess(acc.name, 'Signed in as ' + acc.email + ' ✓');
+    }, 600);
+  }
+
+  function toggleCustomAccountInput() {
+    var box = document.getElementById('g-custom-box');
+    if (!box) return;
+    box.classList.toggle('visible');
+    if (box.classList.contains('visible')) {
+      document.getElementById('g-custom-email').focus();
+    }
+  }
+
+  function submitCustomGoogleAccount() {
+    var name = (document.getElementById('g-custom-name').value || '').trim();
+    var email = (document.getElementById('g-custom-email').value || '').trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert('Please enter a valid Google email address.');
+      return;
+    }
+    if (!name) {
+      name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+    }
+
+    closeGoogleChooser();
+    var user = {
+      uid:      'g_' + Math.random().toString(36).substr(2, 9),
+      name:     name,
+      email:    email,
+      initial:  name[0].toUpperCase(),
+      photo:    null,
+      method:   'google',
+      loggedAt: new Date().toISOString()
+    };
+    saveUser(user);
+    showSuccess(name, 'Signed in as ' + email + ' ✓');
   }
 
   /* ============================================================
