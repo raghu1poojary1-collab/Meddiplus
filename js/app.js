@@ -36,6 +36,8 @@ class MediPulseApp {
       name: "Moodbidri Town Bus Stand, Karnataka"
     };
     this.patientMarker = null;
+    this.mapSearchMarker = null;
+    this.mapSearchAbort = null;
     this.mapEngine = 'osm'; // 'osm' | 'fallback'
 
     this.init();
@@ -51,6 +53,7 @@ class MediPulseApp {
     // 2. Setup UI event listeners
     this.setupHeader();
     this.setupSearchModes();
+    this.setupMapSearch();
     this.setupVoiceSearch();
     this.setupPrescriptionUpload();
     this.setupFilterChips();
@@ -468,7 +471,7 @@ class MediPulseApp {
   /* ==========================================================================
      CUSTOM MARKERS & AUTO-FIT BOUNDS (LEAFLET)
      ========================================================================== */
-  refreshMapMarkers(initialLoad = false) {
+  refreshMapMarkers(initialLoad = false, immediate = false) {
     if (this.mapEngine === 'fallback' || !this.map || typeof L === 'undefined') {
       this.renderFallbackRadar();
       return;
@@ -491,8 +494,8 @@ class MediPulseApp {
 
     const sortedHospitals = [...hospitals].sort((a, b) => a.distanceKm - b.distanceKm);
 
-    sortedHospitals.forEach((h, index) => {
-      boundsPoints.push([h.lat, h.lng]);
+    const placeMarker = (h) => {
+      if (!this.map) return;
 
       const hasOnDutyDoctor = h.doctors.some(d => d.onDuty);
       const hasInStockMed = h.medicines.some(m => m.stock > 0);
@@ -519,29 +522,35 @@ class MediPulseApp {
         popupAnchor: [0, -40]
       });
 
-      setTimeout(() => {
-        if (!this.map) return;
-        const marker = L.marker([h.lat, h.lng], {
-          icon,
-          title: h.name
-        }).addTo(this.map);
+      const marker = L.marker([h.lat, h.lng], {
+        icon,
+        title: h.name
+      }).addTo(this.map);
 
-        marker.bindPopup(this.createPopupContent(h), {
-          maxWidth: 280,
-          closeButton: true
-        });
+      marker.bindPopup(this.createPopupContent(h), {
+        maxWidth: 280,
+        closeButton: true
+      });
 
-        marker.on('click', () => {
-          this.selectHospital(h.id, true);
-        });
+      marker.on('click', () => {
+        this.selectHospital(h.id, true);
+      });
 
-        this.markers[h.id] = marker;
-        this.infoWindows[h.id] = marker;
-      }, index * 100);
+      this.markers[h.id] = marker;
+      this.infoWindows[h.id] = marker;
+    };
+
+    sortedHospitals.forEach((h, index) => {
+      boundsPoints.push([h.lat, h.lng]);
+      if (immediate) {
+        placeMarker(h);
+      } else {
+        setTimeout(() => placeMarker(h), index * 100);
+      }
     });
 
-    // Auto-fit bounds smoothly around patient + hospitals
-    if (this.map && boundsPoints.length > 1) {
+    // Auto-fit bounds smoothly around patient + hospitals unless jumping directly to one hospital
+    if (!immediate && this.map && boundsPoints.length > 1) {
       const delay = initialLoad ? sortedHospitals.length * 100 + 250 : sortedHospitals.length * 100 + 60;
       setTimeout(() => {
         if (!this.map) return;
@@ -570,6 +579,350 @@ class MediPulseApp {
     }
   }
 
+  escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  calcDistanceKm(lat1, lng1, lat2, lng2) {
+    const toRad = (deg) => (deg * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return Math.round(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 10) / 10;
+  }
+
+  hospitalMatchesQuery(h, rawQuery) {
+    const q = (rawQuery || '').toLowerCase().trim();
+    if (!q) return true;
+    const matchesName = (h.name || '').toLowerCase().includes(q);
+    const matchesAddr = (h.address || '').toLowerCase().includes(q);
+    const matchesType = (h.type || '').toLowerCase().includes(q);
+    const matchesDoctor = h.doctors.some(
+      d => d.name.toLowerCase().includes(q) || d.specialty.toLowerCase().includes(q)
+    );
+    const matchesMed = h.medicines.some(
+      m => m.name.toLowerCase().includes(q) || m.category.toLowerCase().includes(q)
+    );
+    const matchesVac = h.vaccines.some(v => v.name.toLowerCase().includes(q));
+    return matchesName || matchesAddr || matchesType || matchesDoctor || matchesMed || matchesVac;
+  }
+
+  /* ==========================================================================
+     IN-MAP HOSPITAL & OPENSTREETMAP PLACE SEARCH
+     ========================================================================== */
+  setupMapSearch() {
+    const input = document.getElementById('map-search-input');
+    const clearBtn = document.getElementById('map-search-clear');
+    const findBtn = document.getElementById('map-search-btn');
+    const dropdown = document.getElementById('map-search-results');
+    if (!input || !dropdown) return;
+
+    let debounceTimer = null;
+    let lastOsmPlaces = [];
+
+    const closeDropdown = () => {
+      dropdown.style.display = 'none';
+    };
+
+    const getLocalHospitalMatches = (q) => {
+      const all = [...window.dataStore.getAll()].sort((a, b) => a.distanceKm - b.distanceKm);
+      if (!q) return all.slice(0, 5);
+      return all.filter(h => this.hospitalMatchesQuery(h, q));
+    };
+
+    const renderDropdown = (query, osmPlaces = [], isLoadingOsm = false) => {
+      const q = (query || '').trim();
+      const localMatches = getLocalHospitalMatches(q);
+      lastOsmPlaces = osmPlaces;
+
+      let html = '';
+
+      if (localMatches.length > 0) {
+        html += `<div class="map-search-section-label">${q ? 'MediPulse Hospitals & Stock Matches' : 'Quick Jump — Verified Facilities Nearby'}</div>`;
+        html += localMatches.slice(0, 5).map(h => {
+          const onDutyCount = h.doctors.filter(d => d.onDuty).length;
+          return `
+            <button type="button" class="map-search-item" data-hosp-id="${this.escapeHtml(h.id)}" role="option">
+              <div class="map-search-item-main">
+                <div class="map-search-item-title">${this.escapeHtml(h.name)}</div>
+                <div class="map-search-item-sub">${this.escapeHtml(h.address)} • ${onDutyCount} doctor(s) on duty</div>
+              </div>
+              <span class="map-search-badge">${h.distanceKm} km</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      if (q.length >= 3) {
+        if (isLoadingOsm) {
+          html += `<div class="map-search-status">Searching OpenStreetMap for &ldquo;${this.escapeHtml(q)}&rdquo;...</div>`;
+        } else if (osmPlaces.length > 0) {
+          html += `<div class="map-search-section-label">OpenStreetMap Places &amp; Hospitals</div>`;
+          html += osmPlaces.map((p, idx) => {
+            const parts = (p.display_name || '').split(',').map(s => s.trim());
+            const title = parts[0] || p.name || q;
+            const sub = parts.slice(1, 4).join(', ') || p.type || 'Karnataka';
+            const badge = (p.type === 'hospital' || p.type === 'clinic' || p.class === 'amenity') ? 'Hospital' : 'Place';
+            return `
+              <button type="button" class="map-search-item" data-osm-idx="${idx}" role="option">
+                <div class="map-search-item-main">
+                  <div class="map-search-item-title">${this.escapeHtml(title)}</div>
+                  <div class="map-search-item-sub">${this.escapeHtml(sub)}</div>
+                </div>
+                <span class="map-search-badge osm">${this.escapeHtml(badge)}</span>
+              </button>
+            `;
+          }).join('');
+        } else if (localMatches.length === 0) {
+          html += `<div class="map-search-status">No matching hospital or OpenStreetMap place found for &ldquo;${this.escapeHtml(q)}&rdquo;.</div>`;
+        }
+      } else if (localMatches.length === 0) {
+        html += `<div class="map-search-status">Type at least 3 characters to search all of OpenStreetMap.</div>`;
+      }
+
+      dropdown.innerHTML = html;
+      dropdown.style.display = 'block';
+
+      dropdown.querySelectorAll('[data-hosp-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-hosp-id');
+          closeDropdown();
+          this.jumpToHospitalFromMapSearch(id);
+        });
+      });
+
+      dropdown.querySelectorAll('[data-osm-idx]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.getAttribute('data-osm-idx'));
+          const place = lastOsmPlaces[idx];
+          if (place) {
+            closeDropdown();
+            this.focusOpenStreetMapPlace(place);
+          }
+        });
+      });
+    };
+
+    const runLiveSearch = async (rawQuery, autoSelect = false) => {
+      const q = (rawQuery || '').trim();
+      const localMatches = getLocalHospitalMatches(q);
+      if (autoSelect && q && localMatches.length > 0) {
+        const directHospital = localMatches.find(h => h.name.toLowerCase().includes(q.toLowerCase()));
+        if (directHospital) {
+          closeDropdown();
+          this.jumpToHospitalFromMapSearch(directHospital.id);
+          return;
+        }
+      }
+
+      if (q.length < 3) {
+        renderDropdown(q, [], false);
+        return;
+      }
+
+      renderDropdown(q, [], true);
+      const places = await this.fetchOpenStreetMapPlaces(q);
+      if ((input.value || '').trim() !== q) return;
+
+      if (autoSelect && places.length > 0 && localMatches.length === 0) {
+        closeDropdown();
+        this.focusOpenStreetMapPlace(places[0]);
+        return;
+      }
+      if (autoSelect && localMatches.length > 0) {
+        closeDropdown();
+        this.jumpToHospitalFromMapSearch(localMatches[0].id);
+        return;
+      }
+      renderDropdown(q, places, false);
+    };
+
+    input.addEventListener('focus', () => {
+      renderDropdown(input.value, lastOsmPlaces, false);
+    });
+
+    input.addEventListener('input', (e) => {
+      const q = e.target.value;
+      if (clearBtn) clearBtn.style.display = q ? 'inline-flex' : 'none';
+      clearTimeout(debounceTimer);
+      renderDropdown(q, [], q.trim().length >= 3);
+      if (q.trim().length >= 3) {
+        debounceTimer = setTimeout(() => runLiveSearch(q, false), 350);
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        clearTimeout(debounceTimer);
+        runLiveSearch(input.value, true);
+      } else if (e.key === 'Escape') {
+        closeDropdown();
+        input.blur();
+      }
+    });
+
+    if (findBtn) {
+      findBtn.addEventListener('click', () => {
+        clearTimeout(debounceTimer);
+        runLiveSearch(input.value, true);
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        clearTimeout(debounceTimer);
+        input.value = '';
+        clearBtn.style.display = 'none';
+        lastOsmPlaces = [];
+        closeDropdown();
+        if (this.map && this.mapSearchMarker && this.map.hasLayer(this.mapSearchMarker)) {
+          this.map.removeLayer(this.mapSearchMarker);
+          this.mapSearchMarker = null;
+        }
+        this.fitBoundsWithPatient();
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      const wrapper = document.querySelector('.map-sticky-wrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        closeDropdown();
+      }
+    });
+  }
+
+  async fetchOpenStreetMapPlaces(query) {
+    if (this.mapSearchAbort) {
+      try { this.mapSearchAbort.abort(); } catch (_) {}
+    }
+    this.mapSearchAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    try {
+      const url =
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}` +
+        `&countrycodes=in&viewbox=74.0,18.5,78.6,11.5&bounded=0&limit=5&addressdetails=1`;
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/json' },
+        signal: this.mapSearchAbort ? this.mapSearchAbort.signal : undefined
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      if (err && err.name === 'AbortError') return [];
+      console.warn('OpenStreetMap Nominatim lookup error:', err);
+      return [];
+    }
+  }
+
+  jumpToHospitalFromMapSearch(hospitalId) {
+    const hospital = window.dataStore.getById(hospitalId);
+    if (!hospital) return;
+
+    if (this.map && this.mapSearchMarker && this.map.hasLayer(this.mapSearchMarker)) {
+      this.map.removeLayer(this.mapSearchMarker);
+      this.mapSearchMarker = null;
+    }
+
+    const searchInput = document.getElementById('map-search-input');
+    const clearBtn = document.getElementById('map-search-clear');
+    if (searchInput) searchInput.value = hospital.name;
+    if (clearBtn) clearBtn.style.display = 'inline-flex';
+
+    // Ensure target hospital marker exists even if previous list filter excluded it
+    if (!this.markers[hospitalId]) {
+      this.activeFilter = 'all';
+      this.searchQuery = '';
+      const mainInput = document.getElementById('search-main-input');
+      if (mainInput) mainInput.value = '';
+      document.querySelectorAll('.chip-btn').forEach(c => {
+        c.classList.toggle('active', c.dataset.filter === 'all');
+      });
+      this.renderResults(true);
+    }
+
+    this.selectHospital(hospitalId, true);
+  }
+
+  focusOpenStreetMapPlace(place) {
+    const lat = parseFloat(place.lat);
+    const lon = parseFloat(place.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || !this.map || typeof L === 'undefined') return;
+
+    const parts = (place.display_name || '').split(',').map(s => s.trim());
+    const title = parts[0] || place.name || 'Selected Location';
+    const sub = parts.slice(1, 4).join(', ');
+
+    const searchInput = document.getElementById('map-search-input');
+    const clearBtn = document.getElementById('map-search-clear');
+    if (searchInput) searchInput.value = title;
+    if (clearBtn) clearBtn.style.display = 'inline-flex';
+
+    if (this.mapSearchMarker && this.map.hasLayer(this.mapSearchMarker)) {
+      this.map.removeLayer(this.mapSearchMarker);
+    }
+
+    const pinHtml = `
+      <div class="custom-pin-marker pin-drop-anim" style="transform-origin: 17px 44px;">
+        <div class="nearest-pulse-ring"></div>
+        <svg class="pin-svg-body" viewBox="0 0 34 44" fill="none">
+          <path d="M17 0C7.61 0 0 7.61 0 17C0 29.75 17 44 17 44C17 44 34 29.75 34 17C34 7.61 26.39 0 17 0Z" fill="#E8622C"/>
+          <circle cx="17" cy="16" r="9" fill="#FAF6EF"/>
+          <circle cx="17" cy="16" r="4.5" fill="#12312E"/>
+        </svg>
+      </div>
+    `;
+
+    const icon = L.divIcon({
+      className: 'osm-searched-place-pin',
+      html: pinHtml,
+      iconSize: [34, 44],
+      iconAnchor: [17, 44],
+      popupAnchor: [0, -40]
+    });
+
+    const isFacility = place.type === 'hospital' || place.type === 'clinic' || place.class === 'amenity';
+    this.mapSearchMarker = L.marker([lat, lon], { icon, title, zIndexOffset: 650 }).addTo(this.map);
+
+    // Find nearest MediPulse facility to this searched map coordinate
+    const allHospitals = window.dataStore.getAll();
+    let nearest = null;
+    let nearestKm = Infinity;
+    allHospitals.forEach(h => {
+      const d = this.calcDistanceKm(lat, lon, h.lat, h.lng);
+      if (d < nearestKm) {
+        nearestKm = d;
+        nearest = h;
+      }
+    });
+
+    const popupEl = document.createElement('div');
+    popupEl.className = 'map-popup-card';
+    popupEl.innerHTML = `
+      <div class="map-popup-title">${this.escapeHtml(title)}</div>
+      <div class="map-popup-dist">${this.escapeHtml(sub || 'OpenStreetMap location')}</div>
+      ${nearest ? `<div class="map-popup-badges"><div><strong>Nearest MediPulse clinic:</strong> ${this.escapeHtml(nearest.name)} (${nearestKm} km)</div></div>` : ''}
+      ${nearest ? `<button type="button" class="map-popup-btn" id="osm-jump-nearest-btn" style="width:100%;margin-bottom:6px;">Open ${this.escapeHtml(nearest.name)}</button>` : ''}
+      <a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=15/${lat}/${lon}" target="_blank" rel="noopener" style="display:block;text-align:center;font-size:11px;color:var(--sage);font-weight:600;text-decoration:none;">View on OpenStreetMap ↗</a>
+    `;
+
+    const jumpBtn = popupEl.querySelector('#osm-jump-nearest-btn');
+    if (jumpBtn && nearest) {
+      jumpBtn.addEventListener('click', () => this.jumpToHospitalFromMapSearch(nearest.id));
+    }
+
+    this.mapSearchMarker.bindPopup(popupEl, { maxWidth: 280, closeButton: true });
+    this.map.flyTo([lat, lon], isFacility ? 15 : 12, { duration: 0.75 });
+    this.mapSearchMarker.openPopup();
+  }
+
   getFilteredHospitals() {
     let hospitals = window.dataStore.getAll();
     if (this.activeFilter === 'doctor') {
@@ -583,13 +936,7 @@ class MediPulseApp {
     }
 
     if (this.searchQuery) {
-      hospitals = hospitals.filter(h => {
-        const matchesName = h.name.toLowerCase().includes(this.searchQuery);
-        const matchesDoctor = h.doctors.some(d => d.name.toLowerCase().includes(this.searchQuery) || d.specialty.toLowerCase().includes(this.searchQuery));
-        const matchesMed = h.medicines.some(m => m.name.toLowerCase().includes(this.searchQuery) || m.category.toLowerCase().includes(this.searchQuery));
-        const matchesVac = h.vaccines.some(v => v.name.toLowerCase().includes(this.searchQuery));
-        return matchesName || matchesDoctor || matchesMed || matchesVac;
-      });
+      hospitals = hospitals.filter(h => this.hospitalMatchesQuery(h, this.searchQuery));
     }
     return hospitals;
   }
@@ -807,41 +1154,19 @@ class MediPulseApp {
   /* ==========================================================================
      RENDER SEARCH RESULTS (Cards with live badges, expandable detail tables)
      ========================================================================== */
-  renderResults() {
+  renderResults(immediateMap = false) {
     const container = document.getElementById('results-cards-list');
     const counterEl = document.getElementById('results-counter');
     if (!container) return;
 
-    let hospitals = window.dataStore.getAll();
-
-    // Apply Filter Chips
-    if (this.activeFilter === 'doctor') {
-      hospitals = hospitals.filter(h => h.doctors.some(d => d.onDuty));
-    } else if (this.activeFilter === 'medicine') {
-      hospitals = hospitals.filter(h => h.medicines.some(m => m.stock > 0));
-    } else if (this.activeFilter === 'vaccine') {
-      hospitals = hospitals.filter(h => h.vaccines.some(v => v.doses > 0));
-    } else if (this.activeFilter === 'emergency') {
-      hospitals = hospitals.filter(h => h.emergency24x7);
-    }
-
-    // Apply Search Query
-    if (this.searchQuery) {
-      hospitals = hospitals.filter(h => {
-        const matchesName = h.name.toLowerCase().includes(this.searchQuery);
-        const matchesDoctor = h.doctors.some(d => d.name.toLowerCase().includes(this.searchQuery) || d.specialty.toLowerCase().includes(this.searchQuery));
-        const matchesMed = h.medicines.some(m => m.name.toLowerCase().includes(this.searchQuery) || m.category.toLowerCase().includes(this.searchQuery));
-        const matchesVac = h.vaccines.some(v => v.name.toLowerCase().includes(this.searchQuery));
-        return matchesName || matchesDoctor || matchesMed || matchesVac;
-      });
-    }
+    const hospitals = this.getFilteredHospitals();
 
     if (counterEl) {
       counterEl.textContent = `${hospitals.length} ${window.i18n.get('resultsFound')}`;
     }
 
     if (this.map && this.mapEngine === 'osm') {
-      this.refreshMapMarkers();
+      this.refreshMapMarkers(false, immediateMap);
     }
 
     if (hospitals.length === 0) {

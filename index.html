@@ -249,10 +249,23 @@
             </div>
             <span id="map-engine-label" style="font-size: 11px; opacity: 0.9; font-weight: 600;">OpenStreetMap</span>
           </div>
-          <!-- OpenStreetMap / Leaflet Mount Point -->
-          <div id="leaflet-map" style="width: 100%; flex: 1; min-height: 480px;"></div>
-          <!-- Fallback View (gracefully displayed if offline / Leaflet CDN unreachable) -->
-          <div id="map-fallback-view" class="map-fallback-container" style="display: none;"></div>
+          <!-- In-Map Hospital & Place Search Bar -->
+          <div class="map-search-bar">
+            <div class="map-search-input-wrap">
+              <svg class="map-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="map-search-input" class="map-search-input" placeholder="Search hospitals on map or place (e.g. City Life, Manipal, Udupi)..." autocomplete="off" aria-label="Search hospitals in OpenStreetMap" />
+              <button type="button" id="map-search-clear" class="map-search-clear" title="Clear map search" aria-label="Clear map search" style="display: none;">&times;</button>
+            </div>
+            <button type="button" id="map-search-btn" class="map-search-go-btn" aria-label="Find on map">Find</button>
+          </div>
+          <div class="map-canvas-wrap">
+            <!-- Live Map Search Dropdown (MediPulse hospitals + OpenStreetMap places) -->
+            <div id="map-search-results" class="map-search-dropdown" style="display: none;" role="listbox" aria-label="Map search suggestions"></div>
+            <!-- OpenStreetMap / Leaflet Mount Point -->
+            <div id="leaflet-map" style="width: 100%; flex: 1; min-height: 430px;"></div>
+            <!-- Fallback View (gracefully displayed if offline / Leaflet CDN unreachable) -->
+            <div id="map-fallback-view" class="map-fallback-container" style="display: none;"></div>
+          </div>
         </div>
       </div>
     </section>

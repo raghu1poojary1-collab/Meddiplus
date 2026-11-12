@@ -1355,7 +1355,7 @@ small, .text-label {
   box-shadow: var(--card-shadow);
   overflow: hidden;
   background-color: var(--white);
-  height: 580px;
+  height: 600px;
   display: flex;
   flex-direction: column;
 }
@@ -1371,11 +1371,199 @@ small, .text-label {
   font-weight: 500;
 }
 
+/* In-Map Hospital & Place Search Bar */
+.map-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--paper);
+  border-bottom: 1px solid var(--line);
+  z-index: 20;
+}
+
+.map-search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 10px 5px 12px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.map-search-input-wrap:focus-within {
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(45, 106, 94, 0.14);
+}
+
+.map-search-icon {
+  color: var(--slate);
+  flex-shrink: 0;
+}
+
+.map-search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  min-width: 0;
+}
+
+.map-search-input::placeholder {
+  color: var(--slate);
+  opacity: 0.78;
+}
+
+.map-search-clear {
+  border: none;
+  background: #ede6da;
+  color: var(--ink);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 15px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.map-search-clear:hover {
+  background: #dfd5c5;
+}
+
+.map-search-go-btn {
+  border: none;
+  background-color: var(--sage);
+  color: var(--white);
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.18s ease, transform 0.12s ease;
+}
+
+.map-search-go-btn:hover {
+  background-color: var(--ink);
+}
+
+.map-search-go-btn:active {
+  transform: scale(0.97);
+}
+
+.map-canvas-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.map-search-dropdown {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  right: 10px;
+  max-height: 310px;
+  overflow-y: auto;
+  background-color: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 14px 32px rgba(18, 49, 46, 0.22);
+  z-index: 950;
+  padding: 6px;
+}
+
+.map-search-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate);
+  padding: 6px 10px 4px;
+}
+
+.map-search-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.15s ease;
+}
+
+.map-search-item:hover {
+  background-color: var(--paper);
+}
+
+.map-search-item-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.map-search-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-search-item-sub {
+  font-size: 11px;
+  color: var(--slate);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-search-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background-color: rgba(45, 106, 94, 0.12);
+  color: var(--sage);
+}
+
+.map-search-badge.osm {
+  background-color: rgba(232, 98, 44, 0.12);
+  color: var(--pulse);
+}
+
+.map-search-status {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--slate);
+  text-align: center;
+}
+
 #leaflet-map,
 #google-map {
   width: 100%;
   flex: 1;
-  min-height: 480px;
+  min-height: 430px;
   z-index: 10;
   background-color: var(--paper);
 }
