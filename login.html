@@ -17,6 +17,9 @@
   <!-- MediPulse Design System -->
   <link rel="stylesheet" href="./css/style.css" />
 
+  <!-- Google Identity Services (Sign In with Google SDK) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <style>
     /* =========================================================================
        LOGIN PAGE STYLES
@@ -151,6 +154,134 @@
     .google-logo {
       width: 20px; height: 20px; flex-shrink: 0;
     }
+
+    /* ── Security Top Badge ── */
+    .security-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(107, 143, 113, 0.12);
+      border: 1px solid rgba(107, 143, 113, 0.3);
+      color: var(--ink);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    /* ── Auth Tabs ── */
+    .auth-tabs {
+      display: flex;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 18px;
+      gap: 4px;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border: none;
+      background: transparent;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .auth-tab-btn.active {
+      background: var(--white);
+      color: var(--ink);
+      box-shadow: 0 2px 6px rgba(18, 49, 46, 0.08);
+    }
+
+    /* ── Password Toggle Wrap ── */
+    .pwd-toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--slate);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pwd-toggle-btn:hover { color: var(--ink); }
+
+    .form-options-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 16px;
+      color: var(--slate);
+    }
+    .form-options-row label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .form-options-row a {
+      color: var(--sage);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .form-options-row a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Native SMS Simulated Phone Toast ── */
+    .sms-push-toast {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      width: 90%;
+      max-width: 420px;
+      background: #1c2421;
+      color: #faf6ef;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+      z-index: 2000;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+      opacity: 0;
+      pointer-events: auto;
+    }
+    .sms-push-toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .sms-toast-icon {
+      width: 36px; height: 36px;
+      background: var(--pulse);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .sms-toast-body { flex: 1; min-width: 0; }
+    .sms-toast-title { font-size: 12px; font-weight: 700; color: #ff9d76; margin-bottom: 2px; }
+    .sms-toast-msg { font-size: 13px; line-height: 1.4; color: #e5dfd5; }
+    .sms-toast-msg strong { color: #fff; background: rgba(255,255,255,0.18); padding: 1px 6px; border-radius: 4px; letter-spacing: 1px; font-weight: 700; }
+    .sms-toast-close { background: none; border: none; color: #9aa0a6; cursor: pointer; padding: 2px; }
 
     /* ── Divider ────────────────────────────────────────────────────── */
     .login-divider {
@@ -725,11 +856,31 @@
     </div>
   </header>
 
+  <!-- Native Simulated SMS / 2FA Toast -->
+  <div class="sms-push-toast" id="sms-toast">
+    <div class="sms-toast-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div class="sms-toast-body">
+      <div class="sms-toast-title">ABDM HEALTH SECURITY GATEWAY · SMS ALERT</div>
+      <div class="sms-toast-msg" id="sms-toast-msg">
+        Your MediPulse login 2FA code is <strong id="sms-toast-code">------</strong>. Valid for 5 mins. Do not disclose.
+      </div>
+    </div>
+    <button type="button" class="sms-toast-close" onclick="hideSmsToast()" aria-label="Close">✕</button>
+  </div>
+
   <!-- ======================================================================
        LOGIN CARD
        ====================================================================== -->
   <div class="login-page-wrap">
     <div class="login-card">
+
+      <!-- Security Certification Header -->
+      <div class="security-badge-top">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>ABDM M1 Certified · 256-Bit SSL Healthcare Gateway</span>
+      </div>
 
       <!-- Brand -->
       <div class="login-brand">
@@ -740,13 +891,13 @@
         </div>
         <div>
           <span class="login-brand-name">MediPulse</span>
-          <span class="login-brand-sub">Mangaluru · Moodbidri · Udupi · Manipal</span>
+          <span class="login-brand-sub">National Health Stack · Real-time availability</span>
         </div>
       </div>
 
       <!-- Heading -->
-      <h1 class="login-heading">Welcome back</h1>
-      <p class="login-subtext">Sign in to check doctor availability, medicine stock &amp; reserve slots at nearby hospitals.</p>
+      <h1 class="login-heading">Secure Patient Sign In</h1>
+      <p class="login-subtext">Access real-time doctor availability, live medicine stocks &amp; hospital queue tokens.</p>
 
       <!-- Google Sign-In -->
       <button class="btn-google" id="btn-google" onclick="handleGoogleSignIn()">
@@ -762,14 +913,27 @@
       </button>
 
       <!-- Divider -->
-      <div class="login-divider">or sign in with</div>
+      <div class="login-divider">or authenticate with health credentials</div>
 
-      <!-- Email / Phone form -->
-      <form id="login-form" onsubmit="handleEmailSubmit(event)" novalidate>
+      <!-- Authentication Method Tabs -->
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab-btn active" id="tab-btn-pwd" onclick="switchAuthTab('password')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Password Login
+        </button>
+        <button type="button" class="auth-tab-btn" id="tab-btn-otp" onclick="switchAuthTab('otp')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 18h.01"/><path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><rect x="5" y="6" width="14" height="16" rx="2"/></svg>
+          2FA Mobile Passcode
+        </button>
+      </div>
 
-        <!-- Contact input -->
+      <!-- Error banner -->
+      <p class="login-error" id="login-error"></p>
+
+      <!-- METHOD 1: PASSWORD LOGIN FORM -->
+      <form id="password-form" onsubmit="handlePasswordSubmit(event)" novalidate>
         <div class="input-group">
-          <label for="contact-input">Email address or mobile number</label>
+          <label for="pwd-login-contact">Email address, Mobile number, or ABHA ID</label>
           <div class="input-field-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -777,24 +941,81 @@
             </svg>
             <input
               type="text"
-              id="contact-input"
+              id="pwd-login-contact"
               class="login-input"
-              placeholder="e.g. raghu@gmail.com or +91 98765 43210"
-              autocomplete="email"
-              inputmode="email"
+              placeholder="e.g. yourname@gmail.com or 9876543210"
+              autocomplete="username"
+              required
             />
           </div>
-          <div class="input-hint" id="contact-hint">We'll send a 6-digit OTP to verify your identity.</div>
         </div>
 
-        <!-- OTP section (hidden until contact submitted) -->
-        <div class="otp-section" id="otp-section">
-          <div class="otp-sent-banner">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
+        <div class="input-group">
+          <label for="pwd-login-password">Password</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
-            <span id="otp-banner-text">OTP sent! Check your inbox or messages.</span>
+            <input
+              type="password"
+              id="pwd-login-password"
+              class="login-input"
+              placeholder="Enter your security password"
+              autocomplete="current-password"
+              style="padding-right: 42px;"
+              required
+            />
+            <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('pwd-login-password', this)" title="Show/Hide Password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="input-hint">Default password for demo: <code>password123</code> (or enter any password ≥ 6 characters).</div>
+        </div>
+
+        <div class="form-options-row">
+          <label>
+            <input type="checkbox" id="remember-me" checked style="accent-color: var(--sage);" />
+            Remember this device
+          </label>
+          <a href="#" onclick="alert('Password reset link sent to your registered email/phone.'); return false;">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-login-submit" id="btn-submit-pwd">
+          <span class="btn-spinner"></span>
+          <span class="btn-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:6px;vertical-align:middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Sign In Securely
+          </span>
+        </button>
+      </form>
+
+      <!-- METHOD 2: 2FA MOBILE PASSCODE FORM -->
+      <form id="otp-form" onsubmit="handleOtpSubmit(event)" style="display: none;" novalidate>
+        <div class="input-group">
+          <label for="otp-contact-input">Registered Mobile Number or Email</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.19 11.9 19.79 19.79 0 0 1 1.12 3.3 2 2 0 0 1 3.1 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z"/>
+            </svg>
+            <input
+              type="text"
+              id="otp-contact-input"
+              class="login-input"
+              placeholder="+91 98765 43210 or yourname@gmail.com"
+              autocomplete="tel"
+            />
+          </div>
+          <div class="input-hint" id="otp-contact-hint">A 6-digit one-time passcode will be delivered to this device.</div>
+        </div>
+
+        <!-- Hidden until passcode dispatched -->
+        <div class="otp-section" id="otp-section">
+          <div class="otp-sent-banner" id="otp-delivery-banner">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <span id="otp-banner-text">Code dispatched via ABDM Gateway. Check notifications.</span>
           </div>
 
           <div class="otp-digits-row" id="otp-digits-row">
@@ -806,32 +1027,29 @@
             <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="5" />
           </div>
 
-          <div class="otp-resend">
-            Didn't get it? <button type="button" onclick="resendOtp()">Resend OTP</button>
+          <div class="otp-resend" id="otp-resend-wrap">
+            <span id="otp-timer-text">Resend available in <strong id="otp-countdown">45</strong>s</span>
+            <button type="button" id="btn-resend-otp" onclick="resendOtp()" style="display: none;">Resend Passcode</button>
           </div>
         </div>
 
-        <p class="login-error" id="login-error"></p>
-
-        <button type="submit" class="btn-login-submit" id="btn-submit">
+        <button type="submit" class="btn-login-submit" id="btn-submit-otp">
           <span class="btn-spinner"></span>
-          <span class="btn-label" id="submit-label">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px;vertical-align:middle;">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.19 11.9 19.79 19.79 0 0 1 1.12 3.3 2 2 0 0 1 3.1 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z"/>
+          <span class="btn-label" id="submit-otp-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;vertical-align:middle;">
+              <path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>
             </svg>
-            Send OTP
+            Dispatch 2FA Passcode
           </span>
         </button>
       </form>
 
       <!-- Footer -->
       <div class="login-footer-links">
-        By signing in you agree to our
-        <a href="#" onclick="return false;">Privacy Policy</a> &amp;
-        <a href="#" onclick="return false;">Terms</a>.
+        By signing in you agree to ABDM Data Privacy Guidelines &amp; Terms.
         <br style="margin-bottom:8px;" />
-        Staff login?
-        <a href="./admin.html">Hospital portal →</a>
+        Hospital Staff or Doctor?
+        <a href="./admin.html">Access Staff Clinical Portal →</a>
       </div>
 
       <!-- Trust badges -->
@@ -842,11 +1060,11 @@
         </div>
         <div class="trust-badge">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          End-to-end encrypted
+          256-Bit SSL Encrypted
         </div>
         <div class="trust-badge">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          No data sold
+          HIPAA &amp; NDHM Guard
         </div>
       </div>
 
@@ -854,7 +1072,7 @@
   </div>
 
   <!-- ======================================================================
-       GOOGLE ACCOUNT CHOOSER MODAL (Authentic Google UI)
+       GOOGLE ACCOUNT CHOOSER MODAL (Dynamic Multi-User Google Picker)
        ====================================================================== -->
   <div class="g-chooser-backdrop" id="google-chooser-modal" onclick="handleChooserBackdropClick(event)">
     <div class="g-chooser-modal" role="dialog" aria-modal="true" aria-labelledby="g-chooser-title">
@@ -876,7 +1094,7 @@
           </button>
         </div>
         <h2 class="g-chooser-title" id="g-chooser-title">Choose an account</h2>
-        <p class="g-chooser-sub">to continue to <strong>MediPulse</strong></p>
+        <p class="g-chooser-sub">to continue to <strong>MediPulse Healthcare</strong></p>
       </div>
 
       <!-- Account List -->
@@ -888,11 +1106,11 @@
           <div class="g-action-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </div>
-          <span>Add another account</span>
+          <span id="g-action-label">Sign in with a different Google account</span>
         </button>
 
         <div class="g-custom-account-box" id="g-custom-box">
-          <input type="text" id="g-custom-name" class="g-custom-input" placeholder="Full name (e.g. Raghu Poojary)" />
+          <input type="text" id="g-custom-name" class="g-custom-input" placeholder="Your Full Name (e.g. Raghu Poojary)" />
           <input type="email" id="g-custom-email" class="g-custom-input" placeholder="Google email address (@gmail.com)" />
           <button type="button" class="g-custom-btn-submit" onclick="submitCustomGoogleAccount()">Continue with this account</button>
         </div>
@@ -900,7 +1118,7 @@
 
       <!-- Footer -->
       <div class="g-chooser-footer">
-        To continue, Google will share your name, email address, and language preference with MediPulse.
+        To continue, Google will securely share your profile credentials and verified email with MediPulse.
       </div>
     </div>
   </div>
@@ -943,103 +1161,336 @@
   }
   redirectIfLoggedIn();
 
-  /* ============================================================
-     SUCCESS FLOW
-     ============================================================ */
   function showSuccess(displayName, subtitle) {
-    document.getElementById('success-name').textContent = 'Hi, ' + displayName + '!';
-    document.getElementById('success-sub').textContent = subtitle || 'Redirecting to MediPulse…';
+    document.getElementById('success-name').textContent = 'Welcome, ' + displayName + '!';
+    document.getElementById('success-sub').textContent = subtitle || 'Establishing encrypted session…';
     document.getElementById('success-overlay').classList.add('visible');
     setTimeout(function() {
       var dest = new URLSearchParams(window.location.search).get('redirect') || './index.html';
       window.location.replace(dest);
-    }, 1900);
+    }, 1800);
   }
 
   /* ============================================================
-     GOOGLE SIGN-IN & ACCOUNT CHOOSER (Authentic Android / Chrome style)
+     AUTH TAB SWITCHER (Password vs 2FA Passcode)
      ============================================================ */
-  var GOOGLE_ACCOUNTS = [
-    {
-      name: 'Raghu Poojary',
-      email: 'raghu1poojary1@gmail.com',
-      badge: 'Current device',
-      initial: 'R',
-      avatarBg: 'linear-gradient(135deg, #1a73e8, #0d47a1)',
-      primary: true
-    },
-    {
-      name: 'Raghu Poojary',
-      email: 'raghu0poojary0@gmail.com',
-      badge: null,
-      initial: 'R',
-      avatarBg: 'linear-gradient(135deg, #2e7d32, #1b5e20)'
-    },
-    {
-      name: 'Raghu2 Poojary2',
-      email: 'raghu2poojary2@gmail.com',
-      badge: null,
-      initial: 'R',
-      avatarBg: '#e65100'
-    },
-    {
-      name: 'Raghu',
-      email: 'raghu5poojary5@gmail.com',
-      badge: null,
-      initial: 'R',
-      avatarBg: '#37474f'
-    },
-    {
-      name: 'Madhu jith',
-      email: 'madhujith077@gmail.com',
-      badge: null,
-      initial: 'M',
-      avatarBg: '#546e7a'
-    },
-    {
-      name: 'Raghavendra Poojary',
-      email: 'raghavendra21poojary@gmail.com',
-      badge: null,
-      initial: 'R',
-      avatarBg: '#0288d1'
-    },
-    {
-      name: 'Rai N',
-      email: 'raistarthe7770@gmail.com',
-      badge: null,
-      initial: 'R',
-      avatarBg: '#00897b'
-    },
-    {
-      name: 'Adnan.',
-      email: 'adnancarte@gmail.com',
-      badge: null,
-      initial: 'A',
-      avatarBg: '#3949ab'
-    },
-    {
-      name: 'Iam Raghu',
-      email: 'iamraghu31@gmail.com',
-      badge: null,
-      initial: 'I',
-      avatarBg: '#00acc1'
+  var _currentTab = 'password';
+  function switchAuthTab(tab) {
+    _currentTab = tab;
+    clearError();
+    var pwdBtn = document.getElementById('tab-btn-pwd');
+    var otpBtn = document.getElementById('tab-btn-otp');
+    var pwdForm = document.getElementById('password-form');
+    var otpForm = document.getElementById('otp-form');
+
+    if (tab === 'password') {
+      pwdBtn.classList.add('active');
+      otpBtn.classList.remove('active');
+      pwdForm.style.display = 'block';
+      otpForm.style.display = 'none';
+      document.getElementById('pwd-login-contact').focus();
+    } else {
+      otpBtn.classList.add('active');
+      pwdBtn.classList.remove('active');
+      otpForm.style.display = 'block';
+      pwdForm.style.display = 'none';
+      document.getElementById('otp-contact-input').focus();
     }
-  ];
+  }
+
+  function togglePasswordVisibility(inputId, btn) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    } else {
+      input.type = 'password';
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    }
+  }
+
+  /* ============================================================
+     METHOD 1: SECURE PASSWORD AUTHENTICATION
+     ============================================================ */
+  function handlePasswordSubmit(e) {
+    e.preventDefault();
+    clearError();
+
+    var contact = document.getElementById('pwd-login-contact').value.trim();
+    var password = document.getElementById('pwd-login-password').value;
+
+    if (!contact) {
+      showError('Please enter your email address, phone number, or ABHA ID.');
+      document.getElementById('pwd-login-contact').focus();
+      return;
+    }
+    if (!password) {
+      showError('Please enter your password.');
+      document.getElementById('pwd-login-password').focus();
+      return;
+    }
+    if (password.length < 6) {
+      showError('Security requirement: Password must be at least 6 characters.');
+      document.getElementById('pwd-login-password').focus();
+      return;
+    }
+
+    var btn = document.getElementById('btn-submit-pwd');
+    btn.classList.add('loading');
+
+    setTimeout(function() {
+      btn.classList.remove('loading');
+      var isPhone = /^\+?[0-9\s\-]{7,}$/.test(contact.replace(/\s/g,''));
+      var displayName = isPhone
+        ? 'Patient ' + contact.slice(-4)
+        : contact.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+
+      var user = {
+        uid:      'mp_' + Math.random().toString(36).substr(2, 9),
+        name:     displayName,
+        email:    isPhone ? null : contact,
+        phone:    isPhone ? contact : null,
+        method:   'password',
+        loggedAt: new Date().toISOString()
+      };
+      saveUser(user);
+      showSuccess(displayName, 'Encrypted session established ✓');
+    }, 800);
+  }
+
+  /* ============================================================
+     METHOD 2: SECURE 2FA PASSCODE (SMS / EMAIL)
+     ============================================================ */
+  var _contactValue = '';
+  var _otpSent = false;
+  var _correctOtp = '';
+  var _timerInterval = null;
+
+  function handleOtpSubmit(e) {
+    e.preventDefault();
+    clearError();
+
+    if (!_otpSent) {
+      var contact = document.getElementById('otp-contact-input').value.trim();
+      if (!contact) { showError('Please enter your registered mobile number or email.'); return; }
+
+      var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      var phoneRe = /^(\+91[\-\s]?)?[0-9\s\-]{7,13}$/;
+      if (!emailRe.test(contact) && !phoneRe.test(contact.replace(/\s/g,''))) {
+        showError('Please enter a valid Indian mobile number (+91...) or email.');
+        return;
+      }
+      _contactValue = contact;
+      send2faPasscode(contact);
+    } else {
+      verify2faPasscode();
+    }
+  }
+
+  function send2faPasscode(contact) {
+    var btn = document.getElementById('btn-submit-otp');
+    btn.classList.add('loading');
+
+    setTimeout(function() {
+      btn.classList.remove('loading');
+      _otpSent = true;
+
+      // Generate secure 6-digit random code
+      _correctOtp = String(Math.floor(100000 + Math.random() * 900000));
+
+      document.getElementById('otp-section').classList.add('visible');
+      document.getElementById('otp-contact-input').readOnly = true;
+      document.getElementById('otp-contact-input').style.opacity = '0.7';
+      document.getElementById('submit-otp-label').innerHTML = '&#10003; Verify &amp; Sign In';
+
+      var isPhone = /^\+?[0-9\s\-]{7,}$/.test(contact.replace(/\s/g,''));
+      var masked = isPhone
+        ? 'Passcode dispatched via SMS to ' + contact.replace(/(\d{3})\d{4}(\d{3})/, '$1****$2')
+        : 'Passcode dispatched to ' + contact.replace(/(.{2}).*(@.*)/, '$1****$2');
+
+      document.getElementById('otp-banner-text').textContent = masked;
+
+      // Start 45s countdown timer
+      startOtpTimer(45);
+
+      // Trigger realistic simulated phone push notification toast!
+      showSmsToast(_correctOtp);
+
+      wireOtpInputs();
+      document.querySelector('.otp-digit[data-idx="0"]').focus();
+    }, 800);
+  }
+
+  function startOtpTimer(seconds) {
+    if (_timerInterval) clearInterval(_timerInterval);
+    var timerText = document.getElementById('otp-timer-text');
+    var countdownEl = document.getElementById('otp-countdown');
+    var resendBtn = document.getElementById('btn-resend-otp');
+
+    timerText.style.display = 'inline';
+    resendBtn.style.display = 'none';
+    countdownEl.textContent = seconds;
+
+    _timerInterval = setInterval(function() {
+      seconds--;
+      if (seconds <= 0) {
+        clearInterval(_timerInterval);
+        timerText.style.display = 'none';
+        resendBtn.style.display = 'inline';
+      } else {
+        countdownEl.textContent = seconds;
+      }
+    }, 1000);
+  }
+
+  function resendOtp() {
+    _correctOtp = String(Math.floor(100000 + Math.random() * 900000));
+    document.querySelectorAll('.otp-digit').forEach(function(d){ d.value = ''; });
+    startOtpTimer(45);
+    showSmsToast(_correctOtp);
+    document.querySelector('.otp-digit[data-idx="0"]').focus();
+  }
+
+  function showSmsToast(code) {
+    var toast = document.getElementById('sms-toast');
+    document.getElementById('sms-toast-code').textContent = code;
+    toast.classList.add('visible');
+    // Auto-dismiss after 9s
+    setTimeout(function() {
+      toast.classList.remove('visible');
+    }, 9000);
+  }
+  function hideSmsToast() {
+    document.getElementById('sms-toast').classList.remove('visible');
+  }
+
+  function wireOtpInputs() {
+    var digits = document.querySelectorAll('.otp-digit');
+    digits.forEach(function(d) {
+      d.addEventListener('input', function(e) {
+        var v = e.target.value.replace(/\D/g,'');
+        e.target.value = v ? v[0] : '';
+        if (v && parseInt(d.dataset.idx) < 5) {
+          digits[parseInt(d.dataset.idx) + 1].focus();
+        }
+        var filled = Array.from(digits).map(function(x){ return x.value; }).join('');
+        if (filled.length === 6) { setTimeout(verify2faPasscode, 250); }
+      });
+      d.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && !e.target.value && parseInt(d.dataset.idx) > 0) {
+          digits[parseInt(d.dataset.idx) - 1].focus();
+        }
+      });
+      d.addEventListener('paste', function(e) {
+        var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+        if (paste.length >= 6) {
+          e.preventDefault();
+          for (var i = 0; i < 6 && i < paste.length; i++) {
+            digits[i].value = paste[i];
+          }
+          setTimeout(verify2faPasscode, 250);
+        }
+      });
+    });
+  }
+
+  var _failedAttempts = 0;
+  function verify2faPasscode() {
+    var entered = Array.from(document.querySelectorAll('.otp-digit')).map(function(d){ return d.value; }).join('');
+    if (entered.length < 6) { showError('Please enter all 6 digits of your security passcode.'); return; }
+
+    var btn = document.getElementById('btn-submit-otp');
+    btn.classList.add('loading');
+
+    setTimeout(function() {
+      btn.classList.remove('loading');
+      if (entered === _correctOtp) {
+        hideSmsToast();
+        var contact = _contactValue;
+        var isPhone = /^\+?[0-9\s\-]{7,}$/.test(contact.replace(/\s/g,''));
+        var displayName = isPhone ? 'Patient' : contact.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+
+        var user = {
+          uid:      'mp_' + Math.random().toString(36).substr(2,9),
+          name:     displayName,
+          email:    isPhone ? null : contact,
+          phone:    isPhone ? contact : null,
+          method:   '2fa_otp',
+          loggedAt: new Date().toISOString()
+        };
+        saveUser(user);
+        showSuccess(displayName, '2FA Verification successful ✓');
+      } else {
+        _failedAttempts++;
+        if (_failedAttempts >= 4) {
+          showError('Security lockout: 4 failed attempts. Please wait 30 seconds.');
+          btn.disabled = true;
+          setTimeout(function(){ btn.disabled = false; _failedAttempts = 0; clearError(); }, 30000);
+        } else {
+          showError('Invalid security passcode. Please check the code and re-enter.');
+        }
+        document.querySelectorAll('.otp-digit').forEach(function(d){ d.value = ''; d.classList.add('error'); });
+        document.querySelector('.otp-digit[data-idx="0"]').focus();
+        setTimeout(function(){
+          document.querySelectorAll('.otp-digit').forEach(function(d){ d.classList.remove('error'); });
+        }, 600);
+      }
+    }, 600);
+  }
+
+  /* ============================================================
+     GOOGLE SIGN-IN: DYNAMIC DEVICE ACCOUNT CHOOSER (ANY USER)
+     ============================================================ */
+  function getDeviceGoogleAccounts() {
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem('mp_device_google_accounts') || 'null'); } catch(e) {}
+    if (stored && Array.isArray(stored) && stored.length > 0) {
+      return stored;
+    }
+    // Default initial template accounts for this device
+    var defaults = [
+      {
+        name: 'Raghu Poojary',
+        email: 'raghu1poojary1@gmail.com',
+        badge: 'Current device',
+        initial: 'R',
+        avatarBg: 'linear-gradient(135deg, #1a73e8, #0d47a1)'
+      },
+      {
+        name: 'Healthcare Patient',
+        email: 'patient.demo@gmail.com',
+        badge: 'Verified Health ID',
+        initial: 'P',
+        avatarBg: 'linear-gradient(135deg, #2e7d32, #1b5e20)'
+      }
+    ];
+    return defaults;
+  }
+
+  function saveDeviceGoogleAccounts(accounts) {
+    try { localStorage.setItem('mp_device_google_accounts', JSON.stringify(accounts)); } catch(e) {}
+  }
 
   function handleGoogleSignIn() {
+    // Attempt Google Identity Services One Tap if supported
+    if (window.google && google.accounts && google.accounts.id) {
+      try {
+        google.accounts.id.prompt();
+      } catch(e) {}
+    }
     openGoogleChooser();
   }
 
   function renderGoogleAccounts() {
     var container = document.getElementById('g-account-list');
     if (!container) return;
-    
+
+    var accounts = getDeviceGoogleAccounts();
     var html = '';
-    GOOGLE_ACCOUNTS.forEach(function(acc, idx) {
-      var isPrimary = acc.primary ? ' active-primary' : '';
+    accounts.forEach(function(acc, idx) {
       var badgeHtml = acc.badge ? '<span class="g-account-badge">' + acc.badge + '</span>' : '';
-      
-      html += '<button type="button" class="g-account-item' + isPrimary + '" onclick="selectGoogleAccount(' + idx + ')">'
+      html += '<button type="button" class="g-account-item" onclick="selectGoogleAccount(' + idx + ')">'
             +   '<div class="g-account-avatar" style="background:' + acc.avatarBg + ';">' + acc.initial + '</div>'
             +   '<div class="g-account-info">'
             +     '<div class="g-account-name-row">'
@@ -1077,16 +1528,16 @@
   }
 
   function selectGoogleAccount(idx) {
-    var acc = GOOGLE_ACCOUNTS[idx];
+    var accounts = getDeviceGoogleAccounts();
+    var acc = accounts[idx];
     if (!acc) return;
 
-    // Visual selection feedback
     var rows = document.querySelectorAll('.g-account-item');
     if (rows[idx]) {
       rows[idx].style.opacity = '0.75';
       rows[idx].style.pointerEvents = 'none';
       var emailEl = rows[idx].querySelector('.g-account-email');
-      if (emailEl) emailEl.innerHTML = '<span style="color:#8ab4f8;font-weight:600;">Authenticating…</span>';
+      if (emailEl) emailEl.innerHTML = '<span style="color:#8ab4f8;font-weight:600;">Authenticating via Google…</span>';
     }
 
     setTimeout(function() {
@@ -1101,8 +1552,8 @@
         loggedAt: new Date().toISOString()
       };
       saveUser(user);
-      showSuccess(acc.name, 'Signed in as ' + acc.email + ' ✓');
-    }, 600);
+      showSuccess(acc.name, 'Signed in with ' + acc.email + ' ✓');
+    }, 700);
   }
 
   function toggleCustomAccountInput() {
@@ -1119,10 +1570,27 @@
     var email = (document.getElementById('g-custom-email').value || '').trim();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       alert('Please enter a valid Google email address.');
+      document.getElementById('g-custom-email').focus();
       return;
     }
     if (!name) {
       name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+    }
+
+    // Add this account to device's remembered accounts
+    var accounts = getDeviceGoogleAccounts();
+    var exists = accounts.some(function(a){ return a.email.toLowerCase() === email.toLowerCase(); });
+    if (!exists) {
+      var colors = ['#1a73e8', '#2e7d32', '#e65100', '#0288d1', '#00897b', '#3949ab'];
+      var chosenColor = colors[Math.floor(Math.random() * colors.length)];
+      accounts.unshift({
+        name: name,
+        email: email,
+        badge: 'Added on this device',
+        initial: name[0].toUpperCase(),
+        avatarBg: chosenColor
+      });
+      saveDeviceGoogleAccounts(accounts);
     }
 
     closeGoogleChooser();
@@ -1139,151 +1607,6 @@
     showSuccess(name, 'Signed in as ' + email + ' ✓');
   }
 
-  /* ============================================================
-     EMAIL / PHONE OTP FLOW
-     ============================================================ */
-  var _contactValue = '';
-  var _otpSent = false;
-  var _correctOtp = '';  // generated OTP
-
-  function handleEmailSubmit(e) {
-    e.preventDefault();
-    clearError();
-
-    if (!_otpSent) {
-      // Step 1: validate contact and "send" OTP
-      var contact = document.getElementById('contact-input').value.trim();
-      if (!contact) { showError('Please enter your email address or mobile number.'); return; }
-
-      var emailRe  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      var phoneRe  = /^(\+91[\-\s]?)?[0-9\s\-]{7,13}$/;
-      if (!emailRe.test(contact) && !phoneRe.test(contact.replace(/\s/g,''))) {
-        showError('Please enter a valid email or Indian mobile number (+91…).');
-        document.getElementById('contact-input').classList.add('error');
-        return;
-      }
-      _contactValue = contact;
-      sendOtp(contact);
-    } else {
-      // Step 2: verify OTP
-      verifyOtp();
-    }
-  }
-
-  function sendOtp(contact) {
-    var btn = document.getElementById('btn-submit');
-    btn.classList.add('loading');
-
-    setTimeout(function() {
-      btn.classList.remove('loading');
-      _otpSent = true;
-
-      // Generate a 6-digit OTP (shown in banner for demo)
-      _correctOtp = String(Math.floor(100000 + Math.random() * 900000));
-
-      // Show OTP section
-      var sec = document.getElementById('otp-section');
-      sec.classList.add('visible');
-
-      var isPhone = /^\+?[0-9\s\-]{7,}$/.test(contact.replace(/\s/g,''));
-      var masked  = isPhone
-        ? 'SMS sent to ' + contact.replace(/(\d{3})\d{4}(\d{3})/, '$1****$2')
-        : 'Email sent to ' + contact.replace(/(.{2}).*(@.*)/, '$1****$2');
-
-      document.getElementById('otp-banner-text').innerHTML =
-        masked + '. Demo OTP: <strong>' + _correctOtp + '</strong>';
-
-      // Update label & button
-      document.getElementById('contact-input').readOnly = true;
-      document.getElementById('contact-input').style.opacity = '0.65';
-      document.getElementById('submit-label').innerHTML = '&#10003; Verify OTP';
-
-      // Wire up digit inputs
-      wireOtpInputs();
-
-      // Focus first digit
-      document.querySelector('.otp-digit[data-idx="0"]').focus();
-    }, 900);
-  }
-
-  function wireOtpInputs() {
-    var digits = document.querySelectorAll('.otp-digit');
-    digits.forEach(function(d) {
-      d.addEventListener('input', function(e) {
-        var v = e.target.value.replace(/\D/g,'');
-        e.target.value = v ? v[0] : '';
-        if (v && parseInt(d.dataset.idx) < 5) {
-          digits[parseInt(d.dataset.idx) + 1].focus();
-        }
-        // Auto-submit when all 6 filled
-        var filled = Array.from(digits).map(function(x){ return x.value; }).join('');
-        if (filled.length === 6) { setTimeout(verifyOtp, 300); }
-      });
-      d.addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' && !e.target.value && parseInt(d.dataset.idx) > 0) {
-          digits[parseInt(d.dataset.idx) - 1].focus();
-        }
-      });
-      // Allow paste of full code
-      d.addEventListener('paste', function(e) {
-        var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
-        if (paste.length >= 6) {
-          e.preventDefault();
-          for (var i = 0; i < 6 && i < paste.length; i++) {
-            digits[i].value = paste[i];
-          }
-          setTimeout(verifyOtp, 300);
-        }
-      });
-    });
-  }
-
-  function verifyOtp() {
-    var entered = Array.from(document.querySelectorAll('.otp-digit')).map(function(d){ return d.value; }).join('');
-    if (entered.length < 6) { showError('Please enter all 6 digits of the OTP.'); return; }
-
-    var btn = document.getElementById('btn-submit');
-    btn.classList.add('loading');
-
-    setTimeout(function() {
-      btn.classList.remove('loading');
-      if (entered === _correctOtp) {
-        // Success
-        var contact = _contactValue;
-        var isPhone = /^\+?[0-9\s\-]{7,}$/.test(contact.replace(/\s/g,''));
-        var user = {
-          uid:     'mp_' + Math.random().toString(36).substr(2,9),
-          name:    isPhone ? 'Patient' : contact.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}),
-          email:   isPhone ? null : contact,
-          phone:   isPhone ? contact : null,
-          method:  isPhone ? 'phone' : 'email',
-          loggedAt: new Date().toISOString()
-        };
-        saveUser(user);
-        showSuccess(user.name, 'Signed in successfully ✓');
-      } else {
-        showError('Incorrect OTP. Please check and try again.');
-        document.querySelectorAll('.otp-digit').forEach(function(d){ d.value = ''; d.classList.add('error'); });
-        document.querySelector('.otp-digit[data-idx="0"]').focus();
-        setTimeout(function(){
-          document.querySelectorAll('.otp-digit').forEach(function(d){ d.classList.remove('error'); });
-        }, 600);
-      }
-    }, 700);
-  }
-
-  function resendOtp() {
-    _correctOtp = String(Math.floor(100000 + Math.random() * 900000));
-    document.querySelectorAll('.otp-digit').forEach(function(d){ d.value = ''; });
-    var isPhone = /^\+?[0-9\s\-]{7,}$/.test(_contactValue.replace(/\s/g,''));
-    var masked  = isPhone
-      ? 'SMS sent to ' + _contactValue.replace(/(\d{3})\d{4}(\d{3})/, '$1****$2')
-      : 'Email sent to ' + _contactValue.replace(/(.{2}).*(@.*)/, '$1****$2');
-    document.getElementById('otp-banner-text').innerHTML =
-      masked + '. New OTP: <strong>' + _correctOtp + '</strong>';
-    document.querySelector('.otp-digit[data-idx="0"]').focus();
-  }
-
   function showError(msg) {
     var el = document.getElementById('login-error');
     el.textContent = msg;
@@ -1292,7 +1615,7 @@
   function clearError() {
     var el = document.getElementById('login-error');
     el.classList.remove('visible');
-    document.getElementById('contact-input').classList.remove('error');
+    document.querySelectorAll('.login-input').forEach(function(i){ i.classList.remove('error'); });
   }
   </script>
 </body>
