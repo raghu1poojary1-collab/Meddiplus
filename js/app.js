@@ -1,58 +1,18 @@
 /**
  * ============================================================================
- * GOOGLE MAPS CONFIGURATION
- * Get your API key from https://console.cloud.google.com/
+ * OPENSTREETMAP (LEAFLET.JS) CONFIGURATION
+ * Reference view: https://www.openstreetmap.org/#map=7/16.222/76.882
  * ============================================================================
  */
-const GOOGLE_MAPS_API_KEY = "YOUR_API_KEY_HERE"; // get this from console.cloud.google.com
-
-// Global Google Maps Auth Failure Handler (Graceful Fallback Mode)
-window.gm_authFailure = function() {
-  console.warn("⚠️ Google Maps Authentication Failed (API Key missing or invalid). Activating graceful fallback view.");
-  if (window.mediPulseApp) {
-    window.mediPulseApp.showMapFallback();
-  } else {
-    window._mapAuthFailed = true;
-  }
-};
-
-// Global initMap callback invoked by Google Maps API script
-window.initMap = function() {
-  if (window.mediPulseApp) {
-    window.mediPulseApp.initGoogleMap();
-  } else {
-    window._pendingInitMap = true;
-  }
-};
-
-/**
- * Custom Desaturated Map Style Palette
- * Mutes roads/land to soft neutral tones complementing --paper (#FAF6EF) and --ink (#12312E).
- * Hides commercial POI business icons/labels while keeping road labels and water visible.
- */
-const GOOGLE_MAPS_STYLES = [
-  { elementType: "geometry", stylers: [{ color: "#FAF6EF" }] },
-  { featureType: "poi.business", stylers: [{ visibility: "off" }] },
-  { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-  { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
-  { featureType: "poi.medical", elementType: "geometry", stylers: [{ color: "#F0EAE1" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#DDEBE7" }] },
-  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#46524F" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#FFFFFF" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#E8E2D5" }] },
-  { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#DDD5C7" }] },
-  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#46524F" }] },
-  { featureType: "road", elementType: "labels.text.stroke", stylers: [{ color: "#FAF6EF" }] },
-  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#DDD5C7" }] },
-  { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#12312E" }] },
-  { featureType: "transit", stylers: [{ visibility: "off" }] }
-];
+const OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+const OSM_REGIONAL_VIEW = { lat: 16.222, lng: 76.882, zoom: 7 };
 
 /**
  * MediPulse — Core Application Logic
- * Implements Google Maps JavaScript API with AdvancedMarkerElement,
- * custom SVG teardrop pins, animated dashed polyline, bidirectional sync,
- * Web Speech API, OCR simulation, and live Admin sync.
+ * Implements OpenStreetMap via Leaflet.js with custom SVG teardrop pins,
+ * animated dashed polyline, bidirectional sync, Web Speech API,
+ * OCR simulation, and live Admin sync.
  */
 class MediPulseApp {
   constructor() {
@@ -76,7 +36,7 @@ class MediPulseApp {
       name: "Moodbidri Town Bus Stand, Karnataka"
     };
     this.patientMarker = null;
-    this.mapEngine = 'google'; // 'google' | 'fallback'
+    this.mapEngine = 'osm'; // 'osm' | 'fallback'
 
     this.init();
   }
@@ -128,14 +88,10 @@ class MediPulseApp {
           this.patientLocation.lng = pos.coords.longitude;
           this.patientLocation.name = "Your Live Location";
 
-          if (this.map) {
-            this.map.panTo({ lat: this.patientLocation.lat, lng: this.patientLocation.lng });
-            if (this.patientMarker) {
-              if (this.patientMarker.setPosition) {
-                this.patientMarker.setPosition(this.patientLocation);
-              } else if (this.patientMarker.position) {
-                this.patientMarker.position = this.patientLocation;
-              }
+          if (this.map && this.mapEngine === 'osm') {
+            this.map.panTo([this.patientLocation.lat, this.patientLocation.lng]);
+            if (this.patientMarker && this.patientMarker.setLatLng) {
+              this.patientMarker.setLatLng([this.patientLocation.lat, this.patientLocation.lng]);
             }
             this.fitBoundsWithPatient();
           }
@@ -149,26 +105,23 @@ class MediPulseApp {
   }
 
   /* ==========================================================================
-     MAP ENGINE INITIALIZATION & FALLBACK
+     MAP ENGINE INITIALIZATION & FALLBACK (OpenStreetMap + Leaflet)
      ========================================================================== */
   initMapEngine() {
-    if (window._mapAuthFailed) {
-      this.showMapFallback();
+    if (typeof L !== 'undefined' && typeof L.map === 'function') {
+      this.initOpenStreetMap();
       return;
     }
 
-    if (window._pendingInitMap || (typeof google !== 'undefined' && google.maps && google.maps.Map)) {
-      this.initGoogleMap();
-      return;
-    }
-
-    // Safety timeout: If Google Maps script hasn't loaded (e.g. invalid key or network block), activate fallback
+    // Wait briefly if Leaflet script is still finishing load
     setTimeout(() => {
-      if (!this.map) {
-        console.info("Google Maps not ready after timeout. Activating graceful fallback view.");
+      if (typeof L !== 'undefined' && typeof L.map === 'function') {
+        this.initOpenStreetMap();
+      } else if (!this.map) {
+        console.info("Leaflet/OpenStreetMap not ready after timeout. Activating graceful fallback view.");
         this.showMapFallback();
       }
-    }, 2200);
+    }, 1500);
   }
 
   /* ==========================================================================
@@ -415,54 +368,81 @@ class MediPulseApp {
   }
 
   /* ==========================================================================
-     GOOGLE MAPS PLATFORM INTEGRATION
-     AdvancedMarkerElement, Custom SVG Teardrop Pins, Custom InfoWindows,
-     Dashed Growing Polyline, Bidirectional Sync, and Fallback Radar.
+     OPENSTREETMAP (LEAFLET.JS) INTEGRATION
+     Custom SVG Teardrop Pins, Popups, Animated Dashed Polyline,
+     Bidirectional Sync, Karnataka Overview Control & Offline Fallback Radar.
      ========================================================================== */
-  initGoogleMap() {
-    const mapContainer = document.getElementById('google-map');
-    if (!mapContainer || typeof google === 'undefined' || !google.maps) {
+  initOpenStreetMap() {
+    const mapContainer = document.getElementById('leaflet-map');
+    if (!mapContainer || typeof L === 'undefined') {
       this.showMapFallback();
       return;
     }
 
     try {
-      this.mapEngine = 'google';
+      this.mapEngine = 'osm';
       const fallbackView = document.getElementById('map-fallback-view');
       if (fallbackView) fallbackView.style.display = 'none';
       mapContainer.style.display = 'block';
 
       const engineLabel = document.getElementById('map-engine-label');
-      if (engineLabel) engineLabel.textContent = 'Google Maps Platform';
+      if (engineLabel) engineLabel.textContent = 'OpenStreetMap Live';
 
-      // Centered on patient location (Moodbidri default or live GPS)
-      this.map = new google.maps.Map(mapContainer, {
-        center: { lat: this.patientLocation.lat, lng: this.patientLocation.lng },
-        zoom: 13,
-        styles: GOOGLE_MAPS_STYLES,
-        mapId: "MEDIPULSE_MAP_ID",
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
-        zoomControl: true,
-        zoomControlOptions: {
-          position: google.maps.ControlPosition.RIGHT_TOP
+      // Start at requested Karnataka regional view (#map=7/16.222/76.882)
+      this.map = L.map(mapContainer, {
+        center: [OSM_REGIONAL_VIEW.lat, OSM_REGIONAL_VIEW.lng],
+        zoom: OSM_REGIONAL_VIEW.zoom,
+        zoomControl: true
+      });
+
+      L.tileLayer(OSM_TILE_URL, {
+        maxZoom: 19,
+        attribution: OSM_ATTRIBUTION
+      }).addTo(this.map);
+
+      // Custom control to toggle between Karnataka (#map=7/16.222/76.882) and Nearby Hospitals
+      const self = this;
+      const ViewToggleControl = L.Control.extend({
+        options: { position: 'topright' },
+        onAdd: function () {
+          const wrap = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+          wrap.style.background = '#FAF6EF';
+          wrap.style.border = '1px solid #DDD5C7';
+          wrap.style.borderRadius = '8px';
+          wrap.style.overflow = 'hidden';
+          wrap.style.boxShadow = '0 2px 8px rgba(18,49,46,0.12)';
+          wrap.innerHTML = `
+            <button type="button" id="osm-fit-btn" title="Zoom to nearby hospitals" style="border:none;background:#FAF6EF;color:#12312E;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;border-right:1px solid #DDD5C7;">Nearby</button>
+            <button type="button" id="osm-state-btn" title="Karnataka overview (16.222, 76.882)" style="border:none;background:#FAF6EF;color:#46524F;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">Karnataka Z7</button>
+          `;
+          L.DomEvent.disableClickPropagation(wrap);
+          wrap.querySelector('#osm-fit-btn').addEventListener('click', () => self.fitBoundsWithPatient());
+          wrap.querySelector('#osm-state-btn').addEventListener('click', () => {
+            if (self.map) self.map.flyTo([OSM_REGIONAL_VIEW.lat, OSM_REGIONAL_VIEW.lng], OSM_REGIONAL_VIEW.zoom, { duration: 0.7 });
+          });
+          return wrap;
         }
       });
+      this.map.addControl(new ViewToggleControl());
 
       // Add Patient Location Pin ("You Are Here")
       this.addPatientMarker();
 
-      // Render Hospital Markers
-      this.refreshMapMarkers();
+      // Render Hospital Markers and fly smoothly to nearby facilities
+      this.refreshMapMarkers(true);
+
+      // Ensure tiles align cleanly after CSS layout settles
+      setTimeout(() => {
+        if (this.map) this.map.invalidateSize();
+      }, 250);
     } catch (e) {
-      console.error("Error creating Google Map instance:", e);
+      console.error("Error creating OpenStreetMap instance:", e);
       this.showMapFallback();
     }
   }
 
   addPatientMarker() {
-    if (!this.map || typeof google === 'undefined' || !google.maps) return;
+    if (!this.map || typeof L === 'undefined') return;
 
     const patientPinHtml = `
       <div style="background-color: var(--ink); color: var(--white); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(18, 49, 46, 0.35); border: 2.5px solid var(--white);">
@@ -470,142 +450,124 @@ class MediPulseApp {
       </div>
     `;
 
-    if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
-      const pinContainer = document.createElement('div');
-      pinContainer.innerHTML = patientPinHtml;
-      this.patientMarker = new google.maps.marker.AdvancedMarkerElement({
-        map: this.map,
-        position: { lat: this.patientLocation.lat, lng: this.patientLocation.lng },
-        title: this.patientLocation.name,
-        content: pinContainer
-      });
-    } else {
-      this.patientMarker = new google.maps.Marker({
-        map: this.map,
-        position: { lat: this.patientLocation.lat, lng: this.patientLocation.lng },
-        title: this.patientLocation.name
-      });
-    }
+    const icon = L.divIcon({
+      className: 'osm-patient-pin',
+      html: patientPinHtml,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+
+    this.patientMarker = L.marker([this.patientLocation.lat, this.patientLocation.lng], {
+      icon,
+      title: this.patientLocation.name,
+      zIndexOffset: 500
+    }).addTo(this.map);
+    this.patientMarker.bindPopup(`<strong>${this.patientLocation.name}</strong>`);
   }
 
   /* ==========================================================================
-     CUSTOM ADVANCED MARKERS & AUTO-FIT BOUNDS
+     CUSTOM MARKERS & AUTO-FIT BOUNDS (LEAFLET)
      ========================================================================== */
-  refreshMapMarkers() {
-    if (this.mapEngine === 'fallback' || !this.map) {
+  refreshMapMarkers(initialLoad = false) {
+    if (this.mapEngine === 'fallback' || !this.map || typeof L === 'undefined') {
       this.renderFallbackRadar();
       return;
     }
 
-    // Remove existing markers
+    // Remove existing hospital markers
     Object.values(this.markers).forEach(m => {
-      if (m.setMap) m.setMap(null);
-      if (m.map) m.map = null;
+      if (m && this.map.hasLayer(m)) this.map.removeLayer(m);
     });
     this.markers = {};
     this.infoWindows = {};
 
-    if (this.routePolyline) {
-      this.routePolyline.setMap(null);
+    if (this.routePolyline && this.map.hasLayer(this.routePolyline)) {
+      this.map.removeLayer(this.routePolyline);
       this.routePolyline = null;
     }
 
     const hospitals = this.getFilteredHospitals();
-    const bounds = new google.maps.LatLngBounds();
-    bounds.extend(new google.maps.LatLng(this.patientLocation.lat, this.patientLocation.lng));
+    const boundsPoints = [[this.patientLocation.lat, this.patientLocation.lng]];
 
-    // Sort by distance rank
     const sortedHospitals = [...hospitals].sort((a, b) => a.distanceKm - b.distanceKm);
 
     sortedHospitals.forEach((h, index) => {
-      bounds.extend(new google.maps.LatLng(h.lat, h.lng));
+      boundsPoints.push([h.lat, h.lng]);
 
-      // Check live availability flags
       const hasOnDutyDoctor = h.doctors.some(d => d.onDuty);
       const hasInStockMed = h.medicines.some(m => m.stock > 0);
       const hasVaccines = h.vaccines.some(v => v.doses > 0);
       const isAvailable = hasOnDutyDoctor && (hasInStockMed || hasVaccines);
+      const dotBadgeColor = isAvailable ? '#E8622C' : '#8c9794';
 
-      const dotBadgeColor = isAvailable ? '#E8622C' : '#8c9794'; // var(--pulse) or muted gray
-
-      // Custom HTML Pin container with SVG Teardrop in var(--ink)
-      const pinContainer = document.createElement('div');
-      pinContainer.className = `google-pin-marker ${h.isNearest ? 'nearest-hospital-pin' : ''} pin-drop-anim`;
-      pinContainer.id = `gpin-${h.id}`;
-      pinContainer.innerHTML = `
-        ${h.isNearest ? '<div class="nearest-pulse-ring"></div>' : ''}
-        <svg class="pin-svg-body" viewBox="0 0 34 44" fill="none">
-          <path d="M17 0C7.61 0 0 7.61 0 17C0 29.75 17 44 17 44C17 44 34 29.75 34 17C34 7.61 26.39 0 17 0Z" fill="var(--ink)"/>
-          <circle cx="17" cy="16" r="10" fill="var(--paper)"/>
-          <circle cx="17" cy="16" r="6" fill="${dotBadgeColor}"/>
-        </svg>
+      const pinHtml = `
+        <div class="custom-pin-marker ${h.isNearest ? 'nearest-hospital-pin' : ''} pin-drop-anim" id="gpin-${h.id}">
+          ${h.isNearest ? '<div class="nearest-pulse-ring"></div>' : ''}
+          <svg class="pin-svg-body" viewBox="0 0 34 44" fill="none">
+            <path d="M17 0C7.61 0 0 7.61 0 17C0 29.75 17 44 17 44C17 44 34 29.75 34 17C34 7.61 26.39 0 17 0Z" fill="var(--ink)"/>
+            <circle cx="17" cy="16" r="10" fill="var(--paper)"/>
+            <circle cx="17" cy="16" r="6" fill="${dotBadgeColor}"/>
+          </svg>
+        </div>
       `;
 
-      // 150ms Staggered Entrance Animation
-      setTimeout(() => {
-        let marker;
-        if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
-          marker = new google.maps.marker.AdvancedMarkerElement({
-            map: this.map,
-            position: { lat: h.lat, lng: h.lng },
-            title: h.name,
-            content: pinContainer
-          });
-        } else {
-          marker = new google.maps.Marker({
-            map: this.map,
-            position: { lat: h.lat, lng: h.lng },
-            title: h.name,
-            animation: google.maps.Animation.DROP
-          });
-          setTimeout(() => marker.setAnimation(null), 750);
-        }
+      const icon = L.divIcon({
+        className: 'osm-hospital-pin-wrap',
+        html: pinHtml,
+        iconSize: [34, 44],
+        iconAnchor: [17, 44],
+        popupAnchor: [0, -40]
+      });
 
-        // Custom InfoWindow matching design system (16px radius, var(--line) border)
-        const infoWindow = new google.maps.InfoWindow({
-          content: this.createPopupContent(h),
-          disableAutoPan: false
+      setTimeout(() => {
+        if (!this.map) return;
+        const marker = L.marker([h.lat, h.lng], {
+          icon,
+          title: h.name
+        }).addTo(this.map);
+
+        marker.bindPopup(this.createPopupContent(h), {
+          maxWidth: 280,
+          closeButton: true
         });
 
-        // Click Marker Listener -> Syncs with results list
-        const clickHandler = () => {
-          this.closeAllInfoWindows();
-          if (infoWindow.open) {
-            infoWindow.open({
-              map: this.map,
-              anchor: marker
-            });
-          }
+        marker.on('click', () => {
           this.selectHospital(h.id, true);
-        };
-
-        if (marker.addListener) {
-          marker.addListener('click', clickHandler);
-        } else if (marker.addEventListener) {
-          marker.addEventListener('gmp-click', clickHandler);
-        }
-        pinContainer.addEventListener('click', clickHandler);
+        });
 
         this.markers[h.id] = marker;
-        this.infoWindows[h.id] = infoWindow;
-      }, index * 150);
+        this.infoWindows[h.id] = marker;
+      }, index * 100);
     });
 
-    // Auto-fit bounds on every new search
-    if (this.map && sortedHospitals.length > 0) {
+    // Auto-fit bounds smoothly around patient + hospitals
+    if (this.map && boundsPoints.length > 1) {
+      const delay = initialLoad ? sortedHospitals.length * 100 + 250 : sortedHospitals.length * 100 + 60;
       setTimeout(() => {
-        this.map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
-      }, sortedHospitals.length * 150 + 60);
+        if (!this.map) return;
+        this.map.flyToBounds(L.latLngBounds(boundsPoints), {
+          padding: [40, 40],
+          maxZoom: 13,
+          duration: 0.85
+        });
+      }, delay);
     }
   }
 
   fitBoundsWithPatient() {
-    if (!this.map || typeof google === 'undefined' || !google.maps) return;
-    const bounds = new google.maps.LatLngBounds();
-    bounds.extend(new google.maps.LatLng(this.patientLocation.lat, this.patientLocation.lng));
+    if (!this.map || typeof L === 'undefined') return;
+    const points = [[this.patientLocation.lat, this.patientLocation.lng]];
     const hospitals = this.getFilteredHospitals();
-    hospitals.forEach(h => bounds.extend(new google.maps.LatLng(h.lat, h.lng)));
-    this.map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
+    hospitals.forEach(h => points.push([h.lat, h.lng]));
+    if (points.length > 1) {
+      this.map.flyToBounds(L.latLngBounds(points), {
+        padding: [40, 40],
+        maxZoom: 13,
+        duration: 0.7
+      });
+    } else {
+      this.map.flyTo([OSM_REGIONAL_VIEW.lat, OSM_REGIONAL_VIEW.lng], OSM_REGIONAL_VIEW.zoom, { duration: 0.7 });
+    }
   }
 
   getFilteredHospitals() {
@@ -652,16 +614,16 @@ class MediPulseApp {
   }
 
   closeAllInfoWindows() {
-    Object.values(this.infoWindows).forEach(iw => {
-      if (iw && iw.close) iw.close();
-    });
+    if (this.map && this.map.closePopup) {
+      this.map.closePopup();
+    }
   }
 
   updateMapPopups() {
     const hospitals = window.dataStore.getAll();
     hospitals.forEach(h => {
-      if (this.infoWindows[h.id]) {
-        this.infoWindows[h.id].setContent(this.createPopupContent(h));
+      if (this.markers[h.id] && this.markers[h.id].setPopupContent) {
+        this.markers[h.id].setPopupContent(this.createPopupContent(h));
       }
     });
     if (this.mapEngine === 'fallback') {
@@ -683,9 +645,8 @@ class MediPulseApp {
         card.classList.add('card-selected');
         card.classList.add('expanded');
 
-        // Apply brief background flash using var(--pulse) at low opacity fading over 0.6s
         card.classList.remove('card-pulse-flash');
-        void card.offsetWidth; // Force CSS reflow to replay animation
+        void card.offsetWidth;
         card.classList.add('card-pulse-flash');
         setTimeout(() => card.classList.remove('card-pulse-flash'), 650);
 
@@ -697,93 +658,69 @@ class MediPulseApp {
       }
     });
 
-    // 2. Pan/Zoom Google Map and open InfoWindow
-    if (this.map && this.markers[hospitalId]) {
-      const targetPos = { lat: hospital.lat, lng: hospital.lng };
-      this.map.panTo(targetPos);
-      this.map.setZoom(14);
-
-      this.closeAllInfoWindows();
-      if (this.infoWindows[hospitalId]) {
-        this.infoWindows[hospitalId].open({
-          map: this.map,
-          anchor: this.markers[hospitalId]
-        });
-      }
+    // 2. Pan/Zoom OpenStreetMap and open Popup
+    if (this.map && this.mapEngine === 'osm' && this.markers[hospitalId]) {
+      const targetPos = [hospital.lat, hospital.lng];
+      this.map.flyTo(targetPos, 14, { duration: 0.6 });
+      this.markers[hospitalId].openPopup();
 
       // 3. Draw animated thin dashed route polyline in var(--sage)
-      this.drawAnimatedPolyline(this.patientLocation, targetPos);
+      this.drawAnimatedPolyline(this.patientLocation, { lat: hospital.lat, lng: hospital.lng });
     } else if (this.mapEngine === 'fallback') {
       this.highlightFallbackPin(hospitalId);
     }
   }
 
   /**
-   * Draws a google.maps.Polyline from patient to selected hospital.
-   * Styled as a thin dashed line in var(--sage) using strokeOpacity: 0 and icons pattern.
-   * Incrementally extends path array over ~0.6s.
+   * Draws an animated dashed L.polyline from patient to selected hospital.
    */
   drawAnimatedPolyline(startPos, destPos) {
-    if (!this.map || typeof google === 'undefined' || !google.maps) return;
+    if (!this.map || typeof L === 'undefined') return;
 
-    if (this.routePolyline) {
-      this.routePolyline.setMap(null);
+    if (this.routePolyline && this.map.hasLayer(this.routePolyline)) {
+      this.map.removeLayer(this.routePolyline);
       this.routePolyline = null;
     }
 
-    const lineSymbol = {
-      path: 'M 0,-1 0,1',
-      strokeOpacity: 1,
-      strokeColor: '#6B8F71', // var(--sage)
-      scale: 3
-    };
+    const startLatLng = [startPos.lat, startPos.lng];
+    this.routePolyline = L.polyline([startLatLng], {
+      color: '#6B8F71',
+      weight: 3.5,
+      opacity: 0.9,
+      dashArray: '7, 9'
+    }).addTo(this.map);
 
-    const startLatLng = new google.maps.LatLng(startPos.lat, startPos.lng);
-
-    this.routePolyline = new google.maps.Polyline({
-      path: [startLatLng],
-      strokeColor: '#6B8F71',
-      strokeOpacity: 0,
-      icons: [{
-        icon: lineSymbol,
-        offset: '0',
-        repeat: '10px'
-      }],
-      map: this.map
-    });
-
-    // Interpolate 18 intermediate points for 600ms growth duration
     const steps = 18;
     const points = [];
     for (let i = 0; i <= steps; i++) {
       const lat = startPos.lat + (destPos.lat - startPos.lat) * (i / steps);
       const lng = startPos.lng + (destPos.lng - startPos.lng) * (i / steps);
-      points.push(new google.maps.LatLng(lat, lng));
+      points.push([lat, lng]);
     }
 
     let step = 1;
     const interval = setInterval(() => {
       if (step <= steps && this.routePolyline) {
-        this.routePolyline.setPath(points.slice(0, step + 1));
+        this.routePolyline.setLatLngs(points.slice(0, step + 1));
         step++;
       } else {
         clearInterval(interval);
       }
-    }, 33); // 18 * 33ms ~ 600ms
+    }, 33);
   }
 
   /* ==========================================================================
-     GRACEFUL STATIC FALLBACK VIEW (When Google Maps key is missing/unconfigured)
+     GRACEFUL STATIC FALLBACK VIEW (If Leaflet / OpenStreetMap tiles unreachable)
      ========================================================================== */
   showMapFallback() {
     this.mapEngine = 'fallback';
-    const googleMapEl = document.getElementById('google-map');
+    const leafletMapEl = document.getElementById('leaflet-map');
     const fallbackEl = document.getElementById('map-fallback-view');
     const engineLabel = document.getElementById('map-engine-label');
 
-    if (googleMapEl) googleMapEl.style.display = 'none';
+    if (leafletMapEl) leafletMapEl.style.display = 'none';
     if (fallbackEl) fallbackEl.style.display = 'flex';
-    if (engineLabel) engineLabel.textContent = 'Calibrated Radar (Fallback)';
+    if (engineLabel) engineLabel.textContent = 'Calibrated Radar (Offline)';
 
     this.renderFallbackRadar();
   }
@@ -901,6 +838,10 @@ class MediPulseApp {
 
     if (counterEl) {
       counterEl.textContent = `${hospitals.length} ${window.i18n.get('resultsFound')}`;
+    }
+
+    if (this.map && this.mapEngine === 'osm') {
+      this.refreshMapMarkers();
     }
 
     if (hospitals.length === 0) {

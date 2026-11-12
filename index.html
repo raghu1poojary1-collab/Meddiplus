@@ -239,19 +239,19 @@
         <div class="cards-list-wrap" id="results-cards-list"></div>
       </div>
 
-      <!-- Right Column: Sticky Google Maps Section -->
+      <!-- Right Column: Sticky OpenStreetMap Section -->
       <div class="map-column">
         <div class="map-sticky-wrapper">
           <div class="map-header-banner">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span class="pulse-dot-live"></span>
-              <span>Live Geographic Radar — Moodbidri Taluk</span>
+              <span>Live Geographic Radar — Karnataka &amp; Coastal Belt</span>
             </div>
-            <span id="map-engine-label" style="font-size: 11px; opacity: 0.9; font-weight: 600;">Google Maps</span>
+            <span id="map-engine-label" style="font-size: 11px; opacity: 0.9; font-weight: 600;">OpenStreetMap</span>
           </div>
-          <!-- Google Maps Mount Point -->
-          <div id="google-map" style="width: 100%; flex: 1; min-height: 480px;"></div>
-          <!-- Fallback View (gracefully displayed if API key is unconfigured or over quota) -->
+          <!-- OpenStreetMap / Leaflet Mount Point -->
+          <div id="leaflet-map" style="width: 100%; flex: 1; min-height: 480px;"></div>
+          <!-- Fallback View (gracefully displayed if offline / Leaflet CDN unreachable) -->
           <div id="map-fallback-view" class="map-fallback-container" style="display: none;"></div>
         </div>
       </div>
@@ -504,6 +504,9 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toast-container"></div>
 
+  <!-- Leaflet.js Engine (Free, OpenStreetMap API) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
   <!-- Application Modules -->
   <script src="./js/i18n.js"></script>
   <script src="./js/data.js"></script>
@@ -530,7 +533,5 @@
     })();
   </script>
 
-  <!-- Google Maps JavaScript API with marker and geometry libraries -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap&libraries=marker,geometry" async defer id="google-maps-script"></script>
 </body>
 </html>
