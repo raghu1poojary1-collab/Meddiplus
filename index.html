@@ -19,6 +19,17 @@
 
   <!-- MediPulse Design System Stylesheet -->
   <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Auth Guard: Ensure patient is signed in before loading dashboard -->
+  <script>
+    (function() {
+      var user = null;
+      try { user = JSON.parse(localStorage.getItem('mp_user') || 'null'); } catch(e) {}
+      if (!user) {
+        window.location.replace('./login.html');
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -63,6 +74,16 @@
             <option value="bn">বাংলা (Bengali)</option>
           </select>
           <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <!-- User Profile Chip (Shown when logged in) -->
+        <div id="user-chip" class="user-header-chip" style="display: none;">
+          <div class="user-avatar-circle" id="user-avatar">U</div>
+          <span id="user-display-name" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">User</span>
+          <button type="button" onclick="logoutUser()" class="btn-logout-inline" title="Sign out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Sign out</span>
+          </button>
         </div>
 
         <!-- Hospital Admin Portal Button (Page 2) -->
@@ -487,6 +508,27 @@
   <script src="./js/i18n.js"></script>
   <script src="./js/data.js"></script>
   <script src="./js/app.js"></script>
+
+  <!-- User Session & Logout Handler -->
+  <script>
+    function logoutUser() {
+      try { localStorage.removeItem('mp_user'); } catch(e) {}
+      window.location.replace('./login.html');
+    }
+    (function() {
+      try {
+        var user = JSON.parse(localStorage.getItem('mp_user') || 'null');
+        if (user) {
+          var chip = document.getElementById('user-chip');
+          if (chip) chip.style.display = 'inline-flex';
+          var nameEl = document.getElementById('user-display-name');
+          if (nameEl) nameEl.textContent = user.name || user.email || 'Patient';
+          var av = document.getElementById('user-avatar');
+          if (av) av.textContent = (user.name || user.email || 'P')[0].toUpperCase();
+        }
+      } catch(e) {}
+    })();
+  </script>
 
   <!-- Google Maps JavaScript API with marker and geometry libraries -->
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap&libraries=marker,geometry" async defer id="google-maps-script"></script>

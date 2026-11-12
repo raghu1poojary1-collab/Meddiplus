@@ -50,7 +50,7 @@ jobs:
         if: ${{ secrets.EMBARKO_TOKEN != '' }}
         run: |
           tar -czf /tmp/medipulse.tar.gz \
-            index.html hospital.html admin.html \
+            index.html hospital.html admin.html login.html \
             css/ js/
 
       - name: Deploy to Embarko

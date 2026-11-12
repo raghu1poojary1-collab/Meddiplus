@@ -295,6 +295,53 @@ small, .text-label {
   border-color: rgba(255, 255, 255, 0.4);
 }
 
+.user-header-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-pill);
+  color: var(--paper);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.user-avatar-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--pulse);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.btn-logout-inline {
+  background: none;
+  border: none;
+  color: rgba(250, 246, 239, 0.7);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  transition: color 0.2s, background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-logout-inline:hover {
+  color: var(--paper);
+  background: rgba(255, 255, 255, 0.15);
+}
+
 .header-network-pill {
   display: none;
   align-items: center;
