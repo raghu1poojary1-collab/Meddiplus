@@ -243,6 +243,98 @@
       text-decoration: underline;
     }
 
+    /* ── Password Recovery Modal ───────────────────────────────────────── */
+    .recovery-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 49, 46, 0.65);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 1100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: gFadeIn 0.22s var(--ease-out);
+    }
+    .recovery-backdrop.visible { display: flex; }
+
+    .recovery-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 16px 48px rgba(18, 49, 46, 0.18);
+      width: 100%;
+      max-width: 440px;
+      padding: 32px 32px 28px;
+      animation: gSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      box-sizing: border-box;
+    }
+    .recovery-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .recovery-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(232, 98, 44, 0.1);
+      color: var(--pulse);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .recovery-title {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--ink);
+      font-family: 'Fraunces', serif;
+      margin: 0 0 6px 0;
+    }
+    .recovery-subtext {
+      font-size: 13px;
+      color: var(--slate);
+      line-height: 1.45;
+      margin-bottom: 20px;
+    }
+
+    .recovery-pass-box {
+      background: var(--paper);
+      border: 1.5px dashed var(--sage);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .recovery-pass-text {
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 1px;
+    }
+    .btn-copy-code {
+      background: var(--white);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s;
+    }
+    .btn-copy-code:hover { background: var(--paper); }
+
     /* ── Native SMS Simulated Phone Toast ── */
     .sms-push-toast {
       position: fixed;
@@ -978,7 +1070,7 @@
             <input type="checkbox" id="remember-me" checked style="accent-color: var(--sage);" />
             Remember this device
           </label>
-          <a href="#" onclick="alert('Password reset link sent to your registered email/phone.'); return false;">Forgot password?</a>
+          <a href="#" onclick="openRecoveryModal(); return false;">Forgot password?</a>
         </div>
 
         <button type="submit" class="btn-login-submit" id="btn-submit-pwd">
@@ -1069,6 +1161,84 @@
       </div>
 
     </div><!-- /login-card -->
+  </div>
+
+  <!-- ======================================================================
+       PASSWORD RECOVERY MODAL (Send Recovery Password to Email)
+       ====================================================================== -->
+  <div class="recovery-backdrop" id="recovery-modal" onclick="handleRecoveryBackdropClick(event)">
+    <div class="recovery-card" role="dialog" aria-modal="true" aria-labelledby="recovery-modal-title">
+      <div class="recovery-header-row">
+        <div class="recovery-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <button type="button" class="g-chooser-close" onclick="closeRecoveryModal()" aria-label="Close" style="color: var(--slate);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- State 1: Request Email -->
+      <div id="recovery-step-input">
+        <h2 class="recovery-title" id="recovery-modal-title">Recover Password</h2>
+        <p class="recovery-subtext">Enter your registered email address. We'll generate and dispatch a secure temporary recovery password to your inbox.</p>
+
+        <form onsubmit="handleSendRecoveryPassword(event)" novalidate>
+          <div class="input-group" style="margin-bottom: 16px;">
+            <label for="recovery-email-input">Registered Email Address</label>
+            <div class="input-field-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input
+                type="email"
+                id="recovery-email-input"
+                class="login-input"
+                placeholder="e.g. yourname@gmail.com"
+                required
+              />
+            </div>
+            <div class="input-hint" id="recovery-input-hint">An official recovery password will be sent via encrypted email.</div>
+          </div>
+
+          <p class="login-error" id="recovery-error"></p>
+
+          <button type="submit" class="btn-login-submit" id="btn-send-recovery">
+            <span class="btn-spinner"></span>
+            <span class="btn-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:6px;vertical-align:middle;"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              Send Recovery Password
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <!-- State 2: Dispatched Success -->
+      <div id="recovery-step-success" style="display: none;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(107, 143, 113, 0.15); color: var(--sage); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 class="recovery-title">Recovery Password Sent!</h2>
+        <p class="recovery-subtext" id="recovery-success-desc">
+          We have dispatched a temporary recovery password to <strong id="recovery-target-email">your email</strong>.
+        </p>
+
+        <div class="recovery-pass-box">
+          <div>
+            <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 3px;">Your Recovery Password</div>
+            <div class="recovery-pass-text" id="recovery-generated-pass">MedPulse#9381</div>
+          </div>
+          <button type="button" class="btn-copy-code" onclick="copyRecoveryPassword()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="copy-btn-text">Copy</span>
+          </button>
+        </div>
+
+        <button type="button" class="btn-login-submit" onclick="applyRecoveryPasswordAndLogin()">
+          <span class="btn-label">&#10003; Fill &amp; Sign In Now</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ======================================================================
@@ -1605,6 +1775,128 @@
     };
     saveUser(user);
     showSuccess(name, 'Signed in as ' + email + ' ✓');
+  }
+
+  /* ============================================================
+     PASSWORD RECOVERY FLOW (Send Recovery Password to Email)
+     ============================================================ */
+  var _lastRecoveryPassword = '';
+  var _lastRecoveryEmail = '';
+
+  function openRecoveryModal() {
+    clearError();
+    var errEl = document.getElementById('recovery-error');
+    if (errEl) errEl.classList.remove('visible');
+    document.getElementById('recovery-step-input').style.display = 'block';
+    document.getElementById('recovery-step-success').style.display = 'none';
+
+    // Pre-fill email if entered in main form
+    var mainContact = (document.getElementById('pwd-login-contact').value || '').trim();
+    if (mainContact && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mainContact)) {
+      document.getElementById('recovery-email-input').value = mainContact;
+    }
+
+    var modal = document.getElementById('recovery-modal');
+    modal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+      document.getElementById('recovery-email-input').focus();
+    }, 150);
+  }
+
+  function closeRecoveryModal() {
+    var modal = document.getElementById('recovery-modal');
+    modal.classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
+  function handleRecoveryBackdropClick(e) {
+    if (e.target && e.target.id === 'recovery-modal') {
+      closeRecoveryModal();
+    }
+  }
+
+  function handleSendRecoveryPassword(e) {
+    e.preventDefault();
+    var email = document.getElementById('recovery-email-input').value.trim();
+    var errEl = document.getElementById('recovery-error');
+    errEl.classList.remove('visible');
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = 'Please enter a valid registered email address.';
+      errEl.classList.add('visible');
+      document.getElementById('recovery-email-input').focus();
+      return;
+    }
+
+    var btn = document.getElementById('btn-send-recovery');
+    btn.classList.add('loading');
+
+    setTimeout(function() {
+      btn.classList.remove('loading');
+      _lastRecoveryEmail = email;
+
+      // Generate a memorable secure temporary recovery password
+      var randomNum = Math.floor(1000 + Math.random() * 9000);
+      _lastRecoveryPassword = 'MedPulse#' + randomNum;
+
+      // Switch to success view in modal
+      document.getElementById('recovery-target-email').textContent = email;
+      document.getElementById('recovery-generated-pass').textContent = _lastRecoveryPassword;
+      document.getElementById('recovery-step-input').style.display = 'none';
+      document.getElementById('recovery-step-success').style.display = 'block';
+
+      // Drop down realistic notification toast at top of viewport
+      showRecoveryEmailToast(email, _lastRecoveryPassword);
+    }, 850);
+  }
+
+  function showRecoveryEmailToast(email, tempPass) {
+    var toast = document.getElementById('sms-toast');
+    var toastTitle = toast.querySelector('.sms-toast-title');
+    var toastMsg = document.getElementById('sms-toast-msg');
+
+    if (toastTitle) toastTitle.textContent = 'MAIL DISPATCHER · INBOX ALERT';
+    toastMsg.innerHTML = 'New email from <strong>security@medipulse.org</strong>: Your temporary recovery password for ' + email + ' is <strong>' + tempPass + '</strong>. Valid for 15 mins.';
+    toast.classList.add('visible');
+    setTimeout(function() {
+      toast.classList.remove('visible');
+    }, 12000);
+  }
+
+  function copyRecoveryPassword() {
+    if (!_lastRecoveryPassword) return;
+    var copyText = document.getElementById('copy-btn-text');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(_lastRecoveryPassword).then(function() {
+        copyText.textContent = 'Copied! ✓';
+        setTimeout(function() { copyText.textContent = 'Copy'; }, 2500);
+      }).catch(function() {
+        copyText.textContent = 'Copied! ✓';
+      });
+    } else {
+      copyText.textContent = 'Copied! ✓';
+    }
+  }
+
+  function applyRecoveryPasswordAndLogin() {
+    if (!_lastRecoveryPassword) return;
+    closeRecoveryModal();
+    switchAuthTab('password');
+
+    document.getElementById('pwd-login-contact').value = _lastRecoveryEmail;
+    document.getElementById('pwd-login-password').value = _lastRecoveryPassword;
+
+    // Show visual confirmation on input
+    var pwdInput = document.getElementById('pwd-login-password');
+    pwdInput.style.borderColor = 'var(--sage)';
+    pwdInput.style.backgroundColor = '#f1f8f3';
+
+    setTimeout(function() {
+      pwdInput.style.borderColor = '';
+      pwdInput.style.backgroundColor = '';
+      document.getElementById('btn-submit-pwd').click();
+    }, 450);
   }
 
   function showError(msg) {
