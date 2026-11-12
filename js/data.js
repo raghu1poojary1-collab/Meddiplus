@@ -1,7 +1,9 @@
 /**
- * MediPulse — Realistic Mock Data Store
- * Facilities centered around Moodbidri & Mangaluru rural taluks, Karnataka (13.0733° N, 74.9958° E).
- * Provides full state mutations with live sync to UI and persistence in localStorage.
+ * MediPulse — Health Data Store
+ * AUTO-GENERATED from MediPulse_Unified_Dataset.csv
+ * 10 hospitals across Mangaluru–Moodbidri–Udupi belt, Karnataka
+ * Reference point: Moodbidri Town Bus Stand (13.0733° N, 74.9958° E)
+ * Data snapshot: 2026-11-12 09:00 IST — synthetic, not for clinical use.
  */
 
 const DEFAULT_PATIENT_LOCATION = {
@@ -12,345 +14,1216 @@ const DEFAULT_PATIENT_LOCATION = {
 
 const INITIAL_HOSPITALS = [
   {
-    id: "hosp-alvas",
-    name: "Alva's Health Centre & Multi-Specialty Hospital",
-    type: "Private Charitable Trust",
-    address: "Alva's Campus, Moodbidri Main Road",
-    lat: 13.0755,
-    lng: 74.9982,
-    distanceKm: 0.8,
-    isNearest: true,
-    emergency24x7: true,
-    phone: "+91 8258 238104",
-    lastUpdatedMins: 2,
-    doctors: [
+    "id": "H003",
+    "name": "City Life Hospital",
+    "type": "General",
+    "address": "Moodbidri, Karnataka - 574227",
+    "lat": 13.0675,
+    "lng": 74.9953,
+    "distanceKm": 0.6,
+    "isNearest": true,
+    "emergency24x7": true,
+    "phone": "+91-824-500003",
+    "lastUpdatedMins": 2,
+    "doctors": [
       {
-        id: "doc-1",
-        name: "Dr. Ramesh Bhat",
-        qualification: "MBBS, MD (General Medicine)",
-        specialty: "General Medicine",
-        onDuty: true,
-        shift: "08:00 - 16:00",
-        queueCount: 4,
-        room: "OPD Room 102"
+        "id": "D005",
+        "name": "Dr. Meera Pai",
+        "qualification": "MBBS, Dermatology",
+        "specialty": "Dermatology",
+        "onDuty": true,
+        "shift": "16:00-20:00",
+        "queueCount": 3,
+        "room": "OPD - DER"
       },
       {
-        id: "doc-2",
-        name: "Dr. Sunitha Shetty",
-        qualification: "MBBS, DCH (Pediatrics)",
-        specialty: "Pediatrics",
-        onDuty: true,
-        shift: "09:00 - 15:00",
-        queueCount: 2,
-        room: "Child Care Cabin 4"
-      },
-      {
-        id: "doc-3",
-        name: "Dr. Anand Nayak",
-        qualification: "MBBS, MS (Orthopedics)",
-        specialty: "Orthopedics",
-        onDuty: false,
-        shift: "16:00 - 20:00 (Evening)",
-        queueCount: 0,
-        room: "Ortho OPD 2"
+        "id": "D017",
+        "name": "Dr. Vikram Sharma",
+        "qualification": "MBBS, Dermatology",
+        "specialty": "Dermatology",
+        "onDuty": false,
+        "shift": "16:00-20:00",
+        "queueCount": 0,
+        "room": "OPD - DER"
       }
     ],
-    medicines: [
-      { id: "med-1", name: "Paracetamol 650mg", category: "Analgesic & Antipyretic", stock: 185, unit: "strips", threshold: 30, price: "Subsidized (₹15/strip)" },
-      { id: "med-2", name: "Amoxicillin 500mg", category: "Antibiotic", stock: 64, unit: "strips", threshold: 20, price: "Subsidized (₹45/strip)" },
-      { id: "med-3", name: "Metformin 500mg", category: "Diabetes Care", stock: 12, unit: "strips", threshold: 25, price: "Subsidized (₹22/strip)" },
-      { id: "med-4", name: "Insulin Glargine 100IU", category: "Injectable Insulin", stock: 25, unit: "vials", threshold: 8, price: "₹280/vial" },
-      { id: "med-5", name: "Cetirizine 10mg", category: "Anti-Allergy", stock: 95, unit: "strips", threshold: 20, price: "Subsidized (₹12/strip)" }
+    "medicines": [
+      {
+        "id": "M007",
+        "name": "ORS Sachet",
+        "category": "Sachet",
+        "stock": 75,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹5/sachet)"
+      },
+      {
+        "id": "M008",
+        "name": "Azithromycin 500 mg",
+        "category": "Tablet",
+        "stock": 40,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M018",
+        "name": "Amoxicillin 500 mg",
+        "category": "Capsule",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹20/strip)"
+      },
+      {
+        "id": "M023",
+        "name": "ORS Sachet",
+        "category": "Sachet",
+        "stock": 75,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹5/sachet)"
+      },
+      {
+        "id": "M030",
+        "name": "Cough Syrup",
+        "category": "Syrup",
+        "stock": 120,
+        "unit": "units",
+        "threshold": 10,
+        "price": "₹60/bottle"
+      },
+      {
+        "id": "M032",
+        "name": "Iron Folic Acid",
+        "category": "Tablet",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      }
     ],
-    vaccines: [
-      { id: "vac-1", name: "Covaxin (Adult & Adolescent)", batch: "BB-2024-CV8", doses: 48, expiry: "12/2026", coldChainStatus: "Normal (3.2°C)" },
-      { id: "vac-2", name: "Pentavalent Vaccine", batch: "SER-PV09", doses: 22, expiry: "08/2026", coldChainStatus: "Normal (4.0°C)" }
+    "vaccines": [
+      {
+        "id": "V023",
+        "name": "Hepatitis A",
+        "batch": "BATCH-2026-0023",
+        "doses": 50,
+        "expiry": "11/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V024",
+        "name": "Typhoid",
+        "batch": "BATCH-2026-0024",
+        "doses": 5,
+        "expiry": "12/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      }
     ]
   },
   {
-    id: "hosp-chc",
-    name: "Government Community Health Centre (CHC)",
-    type: "Public Health Facility (National Health Mission)",
-    address: "Near KSRTC Bus Depot, Moodbidri",
-    lat: 13.0698,
-    lng: 74.9921,
-    distanceKm: 1.4,
-    isNearest: false,
-    emergency24x7: true,
-    phone: "+91 8258 236222",
-    lastUpdatedMins: 5,
-    doctors: [
+    "id": "H005",
+    "name": "Green Valley Clinic",
+    "type": "Clinic",
+    "address": "Karkala, Karnataka - 574104",
+    "lat": 13.202,
+    "lng": 74.989,
+    "distanceKm": 14.3,
+    "isNearest": false,
+    "emergency24x7": false,
+    "phone": "+91-824-500005",
+    "lastUpdatedMins": 2,
+    "doctors": [
       {
-        id: "doc-4",
-        name: "Dr. Preetha Rao",
-        qualification: "MBBS",
-        specialty: "General Medicine",
-        onDuty: true,
-        shift: "08:00 - 14:00",
-        queueCount: 8,
-        room: "Govt OPD Cabin 1"
+        "id": "D020",
+        "name": "Dr. Rahul Sharma",
+        "qualification": "MBBS, Dermatology",
+        "specialty": "Dermatology",
+        "onDuty": false,
+        "shift": "10:00-14:00",
+        "queueCount": 0,
+        "room": "OPD - DER"
       },
       {
-        id: "doc-5",
-        name: "Dr. Vignesh Kamath",
-        qualification: "MBBS, MEM (Emergency)",
-        specialty: "Casualty Medical Officer",
-        onDuty: true,
-        shift: "24-Hour Casualty",
-        queueCount: 1,
-        room: "Emergency Ward"
-      },
-      {
-        id: "doc-6",
-        name: "Dr. Malathi Shenoy",
-        qualification: "MBBS, DGO",
-        specialty: "Obstetrics & Gynecology",
-        onDuty: false,
-        shift: "14:00 - 20:00 (Afternoon)",
-        queueCount: 0,
-        room: "Maternity Ward 2"
+        "id": "D025",
+        "name": "Dr. Vikram Naik",
+        "qualification": "MBBS, ENT",
+        "specialty": "ENT",
+        "onDuty": false,
+        "shift": "16:00-20:00",
+        "queueCount": 0,
+        "room": "OPD - ENT"
       }
     ],
-    medicines: [
-      { id: "med-6", name: "Paracetamol 650mg", category: "Antipyretic", stock: 340, unit: "strips", threshold: 50, price: "Free (Govt Supply)" },
-      { id: "med-7", name: "Amoxicillin 500mg", category: "Antibiotic", stock: 16, unit: "strips", threshold: 25, price: "Free (Govt Supply)" },
-      { id: "med-8", name: "ORS Electrolyte Sachets", category: "Rehydration", stock: 210, unit: "packets", threshold: 40, price: "Free (Govt Supply)" },
-      { id: "med-9", name: "Metformin 500mg", category: "Diabetes", stock: 0, unit: "strips", threshold: 20, price: "Free (Govt Supply)" },
-      { id: "med-10", name: "Cetirizine 10mg", category: "Anti-Allergy", stock: 80, unit: "strips", threshold: 20, price: "Free (Govt Supply)" }
+    "medicines": [
+      {
+        "id": "M020",
+        "name": "Metformin 500 mg",
+        "category": "Tablet",
+        "stock": 40,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M021",
+        "name": "Amlodipine 5 mg",
+        "category": "Tablet",
+        "stock": 75,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M024",
+        "name": "Azithromycin 500 mg",
+        "category": "Tablet",
+        "stock": 8,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      }
     ],
-    vaccines: [
-      { id: "vac-3", name: "BCG Vaccine (Newborn)", batch: "BCG-IND-44", doses: 34, expiry: "10/2026", coldChainStatus: "Normal (3.6°C)" },
-      { id: "vac-4", name: "Tetanus Toxoid (TT)", batch: "TT-2024-11", doses: 60, expiry: "05/2027", coldChainStatus: "Normal (4.2°C)" }
+    "vaccines": [
+      {
+        "id": "V003",
+        "name": "Influenza",
+        "batch": "BATCH-2026-0003",
+        "doses": 35,
+        "expiry": "08/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V011",
+        "name": "Influenza",
+        "batch": "BATCH-2026-0011",
+        "doses": 35,
+        "expiry": "10/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V017",
+        "name": "COVID-19",
+        "batch": "BATCH-2026-0017",
+        "doses": 5,
+        "expiry": "10/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V019",
+        "name": "Influenza",
+        "batch": "BATCH-2026-0019",
+        "doses": 35,
+        "expiry": "09/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V020",
+        "name": "MMR",
+        "batch": "BATCH-2026-0020",
+        "doses": 10,
+        "expiry": "01/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      }
     ]
   },
   {
-    id: "hosp-prasad",
-    name: "Prasad Hospital & Trauma Care",
-    type: "Private Multi-Specialty Hospital",
-    address: "Kaikamba Highway Road, Moodbidri Taluk",
-    lat: 13.0585,
-    lng: 74.9810,
-    distanceKm: 3.2,
-    isNearest: false,
-    emergency24x7: true,
-    phone: "+91 8258 239870",
-    lastUpdatedMins: 11,
-    doctors: [
+    "id": "H008",
+    "name": "CarePoint Hospital",
+    "type": "General",
+    "address": "Bantwal, Karnataka - 574211",
+    "lat": 12.89,
+    "lng": 75.034,
+    "distanceKm": 20.8,
+    "isNearest": false,
+    "emergency24x7": true,
+    "phone": "+91-824-500008",
+    "lastUpdatedMins": 2,
+    "doctors": [
       {
-        id: "doc-7",
-        name: "Dr. Harish Poojary",
-        qualification: "MBBS, MD, DM (Cardiology)",
-        specialty: "Cardiology",
-        onDuty: true,
-        shift: "10:00 - 18:00",
-        queueCount: 3,
-        room: "Cardiac Suite 1"
+        "id": "D004",
+        "name": "Dr. Arjun Rao",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": false,
+        "shift": "14:00-18:00",
+        "queueCount": 0,
+        "room": "OPD - GEN"
       },
       {
-        id: "doc-8",
-        name: "Dr. Divya Hegde",
-        qualification: "MBBS, MD (Internal Medicine)",
-        specialty: "General Medicine",
-        onDuty: true,
-        shift: "09:00 - 17:00",
-        queueCount: 5,
-        room: "Consultation 3"
+        "id": "D014",
+        "name": "Dr. Rahul Pai",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "14:00-18:00",
+        "queueCount": 23,
+        "room": "OPD - GEN"
       },
       {
-        id: "doc-9",
-        name: "Dr. Sudheer Alva",
-        qualification: "MBBS, MD (Pediatrics)",
-        specialty: "Pediatrics",
-        onDuty: false,
-        shift: "18:00 - 22:00 (Night)",
-        queueCount: 0,
-        room: "Pediatric Wing"
+        "id": "D018",
+        "name": "Dr. Arjun Sharma",
+        "qualification": "MBBS, Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": true,
+        "shift": "14:00-18:00",
+        "queueCount": 24,
+        "room": "OPD - CAR"
+      },
+      {
+        "id": "D024",
+        "name": "Dr. Rahul Pai",
+        "qualification": "MBBS, Neurology",
+        "specialty": "Neurology",
+        "onDuty": true,
+        "shift": "10:00-14:00",
+        "queueCount": 22,
+        "room": "OPD - NEU"
       }
     ],
-    medicines: [
-      { id: "med-11", name: "Paracetamol 650mg", category: "Antipyretic", stock: 120, unit: "strips", threshold: 25, price: "₹20/strip" },
-      { id: "med-12", name: "Insulin Glargine 100IU", category: "Diabetes", stock: 6, unit: "vials", threshold: 10, price: "₹310/vial" },
-      { id: "med-13", name: "Amoxicillin 500mg", category: "Antibiotic", stock: 0, unit: "strips", threshold: 15, price: "₹50/strip" },
-      { id: "med-14", name: "Metformin 500mg", category: "Diabetes", stock: 85, unit: "strips", threshold: 20, price: "₹25/strip" },
-      { id: "med-15", name: "Cetirizine 10mg", category: "Anti-Allergy", stock: 50, unit: "strips", threshold: 15, price: "₹15/strip" }
+    "medicines": [
+      {
+        "id": "M001",
+        "name": "Paracetamol 500 mg",
+        "category": "Tablet",
+        "stock": 40,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M009",
+        "name": "Ibuprofen 400 mg",
+        "category": "Tablet",
+        "stock": 15,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M016",
+        "name": "Iron Folic Acid",
+        "category": "Tablet",
+        "stock": 75,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      }
     ],
-    vaccines: [
-      { id: "vac-5", name: "Covishield (COVID-19)", batch: "SII-CS-881", doses: 15, expiry: "11/2026", coldChainStatus: "Normal (3.9°C)" },
-      { id: "vac-6", name: "Hepatitis B Pediatric", batch: "HB-2024-03", doses: 28, expiry: "09/2026", coldChainStatus: "Normal (3.1°C)" }
+    "vaccines": [
+      {
+        "id": "V010",
+        "name": "Hepatitis B",
+        "batch": "BATCH-2026-0010",
+        "doses": 0,
+        "expiry": "09/2027",
+        "coldChainStatus": "Warning (chain break)"
+      }
     ]
   },
   {
-    id: "hosp-yenepoya",
-    name: "Yenepoya Rural Health & Training Centre",
-    type: "Medical College Rural Outreach Clinic",
-    address: "Belvai Road, Belvai Village, Moodbidri",
-    lat: 13.0920,
-    lng: 75.0125,
-    distanceKm: 5.6,
-    isNearest: false,
-    emergency24x7: false,
-    phone: "+91 8258 244510",
-    lastUpdatedMins: 17,
-    doctors: [
+    "id": "H009",
+    "name": "Sunrise Clinic",
+    "type": "Clinic",
+    "address": "Mulki, Karnataka - 574154",
+    "lat": 13.091,
+    "lng": 74.793,
+    "distanceKm": 22.1,
+    "isNearest": false,
+    "emergency24x7": false,
+    "phone": "+91-824-500009",
+    "lastUpdatedMins": 2,
+    "doctors": [
       {
-        id: "doc-10",
-        name: "Dr. Farhan Ahmed",
-        qualification: "MBBS, MD (Community Medicine)",
-        specialty: "General Medicine",
-        onDuty: true,
-        shift: "09:00 - 16:00",
-        queueCount: 6,
-        room: "Rural Clinic Room A"
+        "id": "D016",
+        "name": "Dr. Nisha Rao",
+        "qualification": "MBBS, Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": true,
+        "shift": "10:00-14:00",
+        "queueCount": 20,
+        "room": "OPD - CAR"
       },
       {
-        id: "doc-11",
-        name: "Dr. Reshma D'Souza",
-        qualification: "MBBS, DCH",
-        specialty: "Pediatrics",
-        onDuty: false,
-        shift: "15:00 - 19:00",
-        queueCount: 0,
-        room: "MCH Room 2"
-      },
-      {
-        id: "doc-12",
-        name: "Dr. Naveen Kotian",
-        qualification: "MBBS",
-        specialty: "General Practitioner",
-        onDuty: false,
-        shift: "08:00 - 13:00 (Morning)",
-        queueCount: 0,
-        room: "Consulting Room 1"
+        "id": "D029",
+        "name": "Dr. Rahul Naik",
+        "qualification": "MBBS, Gynecology",
+        "specialty": "Gynecology",
+        "onDuty": true,
+        "shift": "16:00-20:00",
+        "queueCount": 25,
+        "room": "OPD - GYN"
       }
     ],
-    medicines: [
-      { id: "med-16", name: "Paracetamol 650mg", category: "Antipyretic", stock: 14, unit: "strips", threshold: 20, price: "Subsidized (₹10/strip)" },
-      { id: "med-17", name: "Amoxicillin 500mg", category: "Antibiotic", stock: 45, unit: "strips", threshold: 15, price: "Subsidized (₹35/strip)" },
-      { id: "med-18", name: "Metformin 500mg", category: "Diabetes", stock: 60, unit: "strips", threshold: 20, price: "Subsidized (₹18/strip)" },
-      { id: "med-19", name: "ORS Electrolyte Sachets", category: "Rehydration", stock: 140, unit: "packets", threshold: 30, price: "Free (Outreach)" },
-      { id: "med-20", name: "Insulin Glargine 100IU", category: "Diabetes", stock: 0, unit: "vials", threshold: 5, price: "₹290/vial" }
+    "medicines": [
+      {
+        "id": "M006",
+        "name": "Omeprazole 20 mg",
+        "category": "Capsule",
+        "stock": 8,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹20/strip)"
+      },
+      {
+        "id": "M011",
+        "name": "Salbutamol Inhaler",
+        "category": "Inhaler",
+        "stock": 75,
+        "unit": "units",
+        "threshold": 10,
+        "price": "₹120/unit"
+      },
+      {
+        "id": "M022",
+        "name": "Omeprazole 20 mg",
+        "category": "Capsule",
+        "stock": 40,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹20/strip)"
+      },
+      {
+        "id": "M029",
+        "name": "Atorvastatin 10 mg",
+        "category": "Tablet",
+        "stock": 75,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M031",
+        "name": "Insulin Glargine",
+        "category": "Injection",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "₹280/vial"
+      }
     ],
-    vaccines: [
-      { id: "vac-7", name: "Covaxin (Adult)", batch: "BB-OUT-00", doses: 0, expiry: "10/2026", coldChainStatus: "Exhausted" },
-      { id: "vac-8", name: "Pentavalent Vaccine", batch: "SER-PV12", doses: 18, expiry: "07/2026", coldChainStatus: "Normal (3.7°C)" }
+    "vaccines": [
+      {
+        "id": "V007",
+        "name": "Hepatitis A",
+        "batch": "BATCH-2026-0007",
+        "doses": 0,
+        "expiry": "05/2027",
+        "coldChainStatus": "Warning (chain break)"
+      },
+      {
+        "id": "V012",
+        "name": "MMR",
+        "batch": "BATCH-2026-0012",
+        "doses": 50,
+        "expiry": "01/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V013",
+        "name": "Tetanus (Td)",
+        "batch": "BATCH-2026-0013",
+        "doses": 35,
+        "expiry": "05/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V016",
+        "name": "Typhoid",
+        "batch": "BATCH-2026-0016",
+        "doses": 35,
+        "expiry": "03/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V025",
+        "name": "COVID-19",
+        "batch": "BATCH-2026-0025",
+        "doses": 10,
+        "expiry": "12/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      }
+    ]
+  },
+  {
+    "id": "H006",
+    "name": "Arogya Hospital",
+    "type": "General",
+    "address": "Surathkal, Karnataka - 575014",
+    "lat": 13.0068,
+    "lng": 74.7943,
+    "distanceKm": 23.0,
+    "isNearest": false,
+    "emergency24x7": true,
+    "phone": "+91-824-500006",
+    "lastUpdatedMins": 2,
+    "doctors": [
+      {
+        "id": "D006",
+        "name": "Dr. Sneha Sharma",
+        "qualification": "MBBS, Orthopedics",
+        "specialty": "Orthopedics",
+        "onDuty": true,
+        "shift": "16:00-20:00",
+        "queueCount": 17,
+        "room": "OPD - ORT"
+      },
+      {
+        "id": "D010",
+        "name": "Dr. Meera Naik",
+        "qualification": "MBBS, Orthopedics",
+        "specialty": "Orthopedics",
+        "onDuty": true,
+        "shift": "10:00-14:00",
+        "queueCount": 17,
+        "room": "OPD - ORT"
+      },
+      {
+        "id": "D012",
+        "name": "Dr. Ananya Shetty",
+        "qualification": "MBBS, Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": false,
+        "shift": "16:00-20:00",
+        "queueCount": 0,
+        "room": "OPD - CAR"
+      },
+      {
+        "id": "D019",
+        "name": "Dr. Kiran Pai",
+        "qualification": "MBBS, Neurology",
+        "specialty": "Neurology",
+        "onDuty": true,
+        "shift": "16:00-20:00",
+        "queueCount": 0,
+        "room": "OPD - NEU"
+      },
+      {
+        "id": "D021",
+        "name": "Dr. Rahul Sharma",
+        "qualification": "MBBS, Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": false,
+        "shift": "16:00-20:00",
+        "queueCount": 0,
+        "room": "OPD - CAR"
+      },
+      {
+        "id": "D028",
+        "name": "Dr. Kiran Sharma",
+        "qualification": "MBBS, Pediatrics",
+        "specialty": "Pediatrics",
+        "onDuty": false,
+        "shift": "16:00-20:00",
+        "queueCount": 0,
+        "room": "OPD - PED"
+      }
+    ],
+    "medicines": [
+      {
+        "id": "M039",
+        "name": "ORS Sachet",
+        "category": "Sachet",
+        "stock": 120,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹5/sachet)"
+      }
+    ],
+    "vaccines": [
+      {
+        "id": "V001",
+        "name": "COVID-19",
+        "batch": "BATCH-2026-0001",
+        "doses": 35,
+        "expiry": "04/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V008",
+        "name": "Typhoid",
+        "batch": "BATCH-2026-0008",
+        "doses": 0,
+        "expiry": "02/2027",
+        "coldChainStatus": "Warning (chain break)"
+      },
+      {
+        "id": "V009",
+        "name": "COVID-19",
+        "batch": "BATCH-2026-0009",
+        "doses": 0,
+        "expiry": "05/2027",
+        "coldChainStatus": "Warning (chain break)"
+      },
+      {
+        "id": "V018",
+        "name": "Hepatitis B",
+        "batch": "BATCH-2026-0018",
+        "doses": 0,
+        "expiry": "04/2027",
+        "coldChainStatus": "Warning (chain break)"
+      }
+    ]
+  },
+  {
+    "id": "H001",
+    "name": "MediCare General Hospital",
+    "type": "Multi-specialty",
+    "address": "Mangaluru, Karnataka - 575001",
+    "lat": 12.9141,
+    "lng": 74.856,
+    "distanceKm": 23.3,
+    "isNearest": false,
+    "emergency24x7": true,
+    "phone": "+91-824-500001",
+    "lastUpdatedMins": 2,
+    "doctors": [
+      {
+        "id": "D031",
+        "name": "Dr. Rohan Shetty",
+        "qualification": "MBBS, Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": true,
+        "shift": "10:00-14:00",
+        "queueCount": 5,
+        "room": "OPD - CAR"
+      },
+      {
+        "id": "D032",
+        "name": "Dr. Divya Hegde",
+        "qualification": "MBBS, Pediatrics",
+        "specialty": "Pediatrics",
+        "onDuty": true,
+        "shift": "16:00-20:00",
+        "queueCount": 3,
+        "room": "OPD - PED"
+      },
+      {
+        "id": "D033",
+        "name": "Dr. Suresh Bhat",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "09:00-13:00",
+        "queueCount": 6,
+        "room": "OPD - GEN"
+      }
+    ],
+    "medicines": [
+      {
+        "id": "M012",
+        "name": "Pantoprazole 40 mg",
+        "category": "Tablet",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M013",
+        "name": "Atorvastatin 10 mg",
+        "category": "Tablet",
+        "stock": 120,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M019",
+        "name": "Cetirizine 10 mg",
+        "category": "Tablet",
+        "stock": 40,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M025",
+        "name": "Ibuprofen 400 mg",
+        "category": "Tablet",
+        "stock": 8,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M026",
+        "name": "Vitamin C 500 mg",
+        "category": "Tablet",
+        "stock": 120,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M027",
+        "name": "Salbutamol Inhaler",
+        "category": "Inhaler",
+        "stock": 25,
+        "unit": "units",
+        "threshold": 10,
+        "price": "₹120/unit"
+      }
+    ],
+    "vaccines": [
+      {
+        "id": "V022",
+        "name": "HPV",
+        "batch": "BATCH-2026-0022",
+        "doses": 0,
+        "expiry": "06/2027",
+        "coldChainStatus": "Warning (chain break)"
+      }
+    ]
+  },
+  {
+    "id": "H004",
+    "name": "Unity Medical Institute",
+    "type": "Multi-specialty",
+    "address": "Mangaluru, Karnataka - 575002",
+    "lat": 12.873,
+    "lng": 74.843,
+    "distanceKm": 27.8,
+    "isNearest": false,
+    "emergency24x7": true,
+    "phone": "+91-824-500004",
+    "lastUpdatedMins": 2,
+    "doctors": [
+      {
+        "id": "D003",
+        "name": "Dr. Meera Sharma",
+        "qualification": "MBBS, Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": true,
+        "shift": "16:00-20:00",
+        "queueCount": 7,
+        "room": "OPD - CAR"
+      },
+      {
+        "id": "D011",
+        "name": "Dr. Rahul Bhat",
+        "qualification": "MBBS, Neurology",
+        "specialty": "Neurology",
+        "onDuty": false,
+        "shift": "10:00-14:00",
+        "queueCount": 0,
+        "room": "OPD - NEU"
+      },
+      {
+        "id": "D026",
+        "name": "Dr. Meera Rao",
+        "qualification": "MBBS, ENT",
+        "specialty": "ENT",
+        "onDuty": true,
+        "shift": "10:00-14:00",
+        "queueCount": 18,
+        "room": "OPD - ENT"
+      },
+      {
+        "id": "D027",
+        "name": "Dr. Ananya Rao",
+        "qualification": "MBBS, Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": true,
+        "shift": "09:00-13:00",
+        "queueCount": 1,
+        "room": "OPD - CAR"
+      }
+    ],
+    "medicines": [
+      {
+        "id": "M005",
+        "name": "Amlodipine 5 mg",
+        "category": "Tablet",
+        "stock": 8,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M014",
+        "name": "Cough Syrup",
+        "category": "Syrup",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "₹60/bottle"
+      },
+      {
+        "id": "M034",
+        "name": "Amoxicillin 500 mg",
+        "category": "Capsule",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹20/strip)"
+      },
+      {
+        "id": "M040",
+        "name": "Azithromycin 500 mg",
+        "category": "Tablet",
+        "stock": 15,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      }
+    ],
+    "vaccines": [
+      {
+        "id": "V026",
+        "name": "COVID-19",
+        "batch": "BATCH-2026-0026",
+        "doses": 30,
+        "expiry": "06/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V027",
+        "name": "Influenza",
+        "batch": "BATCH-2026-0027",
+        "doses": 25,
+        "expiry": "08/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V028",
+        "name": "Tetanus (Td)",
+        "batch": "BATCH-2026-0028",
+        "doses": 15,
+        "expiry": "09/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      }
+    ]
+  },
+  {
+    "id": "H007",
+    "name": "Lakeside Hospital",
+    "type": "Multi-specialty",
+    "address": "Manipal, Karnataka - 576104",
+    "lat": 13.3525,
+    "lng": 74.786,
+    "distanceKm": 38.5,
+    "isNearest": false,
+    "emergency24x7": true,
+    "phone": "+91-824-500007",
+    "lastUpdatedMins": 2,
+    "doctors": [
+      {
+        "id": "D030",
+        "name": "Dr. Meera Rao",
+        "qualification": "MBBS, Dermatology",
+        "specialty": "Dermatology",
+        "onDuty": false,
+        "shift": "14:00-18:00",
+        "queueCount": 0,
+        "room": "OPD - DER"
+      }
+    ],
+    "medicines": [
+      {
+        "id": "M003",
+        "name": "Cetirizine 10 mg",
+        "category": "Tablet",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M015",
+        "name": "Insulin Glargine",
+        "category": "Injection",
+        "stock": 3,
+        "unit": "units",
+        "threshold": 10,
+        "price": "₹280/vial"
+      },
+      {
+        "id": "M017",
+        "name": "Paracetamol 500 mg",
+        "category": "Tablet",
+        "stock": 8,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M038",
+        "name": "Omeprazole 20 mg",
+        "category": "Capsule",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹20/strip)"
+      }
+    ],
+    "vaccines": [
+      {
+        "id": "V002",
+        "name": "Hepatitis B",
+        "batch": "BATCH-2026-0002",
+        "doses": 5,
+        "expiry": "03/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V021",
+        "name": "Tetanus (Td)",
+        "batch": "BATCH-2026-0021",
+        "doses": 0,
+        "expiry": "05/2027",
+        "coldChainStatus": "Warning (chain break)"
+      }
+    ]
+  },
+  {
+    "id": "H002",
+    "name": "Coastal Health Centre",
+    "type": "General",
+    "address": "Udupi, Karnataka - 576101",
+    "lat": 13.3409,
+    "lng": 74.7421,
+    "distanceKm": 40.5,
+    "isNearest": false,
+    "emergency24x7": true,
+    "phone": "+91-824-500002",
+    "lastUpdatedMins": 2,
+    "doctors": [
+      {
+        "id": "D001",
+        "name": "Dr. Ananya Naik",
+        "qualification": "MBBS, Orthopedics",
+        "specialty": "Orthopedics",
+        "onDuty": true,
+        "shift": "10:00-14:00",
+        "queueCount": 4,
+        "room": "OPD - ORT"
+      },
+      {
+        "id": "D002",
+        "name": "Dr. Kiran Sharma",
+        "qualification": "MBBS, Neurology",
+        "specialty": "Neurology",
+        "onDuty": true,
+        "shift": "09:00-13:00",
+        "queueCount": 2,
+        "room": "OPD - NEU"
+      },
+      {
+        "id": "D007",
+        "name": "Dr. Vikram Rao",
+        "qualification": "MBBS, Orthopedics",
+        "specialty": "Orthopedics",
+        "onDuty": false,
+        "shift": "10:00-14:00",
+        "queueCount": 0,
+        "room": "OPD - ORT"
+      },
+      {
+        "id": "D008",
+        "name": "Dr. Ananya Naik",
+        "qualification": "MBBS, Pediatrics",
+        "specialty": "Pediatrics",
+        "onDuty": false,
+        "shift": "09:00-13:00",
+        "queueCount": 0,
+        "room": "OPD - PED"
+      },
+      {
+        "id": "D009",
+        "name": "Dr. Vikram Pai",
+        "qualification": "MBBS, Gynecology",
+        "specialty": "Gynecology",
+        "onDuty": false,
+        "shift": "10:00-14:00",
+        "queueCount": 0,
+        "room": "OPD - GYN"
+      },
+      {
+        "id": "D013",
+        "name": "Dr. Meera Sharma",
+        "qualification": "MBBS, ENT",
+        "specialty": "ENT",
+        "onDuty": true,
+        "shift": "16:00-20:00",
+        "queueCount": 12,
+        "room": "OPD - ENT"
+      },
+      {
+        "id": "D022",
+        "name": "Dr. Sneha Pai",
+        "qualification": "MBBS, Pediatrics",
+        "specialty": "Pediatrics",
+        "onDuty": true,
+        "shift": "10:00-14:00",
+        "queueCount": 18,
+        "room": "OPD - PED"
+      },
+      {
+        "id": "D023",
+        "name": "Dr. Kiran Naik",
+        "qualification": "MBBS, Gynecology",
+        "specialty": "Gynecology",
+        "onDuty": true,
+        "shift": "10:00-14:00",
+        "queueCount": 4,
+        "room": "OPD - GYN"
+      }
+    ],
+    "medicines": [
+      {
+        "id": "M002",
+        "name": "Amoxicillin 500 mg",
+        "category": "Capsule",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹20/strip)"
+      },
+      {
+        "id": "M004",
+        "name": "Metformin 500 mg",
+        "category": "Tablet",
+        "stock": 25,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M010",
+        "name": "Vitamin C 500 mg",
+        "category": "Tablet",
+        "stock": 8,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M035",
+        "name": "Cetirizine 10 mg",
+        "category": "Tablet",
+        "stock": 40,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      }
+    ],
+    "vaccines": [
+      {
+        "id": "V004",
+        "name": "MMR",
+        "batch": "BATCH-2026-0004",
+        "doses": 5,
+        "expiry": "01/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V006",
+        "name": "HPV",
+        "batch": "BATCH-2026-0006",
+        "doses": 0,
+        "expiry": "09/2027",
+        "coldChainStatus": "Warning (chain break)"
+      },
+      {
+        "id": "V014",
+        "name": "HPV",
+        "batch": "BATCH-2026-0014",
+        "doses": 35,
+        "expiry": "03/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      },
+      {
+        "id": "V015",
+        "name": "Hepatitis A",
+        "batch": "BATCH-2026-0015",
+        "doses": 5,
+        "expiry": "02/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      }
+    ]
+  },
+  {
+    "id": "H010",
+    "name": "People's Hospital",
+    "type": "General",
+    "address": "Puttur, Karnataka - 574201",
+    "lat": 12.76,
+    "lng": 75.204,
+    "distanceKm": 41.5,
+    "isNearest": false,
+    "emergency24x7": true,
+    "phone": "+91-824-500010",
+    "lastUpdatedMins": 2,
+    "doctors": [
+      {
+        "id": "D015",
+        "name": "Dr. Vikram Sharma",
+        "qualification": "MBBS, Neurology",
+        "specialty": "Neurology",
+        "onDuty": false,
+        "shift": "10:00-14:00",
+        "queueCount": 0,
+        "room": "OPD - NEU"
+      }
+    ],
+    "medicines": [
+      {
+        "id": "M028",
+        "name": "Pantoprazole 40 mg",
+        "category": "Tablet",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M033",
+        "name": "Paracetamol 500 mg",
+        "category": "Tablet",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M036",
+        "name": "Metformin 500 mg",
+        "category": "Tablet",
+        "stock": 8,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      },
+      {
+        "id": "M037",
+        "name": "Amlodipine 5 mg",
+        "category": "Tablet",
+        "stock": 0,
+        "unit": "units",
+        "threshold": 10,
+        "price": "Subsidized (₹15/strip)"
+      }
+    ],
+    "vaccines": [
+      {
+        "id": "V005",
+        "name": "Tetanus (Td)",
+        "batch": "BATCH-2026-0005",
+        "doses": 10,
+        "expiry": "10/2027",
+        "coldChainStatus": "Normal (3.8°C)"
+      }
     ]
   }
 ];
 
 class HealthDataStore {
   constructor() {
-    this.storageKey = "medipulse_hospitals_v1";
-    this.auditKey = "medipulse_audit_log_v1";
-    this.hospitals = this.loadHospitals();
-    this.auditLog = this.loadAuditLog();
-    this.listeners = [];
+    this._data = this._load();
+    this._listeners = [];
   }
 
-  loadHospitals() {
-    const saved = localStorage.getItem(this.storageKey);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Error parsing saved hospital data", e);
-      }
-    }
+  _load() {
+    try {
+      const saved = localStorage.getItem('medipulse_v3');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
     return JSON.parse(JSON.stringify(INITIAL_HOSPITALS));
   }
 
-  saveHospitals() {
-    localStorage.setItem(this.storageKey, JSON.stringify(this.hospitals));
-    this.notify();
+  _save() {
+    try { localStorage.setItem('medipulse_v3', JSON.stringify(this._data)); } catch (e) {}
   }
 
-  loadAuditLog() {
-    const saved = localStorage.getItem(this.auditKey);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Error parsing audit log", e);
-      }
-    }
-    return [
-      { id: "log-1", time: "10 mins ago", user: "Staff Sister Prema", action: "Updated Dr. Ramesh Bhat duty status to ON DUTY", facility: "Alva's Health Centre" },
-      { id: "log-2", time: "25 mins ago", user: "Pharmacist K. Shenoy", action: "Added 100 strips Paracetamol 650mg into inventory", facility: "CHC Moodbidri" },
-      { id: "log-3", time: "1 hr ago", user: "Duty Nurse Reena", action: "Cold-chain verification recorded: 3.2°C compliant", facility: "Prasad Hospital" }
-    ];
+  _notify(hospitalId) {
+    this._listeners.forEach(fn => fn(hospitalId));
   }
 
-  addAudit(action, facility, user = "Desk Staff") {
-    const newEntry = {
-      id: "log-" + Date.now(),
-      time: "Just now",
-      user,
-      action,
-      facility
-    };
-    this.auditLog.unshift(newEntry);
-    if (this.auditLog.length > 20) this.auditLog.pop();
-    localStorage.setItem(this.auditKey, JSON.stringify(this.auditLog));
+  subscribe(fn) { this._listeners.push(fn); }
+
+  getAll()       { return this._data; }
+  getById(id)    { return this._data.find(h => h.id === id) || null; }
+  getNearest()   { return this._data.find(h => h.isNearest) || this._data[0]; }
+
+  reset() {
+    this._data = JSON.parse(JSON.stringify(INITIAL_HOSPITALS));
+    this._save();
+    this._notify(null);
   }
 
-  subscribe(listener) {
-    this.listeners.push(listener);
+  updateDoctor(hospitalId, doctorId, changes) {
+    const h = this.getById(hospitalId);
+    if (!h) return false;
+    const d = h.doctors.find(doc => doc.id === doctorId);
+    if (!d) return false;
+    Object.assign(d, changes);
+    if (!d.onDuty) d.queueCount = 0;
+    this._save();
+    this._notify(hospitalId);
+    return true;
   }
 
-  notify() {
-    this.listeners.forEach(fn => fn(this.hospitals));
+  updateMedicine(hospitalId, medicineId, changes) {
+    const h = this.getById(hospitalId);
+    if (!h) return false;
+    const m = h.medicines.find(med => med.id === medicineId);
+    if (!m) return false;
+    Object.assign(m, changes);
+    this._save();
+    this._notify(hospitalId);
+    return true;
   }
 
-  getAll() {
-    return this.hospitals;
+  updateVaccine(hospitalId, vaccineId, changes) {
+    const h = this.getById(hospitalId);
+    if (!h) return false;
+    const v = h.vaccines.find(vac => vac.id === vaccineId);
+    if (!v) return false;
+    Object.assign(v, changes);
+    this._save();
+    this._notify(hospitalId);
+    return true;
   }
 
-  getById(id) {
-    return this.hospitals.find(h => h.id === id);
+  searchByMedicine(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return this._data;
+    return this._data.filter(h =>
+      h.medicines.some(m => m.name.toLowerCase().includes(q) && m.stock > 0)
+    );
   }
 
-  toggleDoctorDuty(hospitalId, doctorId) {
-    const hospital = this.getById(hospitalId);
-    if (!hospital) return null;
-    const doc = hospital.doctors.find(d => d.id === doctorId);
-    if (!doc) return null;
-
-    doc.onDuty = !doc.onDuty;
-    hospital.lastUpdatedMins = 0;
-    this.addAudit(`Changed ${doc.name} duty status to ${doc.onDuty ? 'ON DUTY' : 'OFF DUTY'}`, hospital.name);
-    this.saveHospitals();
-    return doc;
+  searchBySpecialty(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return this._data;
+    return this._data.filter(h =>
+      h.doctors.some(d => d.specialty.toLowerCase().includes(q) && d.onDuty)
+    );
   }
 
-  updateMedicineStock(hospitalId, medicineId, newStock) {
-    const hospital = this.getById(hospitalId);
-    if (!hospital) return null;
-    const med = hospital.medicines.find(m => m.id === medicineId);
-    if (!med) return null;
-
-    med.stock = Math.max(0, parseInt(newStock) || 0);
-    hospital.lastUpdatedMins = 0;
-    this.addAudit(`Updated ${med.name} stock to ${med.stock} ${med.unit}`, hospital.name);
-    this.saveHospitals();
-    return med;
+  searchByVaccine(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return this._data;
+    return this._data.filter(h =>
+      h.vaccines.some(v => v.name.toLowerCase().includes(q) && v.doses > 0)
+    );
   }
 
-  updateVaccineDoses(hospitalId, vaccineId, newDoses) {
-    const hospital = this.getById(hospitalId);
-    if (!hospital) return null;
-    const vac = hospital.vaccines.find(v => v.id === vaccineId);
-    if (!vac) return null;
-
-    vac.doses = Math.max(0, parseInt(newDoses) || 0);
-    hospital.lastUpdatedMins = 0;
-    this.addAudit(`Updated ${vac.name} available doses to ${vac.doses}`, hospital.name);
-    this.saveHospitals();
-    return vac;
-  }
-
-  resetToDefaults() {
-    this.hospitals = JSON.parse(JSON.stringify(INITIAL_HOSPITALS));
-    this.saveHospitals();
+  search(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return this._data;
+    return this._data.filter(h =>
+      h.name.toLowerCase().includes(q) ||
+      h.type.toLowerCase().includes(q) ||
+      h.address.toLowerCase().includes(q) ||
+      h.medicines.some(m => m.name.toLowerCase().includes(q)) ||
+      h.doctors.some(d => d.specialty.toLowerCase().includes(q) || d.name.toLowerCase().includes(q)) ||
+      h.vaccines.some(v => v.name.toLowerCase().includes(q))
+    );
   }
 }
 
-window.dataStore = new HealthDataStore();
+const window_dataStore = new HealthDataStore();
+window.dataStore = window_dataStore;
