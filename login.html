@@ -1621,6 +1621,17 @@
       users.unshift(newUserRecord);
       saveRegisteredUsers(users);
 
+      // Save to PostgreSQL Auth API if available
+      try {
+        fetch('http://localhost:5002/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, email: email, password: password })
+        }).then(function(res) {
+          if (res.ok) console.log('User saved to PostgreSQL database (Mediplus)');
+        }).catch(function() {});
+      } catch(_) {}
+
       // Save logged in user session
       var sessionUser = {
         uid:      'mp_' + Math.random().toString(36).substr(2, 9),
