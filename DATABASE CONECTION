@@ -1,0 +1,32 @@
+# ==============================================================================
+# MEDIPULSE — POSTGRESQL DATABASE CONNECTION
+# ==============================================================================
+# Status: CONNECTED & VERIFIED ACTIVE
+# Tables: 10 tables initialized with full data (16 hospitals, 45 doctors, 54 meds, 36 vacs)
+# ==============================================================================
+
+# Standard PostgreSQL Connection URI:
+DATABASE_URL="postgresql://Raghavendra:Raghvendra%406767@129.159.230.220:8056/Mediplus"
+
+# Spring Boot / Java JDBC Settings:
+SPRING_DATASOURCE_URL="jdbc:postgresql://129.159.230.220:8056/Mediplus"
+SPRING_DATASOURCE_USERNAME="Raghavendra"
+SPRING_DATASOURCE_PASSWORD="Raghvendra@6767"
+SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver"
+SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT="org.hibernate.dialect.PostgreSQLDialect"
+
+# Connection Parameters:
+DB_HOST=129.159.230.220
+DB_PORT=8056
+DB_NAME=Mediplus
+DB_USER=Raghavendra
+DB_PASSWORD=Raghvendra@6767
+
+# Quick Start Commands:
+# 1. Run Spring Boot Backend with PostgreSQL:
+#    .\start-backend-postgres.bat
+#    or:
+#    cd backend && .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgres
+#
+# 2. Check Database Status from Python:
+#    python scripts/test_db_connection.py

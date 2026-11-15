@@ -8,13 +8,13 @@ spring:
     name: medipulse-backend
 
   # ===================================================================
-  # DATASOURCE (MySQL 8.0 by default, override via ENV variables)
+  # DATASOURCE (Remote PostgreSQL by default, override via ENV variables)
   # ===================================================================
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/medipulse?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:admin123}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:postgresql://129.159.230.220:8056/Mediplus}
+    username: ${DB_USERNAME:Raghavendra}
+    password: ${DB_PASSWORD:Raghvendra@6767}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
     hikari:
       pool-name: MediPulseHikariPool
       maximum-pool-size: 15
@@ -28,10 +28,10 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: validate # Flyway executes and tracks all schema migrations
+      ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: ${DB_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
         format_sql: true
     show-sql: false
 
@@ -39,7 +39,7 @@ spring:
   # FLYWAY DATABASE MIGRATIONS
   # ===================================================================
   flyway:
-    enabled: true
+    enabled: ${FLYWAY_ENABLED:false}
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:db/migration
