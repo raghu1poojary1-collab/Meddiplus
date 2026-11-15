@@ -11,3 +11,4 @@ echo ===================================================
 cd /d "%~dp0backend"
 call mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgres
 pause
+

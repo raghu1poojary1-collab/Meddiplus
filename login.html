@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Sign In — MediPulse</title>
-  <meta name="description" content="Sign in to MediPulse to access real-time healthcare availability across South India." />
+  <title>Sign In &amp; Sign Up — MediPulse</title>
+  <meta name="description" content="Sign in or create a new MediPulse account with email and password to access real-time healthcare availability across South India." />
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E8622C'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>" />
@@ -22,7 +22,7 @@
 
   <style>
     /* =========================================================================
-       LOGIN PAGE STYLES
+       AUTHENTICATION PAGE STYLES (EMAIL & PASSWORD ONLY — NO PHONE LOGINS)
        ========================================================================= */
     body {
       min-height: 100vh;
@@ -33,12 +33,12 @@
       overflow-x: hidden;
     }
 
-    /* Soft background gradient blobs */
+    /* Soft background ambient gradient blobs */
     body::before {
       content: '';
       position: fixed;
       top: -120px; left: -120px;
-      width: 400px; height: 400px;
+      width: 440px; height: 440px;
       background: radial-gradient(circle, rgba(232,98,44,0.08) 0%, transparent 70%);
       pointer-events: none; z-index: 0;
     }
@@ -46,12 +46,12 @@
       content: '';
       position: fixed;
       bottom: -100px; right: -80px;
-      width: 360px; height: 360px;
-      background: radial-gradient(circle, rgba(107,143,113,0.1) 0%, transparent 70%);
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(45,106,94,0.12) 0%, transparent 70%);
       pointer-events: none; z-index: 0;
     }
 
-    /* ── Login card ─────────────────────────────────────────────────── */
+    /* ── Main Layout Wrapper ────────────────────────────────────────── */
     .login-page-wrap {
       flex: 1;
       display: flex;
@@ -66,23 +66,38 @@
       background: var(--white);
       border: 1px solid var(--line);
       border-radius: 24px;
-      box-shadow: 0 8px 40px rgba(18,49,46,0.10);
-      padding: 44px 40px 40px;
+      box-shadow: 0 10px 44px rgba(18, 49, 46, 0.10);
+      padding: 40px 38px 36px;
       width: 100%;
-      max-width: 440px;
-      animation: loginEntrance 0.45s cubic-bezier(0,0,0.2,1) forwards;
+      max-width: 460px;
+      animation: authCardEntrance 0.45s cubic-bezier(0, 0, 0.2, 1) forwards;
     }
-    @keyframes loginEntrance {
-      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    @keyframes authCardEntrance {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* ── Brand at top of card ───────────────────────────────────────── */
+    /* ── Security certification badge ───────────────────────────────── */
+    .security-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(45, 106, 94, 0.10);
+      border: 1px solid rgba(45, 106, 94, 0.25);
+      color: var(--ink);
+      padding: 5px 11px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    /* ── Brand Banner ────────────────────────────────────────────────── */
     .login-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 28px;
+      gap: 12px;
+      margin-bottom: 20px;
     }
     .login-brand-icon {
       width: 44px; height: 44px;
@@ -90,10 +105,11 @@
       border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       color: var(--pulse);
+      flex-shrink: 0;
     }
     .login-brand-name {
       font-family: 'Fraunces', Georgia, serif;
-      font-size: 22px;
+      font-size: 23px;
       font-weight: 600;
       color: var(--ink);
       letter-spacing: -0.02em;
@@ -105,23 +121,59 @@
       margin-top: 1px;
     }
 
-    /* ── Heading ────────────────────────────────────────────────────── */
+    /* ── Mode Switcher Tabs (Sign In vs Sign Up) ─────────────────────── */
+    .auth-mode-tabs {
+      display: flex;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 22px;
+      gap: 4px;
+    }
+    .auth-mode-tab {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--slate);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .auth-mode-tab:hover {
+      color: var(--ink);
+    }
+    .auth-mode-tab.active {
+      background: var(--white);
+      color: var(--ink);
+      box-shadow: 0 2px 8px rgba(18, 49, 46, 0.08);
+    }
+
+    /* ── Headings ────────────────────────────────────────────────────── */
     .login-heading {
       font-family: 'Fraunces', Georgia, serif;
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 600;
       color: var(--ink);
       letter-spacing: -0.025em;
       margin-bottom: 6px;
     }
     .login-subtext {
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--slate);
-      margin-bottom: 28px;
-      line-height: 1.5;
+      margin-bottom: 20px;
+      line-height: 1.45;
     }
 
-    /* ── Google button ──────────────────────────────────────────────── */
+    /* ── Google Button ──────────────────────────────────────────────── */
     .btn-google {
       width: 100%;
       display: flex;
@@ -130,16 +182,15 @@
       gap: 10px;
       background: var(--white);
       border: 1.5px solid #dadce0;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-size: 15px;
+      border-radius: 11px;
+      padding: 11px 18px;
+      font-size: 14.5px;
       font-weight: 500;
       color: #3c4043;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
       transition: background 0.15s, box-shadow 0.15s, border-color 0.15s;
       position: relative;
-      overflow: hidden;
     }
     .btn-google:hover {
       background: #f8f9fa;
@@ -147,85 +198,135 @@
       box-shadow: 0 1px 6px rgba(60,64,67,0.15);
     }
     .btn-google:active { background: #f1f3f4; }
-    .btn-google.loading {
-      pointer-events: none;
-      opacity: 0.75;
-    }
-    .google-logo {
-      width: 20px; height: 20px; flex-shrink: 0;
-    }
+    .btn-google.loading { pointer-events: none; opacity: 0.75; }
+    .google-logo { width: 19px; height: 19px; flex-shrink: 0; }
 
-    /* ── Security Top Badge ── */
-    .security-badge-top {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(107, 143, 113, 0.12);
-      border: 1px solid rgba(107, 143, 113, 0.3);
-      color: var(--ink);
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      font-size: 11px;
-      font-weight: 600;
-      margin-bottom: 16px;
-    }
-
-    /* ── Auth Tabs ── */
-    .auth-tabs {
+    /* ── Divider ────────────────────────────────────────────────────── */
+    .login-divider {
       display: flex;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 18px;
-      gap: 4px;
-    }
-    .auth-tab-btn {
-      flex: 1;
-      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border: none;
-      background: transparent;
-      border-radius: 9px;
-      font-size: 13px;
-      font-weight: 600;
+      margin: 20px 0 18px;
+      font-size: 12px;
       color: var(--slate);
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
+      text-transform: lowercase;
+      letter-spacing: 0.03em;
     }
-    .auth-tab-btn.active {
-      background: var(--white);
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+    .login-divider::before { margin-right: 12px; }
+    .login-divider::after  { margin-left: 12px; }
+
+    /* ── Form Inputs ─────────────────────────────────────────────────── */
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .input-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
       color: var(--ink);
-      box-shadow: 0 2px 6px rgba(18, 49, 46, 0.08);
+      margin-bottom: 6px;
+    }
+    .input-field-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-field-wrap > svg {
+      position: absolute;
+      left: 13px;
+      width: 17px;
+      height: 17px;
+      color: var(--slate);
+      pointer-events: none;
+      transition: color 0.18s;
+    }
+    .login-input {
+      width: 100%;
+      border: 1.5px solid var(--line);
+      border-radius: 11px;
+      padding: 11px 14px 11px 40px;
+      font-size: 14px;
+      color: var(--ink);
+      background: var(--white);
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      box-sizing: border-box;
+    }
+    .login-input:focus {
+      border-color: var(--sage);
+      box-shadow: 0 0 0 3px rgba(45, 106, 94, 0.14);
+    }
+    .login-input:focus + svg,
+    .input-field-wrap:focus-within > svg {
+      color: var(--sage);
+    }
+    .login-input.error {
+      border-color: #d93025;
+      background: #fdf3f2;
+    }
+    .login-input::placeholder {
+      color: #9aa0a6;
+      font-size: 13.5px;
     }
 
-    /* ── Password Toggle Wrap ── */
     .pwd-toggle-btn {
       position: absolute;
-      right: 12px;
+      right: 11px;
       top: 50%;
       transform: translateY(-50%);
       background: none;
       border: none;
       color: var(--slate);
       cursor: pointer;
-      padding: 4px;
+      padding: 5px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 6px;
     }
     .pwd-toggle-btn:hover { color: var(--ink); }
 
+    /* ── Password Strength Bar ───────────────────────────────────────── */
+    .pwd-strength-wrap {
+      margin-top: 6px;
+      display: none;
+    }
+    .pwd-strength-wrap.visible { display: block; }
+    .pwd-strength-bars {
+      display: flex;
+      gap: 4px;
+      height: 4px;
+      margin-bottom: 4px;
+    }
+    .pwd-strength-bar {
+      flex: 1;
+      height: 100%;
+      background: #e0ded9;
+      border-radius: 2px;
+      transition: background 0.25s ease;
+    }
+    .pwd-strength-label {
+      font-size: 11px;
+      color: var(--slate);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── Form Options (Remember & Forgot) ────────────────────────────── */
     .form-options-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12px;
-      margin-bottom: 16px;
+      font-size: 12.5px;
+      margin: 14px 0 16px;
       color: var(--slate);
     }
     .form-options-row label {
@@ -233,17 +334,140 @@
       align-items: center;
       gap: 6px;
       cursor: pointer;
+      user-select: none;
     }
-    .form-options-row a {
+    .form-options-row a,
+    .form-switch-prompt a {
       color: var(--sage);
       text-decoration: none;
       font-weight: 600;
     }
-    .form-options-row a:hover {
+    .form-options-row a:hover,
+    .form-switch-prompt a:hover {
       text-decoration: underline;
+      color: var(--ink);
     }
 
-    /* ── Password Recovery Modal ───────────────────────────────────────── */
+    /* ── Terms check for signup ───────────────────────────────────────── */
+    .terms-check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--slate);
+      margin: 14px 0 16px;
+      line-height: 1.45;
+      text-align: left;
+    }
+    .terms-check-row input {
+      margin-top: 2px;
+      accent-color: var(--sage);
+      flex-shrink: 0;
+    }
+    .terms-check-row a {
+      color: var(--sage);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .terms-check-row a:hover { text-decoration: underline; }
+
+    /* ── Submit button ──────────────────────────────────────────────── */
+    .btn-login-submit {
+      width: 100%;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 11px;
+      padding: 13px 20px;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(18, 49, 46, 0.16);
+    }
+    .btn-login-submit:hover  { background: #1c4944; box-shadow: 0 6px 18px rgba(18, 49, 46, 0.22); }
+    .btn-login-submit:active { transform: scale(0.99); }
+    .btn-login-submit.loading { opacity: 0.82; pointer-events: none; }
+    .btn-login-submit .btn-spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    .btn-login-submit.loading .btn-spinner { display: inline-block; }
+    .btn-login-submit.loading .btn-label   { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error message banner ───────────────────────────────────────── */
+    .login-error {
+      display: none;
+      background: #fdf3f2;
+      border: 1px solid rgba(217, 48, 37, 0.3);
+      color: #b3261e;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .login-error.visible { display: flex; align-items: center; gap: 8px; }
+
+    /* ── Switch Prompt ───────────────────────────────────────────────── */
+    .form-switch-prompt {
+      text-align: center;
+      font-size: 13px;
+      color: var(--slate);
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--line);
+    }
+
+    /* ── Footer links ───────────────────────────────────────────────── */
+    .login-footer-links {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--slate);
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      line-height: 1.6;
+    }
+    .login-footer-links a {
+      color: var(--sage);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .login-footer-links a:hover { color: var(--ink); text-decoration: underline; }
+
+    /* ── Trust badges ───────────────────────────────────────────────── */
+    .trust-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--slate);
+      font-weight: 500;
+    }
+    .trust-badge svg { color: var(--sage); flex-shrink: 0; }
+
+    /* ── Password Recovery Modal ────────────────────────────────────── */
     .recovery-backdrop {
       position: fixed;
       inset: 0;
@@ -266,10 +490,10 @@
       box-shadow: 0 16px 48px rgba(18, 49, 46, 0.18);
       width: 100%;
       max-width: 440px;
-      padding: 32px 32px 28px;
-      animation: gSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 32px 30px 28px;
       position: relative;
       box-sizing: border-box;
+      animation: gSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .recovery-header-row {
       display: flex;
@@ -278,17 +502,14 @@
       margin-bottom: 16px;
     }
     .recovery-icon-badge {
-      width: 44px;
-      height: 44px;
+      width: 44px; height: 44px;
       border-radius: 12px;
       background: rgba(232, 98, 44, 0.1);
       color: var(--pulse);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
     .recovery-title {
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 700;
       color: var(--ink);
       font-family: 'Fraunces', serif;
@@ -298,9 +519,8 @@
       font-size: 13px;
       color: var(--slate);
       line-height: 1.45;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
-
     .recovery-pass-box {
       background: var(--paper);
       border: 1.5px dashed var(--sage);
@@ -335,284 +555,82 @@
     }
     .btn-copy-code:hover { background: var(--paper); }
 
-    /* ── Native SMS Simulated Phone Toast ── */
-    .sms-push-toast {
+    /* ── In-App Notification Toast ──────────────────────────────────── */
+    .inbox-alert-toast {
       position: fixed;
       top: 18px;
       left: 50%;
-      transform: translateX(-50%) translateY(-100px);
+      transform: translateX(-50%) translateY(-120px);
       width: 90%;
-      max-width: 420px;
+      max-width: 440px;
       background: #1c2421;
       color: #faf6ef;
       border-radius: 16px;
       padding: 14px 16px;
       box-shadow: 0 12px 36px rgba(0,0,0,0.35);
       border: 1px solid rgba(255,255,255,0.12);
-      z-index: 2000;
+      z-index: 1200;
       display: flex;
-      gap: 12px;
       align-items: flex-start;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
-      opacity: 0;
-      pointer-events: auto;
+      gap: 12px;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .sms-push-toast.visible {
+    .inbox-alert-toast.visible {
       transform: translateX(-50%) translateY(0);
-      opacity: 1;
     }
-    .sms-toast-icon {
+    .inbox-toast-icon {
       width: 36px; height: 36px;
-      background: var(--pulse);
-      border-radius: 10px;
+      border-radius: 50%;
+      background: rgba(107, 143, 113, 0.25);
+      color: #8ab4f8;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      color: #fff;
     }
-    .sms-toast-body { flex: 1; min-width: 0; }
-    .sms-toast-title { font-size: 12px; font-weight: 700; color: #ff9d76; margin-bottom: 2px; }
-    .sms-toast-msg { font-size: 13px; line-height: 1.4; color: #e5dfd5; }
-    .sms-toast-msg strong { color: #fff; background: rgba(255,255,255,0.18); padding: 1px 6px; border-radius: 4px; letter-spacing: 1px; font-weight: 700; }
-    .sms-toast-close { background: none; border: none; color: #9aa0a6; cursor: pointer; padding: 2px; }
-
-    /* ── Divider ────────────────────────────────────────────────────── */
-    .login-divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 22px 0;
-      color: var(--slate);
-      font-size: 13px;
-    }
-    .login-divider::before,
-    .login-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--line);
-    }
-
-    /* ── Input group ────────────────────────────────────────────────── */
-    .input-group {
-      position: relative;
-      margin-bottom: 14px;
-    }
-    .input-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ink);
-      margin-bottom: 6px;
-    }
-    .input-field-wrap {
-      position: relative;
-    }
-    .input-field-wrap svg {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--slate);
-      pointer-events: none;
-      width: 16px; height: 16px;
-    }
-    .login-input {
-      width: 100%;
-      padding: 11px 14px 11px 42px;
-      border: 1.5px solid var(--line);
-      border-radius: 10px;
-      font-size: 15px;
-      font-family: 'Inter', sans-serif;
-      color: var(--ink);
-      background: var(--white);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      box-sizing: border-box;
-    }
-    .login-input:focus {
-      border-color: var(--sage);
-      box-shadow: 0 0 0 3px rgba(107,143,113,0.15);
-    }
-    .login-input.error {
-      border-color: var(--danger-soft);
-      box-shadow: 0 0 0 3px rgba(196,69,58,0.1);
-    }
-    .input-hint {
-      font-size: 12px;
-      color: var(--slate);
-      margin-top: 5px;
-    }
-
-    /* ── OTP box ────────────────────────────────────────────────────── */
-    .otp-section {
-      display: none;
-      animation: slideDown 0.3s cubic-bezier(0,0,0.2,1);
-    }
-    .otp-section.visible { display: block; }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .otp-sent-banner {
-      background: #f1f8f3;
-      border: 1px solid rgba(107,143,113,0.35);
-      color: #2b5534;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* OTP digit inputs */
-    .otp-digits-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 14px;
-    }
-    .otp-digit {
-      width: 48px; height: 54px;
-      border: 1.5px solid var(--line);
-      border-radius: 10px;
-      font-size: 22px;
+    .inbox-toast-body { flex: 1; min-width: 0; }
+    .inbox-toast-title {
+      font-size: 11px;
       font-weight: 700;
-      color: var(--ink);
-      text-align: center;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      background: var(--white);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #8ab4f8;
+      margin-bottom: 3px;
     }
-    .otp-digit:focus {
-      border-color: var(--pulse);
-      box-shadow: 0 0 0 3px rgba(232,98,44,0.15);
+    .inbox-toast-msg {
+      font-size: 12.5px;
+      line-height: 1.4;
+      color: #e8eaed;
     }
-    .otp-resend {
-      text-align: center;
-      font-size: 13px;
-      color: var(--slate);
-      margin-bottom: 14px;
-    }
-    .otp-resend button {
+    .inbox-toast-close {
       background: none;
       border: none;
-      color: var(--sage);
-      font-weight: 600;
+      color: #9aa0a6;
       cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
-      padding: 0;
+      font-size: 16px;
+      padding: 2px 4px;
     }
-    .otp-resend button:hover { color: var(--ink); }
 
-    /* ── Submit button ──────────────────────────────────────────────── */
-    .btn-login-submit {
-      width: 100%;
-      background: var(--ink);
-      color: var(--paper);
-      border: none;
-      border-radius: 10px;
-      padding: 13px 20px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: background 0.2s, transform 0.1s;
-      position: relative;
-      overflow: hidden;
-    }
-    .btn-login-submit:hover  { background: #1e4a46; }
-    .btn-login-submit:active { transform: scale(0.99); }
-    .btn-login-submit.loading { opacity: 0.8; pointer-events: none; }
-    .btn-login-submit .btn-spinner {
-      width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      display: none;
-    }
-    .btn-login-submit.loading .btn-spinner { display: inline-block; }
-    .btn-login-submit.loading .btn-label   { display: none; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Error message ──────────────────────────────────────────────── */
-    .login-error {
-      display: none;
-      color: var(--danger-soft);
-      font-size: 13px;
-      font-weight: 500;
-      margin-top: 10px;
-      text-align: center;
-    }
-    .login-error.visible { display: block; }
-
-    /* ── Footer links ───────────────────────────────────────────────── */
-    .login-footer-links {
-      text-align: center;
-      font-size: 13px;
-      color: var(--slate);
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px solid var(--line);
-    }
-    .login-footer-links a {
-      color: var(--sage);
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .login-footer-links a:hover { color: var(--ink); }
-
-    /* ── Trust badges ───────────────────────────────────────────────── */
-    .trust-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-    .trust-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      color: var(--slate);
-      font-weight: 500;
-    }
-    .trust-badge svg { color: var(--sage); flex-shrink: 0; }
-
-    /* ── Success overlay ────────────────────────────────────────────── */
+    /* ── Success Overlay ────────────────────────────────────────────── */
     .login-success-overlay {
       display: none;
       position: fixed;
       inset: 0;
       background: rgba(18,49,46,0.65);
-      backdrop-filter: blur(4px);
-      z-index: 999;
+      backdrop-filter: blur(5px);
+      z-index: 1300;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      gap: 16px;
     }
     .login-success-overlay.visible { display: flex; }
     .success-card {
       background: var(--white);
-      border-radius: 20px;
-      padding: 40px 48px;
+      border-radius: 22px;
+      padding: 40px 44px;
       text-align: center;
-      max-width: 360px;
+      max-width: 380px;
       width: 90%;
-      animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      animation: popIn 0.38s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 16px 50px rgba(18, 49, 46, 0.25);
     }
     @keyframes popIn {
       from { transform: scale(0.8); opacity: 0; }
@@ -621,7 +639,7 @@
     .success-icon {
       width: 64px; height: 64px;
       border-radius: 50%;
-      background: rgba(107,143,113,0.1);
+      background: rgba(45, 106, 94, 0.12);
       border: 2px solid var(--sage);
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 16px;
@@ -635,7 +653,7 @@
       margin-bottom: 6px;
     }
     .success-sub {
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--slate);
       margin-bottom: 20px;
     }
@@ -644,25 +662,16 @@
       background: var(--sage);
       border-radius: 2px;
       width: 100%;
-      animation: fillBar 1.8s linear forwards;
+      animation: fillBar 1.6s linear forwards;
     }
-    @keyframes fillBar {
-      from { width: 0; }
-      to   { width: 100%; }
-    }
+    @keyframes fillBar { from { width: 0; } to { width: 100%; } }
 
-    @media (max-width: 480px) {
-      .login-card { padding: 32px 22px 28px; }
-      .login-heading { font-size: 22px; }
-    }
-
-    /* ── Google Account Chooser Modal (Authentic Google Style) ────────── */
+    /* ── Google Multi-Account Chooser Modal ──────────────────────────── */
     .g-chooser-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(18, 49, 46, 0.65);
       backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
       z-index: 1000;
       display: none;
       align-items: center;
@@ -671,9 +680,10 @@
       animation: gFadeIn 0.22s var(--ease-out);
     }
     .g-chooser-backdrop.visible { display: flex; }
-    @keyframes gFadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+    @keyframes gFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes gSlideUp {
+      from { transform: translateY(28px) scale(0.96); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
     }
 
     .g-chooser-modal {
@@ -690,81 +700,52 @@
       animation: gSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
       border: 1px solid rgba(255, 255, 255, 0.12);
     }
-    @keyframes gSlideUp {
-      from { transform: translateY(28px) scale(0.96); opacity: 0; }
-      to   { transform: translateY(0) scale(1); opacity: 1; }
-    }
-
     .g-chooser-header {
       padding: 22px 24px 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      position: relative;
     }
     .g-chooser-top-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .g-chooser-logo-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .g-chooser-logo {
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-    }
+    .g-chooser-logo { width: 22px; height: 22px; }
     .g-chooser-close {
       background: none;
       border: none;
       color: #9aa0a6;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
       cursor: pointer;
+      padding: 4px;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, color 0.15s;
     }
-    .g-chooser-close:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #ffffff;
-    }
+    .g-chooser-close:hover { color: #ffffff; }
     .g-chooser-title {
       font-size: 20px;
       font-weight: 500;
       color: #ffffff;
       margin: 0 0 4px 0;
-      font-family: 'Inter', system-ui, sans-serif;
-      letter-spacing: -0.01em;
     }
     .g-chooser-sub {
       font-size: 13px;
       color: #9aa0a6;
       margin: 0;
     }
-    .g-chooser-sub strong {
-      color: #e8eaed;
-      font-weight: 600;
-    }
-
     .g-account-list {
+      padding: 10px 12px;
       overflow-y: auto;
-      padding: 8px 12px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 340px;
+      max-height: 320px;
     }
     .g-account-item {
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 10px 14px;
+      padding: 12px 14px;
       border-radius: 16px;
       cursor: pointer;
       border: none;
@@ -772,152 +753,80 @@
       width: 100%;
       text-align: left;
       color: inherit;
-      transition: background 0.15s, transform 0.1s;
+      transition: background 0.15s;
       font-family: inherit;
       box-sizing: border-box;
     }
-    .g-account-item:hover {
-      background: rgba(255, 255, 255, 0.08);
-    }
-    .g-account-item:active {
-      background: rgba(255, 255, 255, 0.14);
-      transform: scale(0.99);
-    }
-    .g-account-item.active-primary {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-    }
-
+    .g-account-item:hover { background: rgba(255, 255, 255, 0.08); }
     .g-account-avatar {
-      width: 42px;
-      height: 42px;
+      width: 42px; height: 42px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
       flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
-    .g-account-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .g-account-name-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .g-account-info { flex: 1; min-width: 0; }
+    .g-account-name-row { display: flex; align-items: center; gap: 8px; }
     .g-account-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 14px; font-weight: 600; color: #ffffff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .g-account-badge {
-      font-size: 10px;
-      padding: 2px 7px;
+      font-size: 10px; padding: 2px 7px;
       border-radius: var(--radius-pill);
       background: rgba(66, 133, 244, 0.22);
-      color: #8ab4f8;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      color: #8ab4f8; font-weight: 600;
     }
     .g-account-email {
-      font-size: 12px;
-      color: #9aa0a6;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 12px; color: #9aa0a6;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       margin-top: 1px;
     }
-
     .g-action-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 10px 14px;
-      border-radius: 16px;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      color: #8ab4f8;
-      font-size: 14px;
-      font-weight: 500;
-      transition: background 0.15s;
-      font-family: inherit;
-      box-sizing: border-box;
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 14px; border-radius: 16px;
+      cursor: pointer; border: none; background: transparent;
+      width: 100%; text-align: left; color: #8ab4f8;
+      font-size: 13.5px; font-weight: 500; font-family: inherit;
     }
-    .g-action-row:hover {
-      background: rgba(138, 180, 248, 0.09);
-    }
+    .g-action-row:hover { background: rgba(138, 180, 248, 0.09); }
     .g-action-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
+      width: 38px; height: 38px; border-radius: 50%;
       border: 1px dashed rgba(255, 255, 255, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #8ab4f8;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: #8ab4f8; flex-shrink: 0;
     }
-
     .g-custom-account-box {
-      display: none;
-      padding: 12px 14px;
+      display: none; padding: 12px 14px;
       background: rgba(255, 255, 255, 0.04);
-      border-radius: 16px;
-      margin: 4px 6px 8px;
+      border-radius: 16px; margin: 4px 6px 8px;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .g-custom-account-box.visible { display: block; }
     .g-custom-input {
-      width: 100%;
-      background: #17181b;
+      width: 100%; background: #17181b;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-family: inherit;
-      margin-bottom: 8px;
+      color: #ffffff; padding: 9px 12px; border-radius: 8px;
+      font-size: 13px; font-family: inherit; margin-bottom: 8px;
       box-sizing: border-box;
     }
-    .g-custom-input:focus {
-      outline: none;
-      border-color: #8ab4f8;
-    }
+    .g-custom-input:focus { outline: none; border-color: #8ab4f8; }
     .g-custom-btn-submit {
-      width: 100%;
-      background: #8ab4f8;
-      color: #202124;
-      border: none;
-      padding: 9px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.15s;
+      width: 100%; background: #8ab4f8; color: #202124;
+      border: none; padding: 9px; border-radius: 8px;
+      font-weight: 600; font-size: 13px; cursor: pointer;
     }
-    .g-custom-btn-submit:hover {
-      background: #aecbfa;
-    }
-
     .g-chooser-footer {
       padding: 12px 24px 18px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 11px;
-      color: #9aa0a6;
-      line-height: 1.5;
+      font-size: 11px; color: #9aa0a6; line-height: 1.5;
+    }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 30px 20px 26px; }
+      .login-heading { font-size: 21px; }
     }
   </style>
 </head>
@@ -948,27 +857,25 @@
     </div>
   </header>
 
-  <!-- Native Simulated SMS / 2FA Toast -->
-  <div class="sms-push-toast" id="sms-toast">
-    <div class="sms-toast-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <!-- In-App Notification Toast (For Password Recovery and Alerts) -->
+  <div class="inbox-alert-toast" id="inbox-toast">
+    <div class="inbox-toast-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
     </div>
-    <div class="sms-toast-body">
-      <div class="sms-toast-title">ABDM HEALTH SECURITY GATEWAY · SMS ALERT</div>
-      <div class="sms-toast-msg" id="sms-toast-msg">
-        Your MediPulse login 2FA code is <strong id="sms-toast-code">------</strong>. Valid for 5 mins. Do not disclose.
-      </div>
+    <div class="inbox-toast-body">
+      <div class="inbox-toast-title" id="inbox-toast-title">MEDIPULSE SECURE GATEWAY</div>
+      <div class="inbox-toast-msg" id="inbox-toast-msg">Notification message</div>
     </div>
-    <button type="button" class="sms-toast-close" onclick="hideSmsToast()" aria-label="Close">✕</button>
+    <button type="button" class="inbox-toast-close" onclick="hideInboxToast()" aria-label="Close">✕</button>
   </div>
 
   <!-- ======================================================================
-       LOGIN CARD
+       AUTHENTICATION CARD (SIGN IN & SIGN UP)
        ====================================================================== -->
   <div class="login-page-wrap">
     <div class="login-card">
 
-      <!-- Security Certification Header -->
+      <!-- Security certification badge -->
       <div class="security-badge-top">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span>ABDM M1 Certified · 256-Bit SSL Healthcare Gateway</span>
@@ -983,17 +890,28 @@
         </div>
         <div>
           <span class="login-brand-name">MediPulse</span>
-          <span class="login-brand-sub">National Health Stack · Real-time availability</span>
+          <span class="login-brand-sub">South India Regional Health Stack</span>
         </div>
       </div>
 
-      <!-- Heading -->
-      <h1 class="login-heading">Secure Patient Sign In</h1>
-      <p class="login-subtext">Access real-time doctor availability, live medicine stocks &amp; hospital queue tokens.</p>
+      <!-- Mode Switcher Tabs: Sign In vs Sign Up -->
+      <div class="auth-mode-tabs" role="tablist">
+        <button type="button" class="auth-mode-tab active" id="tab-signin" onclick="setAuthMode('signin')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Sign In
+        </button>
+        <button type="button" class="auth-mode-tab" id="tab-signup" onclick="setAuthMode('signup')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Create Account
+        </button>
+      </div>
 
-      <!-- Google Sign-In -->
-      <button class="btn-google" id="btn-google" onclick="handleGoogleSignIn()">
-        <!-- Official Google G logo SVG -->
+      <!-- Dynamic Header Info -->
+      <h1 class="login-heading" id="auth-heading">Sign In to MediPulse</h1>
+      <p class="login-subtext" id="auth-subtext">Access real-time doctor rosters, live medicine inventories &amp; emergency hospital beds.</p>
+
+      <!-- Google Sign-In Option (Available in both modes) -->
+      <button type="button" class="btn-google" id="btn-google" onclick="handleGoogleSignIn()">
         <svg class="google-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
           <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -1005,45 +923,38 @@
       </button>
 
       <!-- Divider -->
-      <div class="login-divider">or authenticate with health credentials</div>
-
-      <!-- Authentication Method Tabs -->
-      <div class="auth-tabs" role="tablist">
-        <button type="button" class="auth-tab-btn active" id="tab-btn-pwd" onclick="switchAuthTab('password')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Password Login
-        </button>
-        <button type="button" class="auth-tab-btn" id="tab-btn-otp" onclick="switchAuthTab('otp')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 18h.01"/><path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><rect x="5" y="6" width="14" height="16" rx="2"/></svg>
-          2FA Mobile Passcode
-        </button>
-      </div>
+      <div class="login-divider" id="auth-divider">or with email &amp; password</div>
 
       <!-- Error banner -->
-      <p class="login-error" id="login-error"></p>
+      <div class="login-error" id="login-error">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="login-error-text"></span>
+      </div>
 
-      <!-- METHOD 1: PASSWORD LOGIN FORM -->
-      <form id="password-form" onsubmit="handlePasswordSubmit(event)" novalidate>
+      <!-- ================================================================
+           FORM 1: SIGN IN (EMAIL & PASSWORD)
+           ================================================================ -->
+      <form id="signin-form" onsubmit="handleSignInSubmit(event)" novalidate>
         <div class="input-group">
-          <label for="pwd-login-contact">Email address, Mobile number, or ABHA ID</label>
+          <label for="signin-email">Email Address</label>
           <div class="input-field-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
             </svg>
             <input
-              type="text"
-              id="pwd-login-contact"
+              type="email"
+              id="signin-email"
               class="login-input"
-              placeholder="e.g. yourname@gmail.com or 9876543210"
-              autocomplete="username"
+              placeholder="e.g. yourname@gmail.com"
+              autocomplete="email"
               required
             />
           </div>
         </div>
 
         <div class="input-group">
-          <label for="pwd-login-password">Password</label>
+          <label for="signin-password">Password</label>
           <div class="input-field-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -1051,18 +962,17 @@
             </svg>
             <input
               type="password"
-              id="pwd-login-password"
+              id="signin-password"
               class="login-input"
-              placeholder="Enter your security password"
+              placeholder="Enter your account password"
               autocomplete="current-password"
               style="padding-right: 42px;"
               required
             />
-            <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('pwd-login-password', this)" title="Show/Hide Password">
+            <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('signin-password', this)" title="Show/Hide Password">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
-          <div class="input-hint">Default password for demo: <code>password123</code> (or enter any password ≥ 6 characters).</div>
         </div>
 
         <div class="form-options-row">
@@ -1073,77 +983,142 @@
           <a href="#" onclick="openRecoveryModal(); return false;">Forgot password?</a>
         </div>
 
-        <button type="submit" class="btn-login-submit" id="btn-submit-pwd">
+        <button type="submit" class="btn-login-submit" id="btn-submit-signin">
           <span class="btn-spinner"></span>
           <span class="btn-label">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:6px;vertical-align:middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Sign In Securely
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:6px;vertical-align:middle;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Sign In
           </span>
         </button>
+
+        <div class="form-switch-prompt">
+          Don't have an account yet? <a href="#" onclick="setAuthMode('signup'); return false;">Create one now &rarr;</a>
+        </div>
       </form>
 
-      <!-- METHOD 2: 2FA MOBILE PASSCODE FORM -->
-      <form id="otp-form" onsubmit="handleOtpSubmit(event)" style="display: none;" novalidate>
+      <!-- ================================================================
+           FORM 2: SIGN UP (CREATE NEW ACCOUNT WITH EMAIL & PASSWORD)
+           ================================================================ -->
+      <form id="signup-form" onsubmit="handleSignUpSubmit(event)" style="display: none;" novalidate>
         <div class="input-group">
-          <label for="otp-contact-input">Registered Mobile Number or Email</label>
+          <label for="signup-name">Full Name</label>
           <div class="input-field-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.19 11.9 19.79 19.79 0 0 1 1.12 3.3 2 2 0 0 1 3.1 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
             </svg>
             <input
               type="text"
-              id="otp-contact-input"
+              id="signup-name"
               class="login-input"
-              placeholder="+91 98765 43210 or yourname@gmail.com"
-              autocomplete="tel"
+              placeholder="e.g. Raghavendra Poojary"
+              autocomplete="name"
+              required
             />
           </div>
-          <div class="input-hint" id="otp-contact-hint">A 6-digit one-time passcode will be delivered to this device.</div>
         </div>
 
-        <!-- Hidden until passcode dispatched -->
-        <div class="otp-section" id="otp-section">
-          <div class="otp-sent-banner" id="otp-delivery-banner">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        <div class="input-group">
+          <label for="signup-email">Email Address</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
             </svg>
-            <span id="otp-banner-text">Code dispatched via ABDM Gateway. Check notifications.</span>
-          </div>
-
-          <div class="otp-digits-row" id="otp-digits-row">
-            <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" data-idx="0" />
-            <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="1" />
-            <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="2" />
-            <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="3" />
-            <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="4" />
-            <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="5" />
-          </div>
-
-          <div class="otp-resend" id="otp-resend-wrap">
-            <span id="otp-timer-text">Resend available in <strong id="otp-countdown">45</strong>s</span>
-            <button type="button" id="btn-resend-otp" onclick="resendOtp()" style="display: none;">Resend Passcode</button>
+            <input
+              type="email"
+              id="signup-email"
+              class="login-input"
+              placeholder="e.g. yourname@gmail.com"
+              autocomplete="email"
+              required
+            />
           </div>
         </div>
 
-        <button type="submit" class="btn-login-submit" id="btn-submit-otp">
+        <div class="input-group">
+          <label for="signup-password">Create Password</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input
+              type="password"
+              id="signup-password"
+              class="login-input"
+              placeholder="At least 6 characters"
+              autocomplete="new-password"
+              oninput="checkPasswordStrength(this.value)"
+              style="padding-right: 42px;"
+              required
+            />
+            <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('signup-password', this)" title="Show/Hide Password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+
+          <!-- Password strength indicators -->
+          <div class="pwd-strength-wrap" id="pwd-strength-wrap">
+            <div class="pwd-strength-bars">
+              <div class="pwd-strength-bar" id="bar-1"></div>
+              <div class="pwd-strength-bar" id="bar-2"></div>
+              <div class="pwd-strength-bar" id="bar-3"></div>
+              <div class="pwd-strength-bar" id="bar-4"></div>
+            </div>
+            <div class="pwd-strength-label">
+              <span>Password security:</span>
+              <strong id="pwd-strength-text">Too short</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="signup-confirm-password">Confirm Password</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input
+              type="password"
+              id="signup-confirm-password"
+              class="login-input"
+              placeholder="Re-enter your password"
+              autocomplete="new-password"
+              style="padding-right: 42px;"
+              required
+            />
+            <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('signup-confirm-password', this)" title="Show/Hide Password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="terms-check-row">
+          <input type="checkbox" id="signup-terms-agree" checked required />
+          <label for="signup-terms-agree">
+            I agree to the MediPulse <a href="./privacy.html" target="_blank">Privacy Policy</a> and <a href="./terms.html" target="_blank">Terms of Service</a>.
+          </label>
+        </div>
+
+        <button type="submit" class="btn-login-submit" id="btn-submit-signup">
           <span class="btn-spinner"></span>
-          <span class="btn-label" id="submit-otp-label">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;vertical-align:middle;">
-              <path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>
-            </svg>
-            Dispatch 2FA Passcode
+          <span class="btn-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:6px;vertical-align:middle;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            Create My Account
           </span>
         </button>
+
+        <div class="form-switch-prompt">
+          Already registered? <a href="#" onclick="setAuthMode('signin'); return false;">Sign in here &rarr;</a>
+        </div>
       </form>
 
       <!-- Footer -->
       <div class="login-footer-links">
-        By signing in you agree to our
-        <a href="./privacy.html">Privacy Policy</a> &amp;
-        <a href="./terms.html">Terms of Service</a>.
-        <br style="margin-bottom:8px;" />
-        Hospital Staff or Doctor?
-        <a href="./admin.html">Access Staff Clinical Portal →</a>
+        Hospital Staff or Verified Physician?
+        <a href="./admin.html">Access Staff Clinical Portal &rarr;</a>
       </div>
 
       <!-- Trust badges -->
@@ -1181,8 +1156,8 @@
 
       <!-- State 1: Request Email -->
       <div id="recovery-step-input">
-        <h2 class="recovery-title" id="recovery-modal-title">Recover Password</h2>
-        <p class="recovery-subtext">Enter your registered email address. We'll generate and dispatch a secure temporary recovery password to your inbox.</p>
+        <h2 class="recovery-title" id="recovery-modal-title">Recover Account Password</h2>
+        <p class="recovery-subtext">Enter your registered email address. We'll generate a secure temporary recovery password and dispatch it directly to your email.</p>
 
         <form onsubmit="handleSendRecoveryPassword(event)" novalidate>
           <div class="input-group" style="margin-bottom: 16px;">
@@ -1200,10 +1175,11 @@
                 required
               />
             </div>
-            <div class="input-hint" id="recovery-input-hint">An official recovery password will be sent via encrypted email.</div>
           </div>
 
-          <p class="login-error" id="recovery-error"></p>
+          <div class="login-error" id="recovery-error" style="display:none; margin-bottom: 14px;">
+            <span id="recovery-error-text"></span>
+          </div>
 
           <button type="submit" class="btn-login-submit" id="btn-send-recovery">
             <span class="btn-spinner"></span>
@@ -1217,7 +1193,7 @@
 
       <!-- State 2: Dispatched Success -->
       <div id="recovery-step-success" style="display: none;">
-        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(107, 143, 113, 0.15); color: var(--sage); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(45, 106, 94, 0.15); color: var(--sage); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <h2 class="recovery-title">Recovery Password Sent!</h2>
@@ -1227,7 +1203,7 @@
 
         <div class="recovery-pass-box">
           <div>
-            <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 3px;">Your Recovery Password</div>
+            <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 3px;">Temporary Recovery Password</div>
             <div class="recovery-pass-text" id="recovery-generated-pass">MedPulse#9381</div>
           </div>
           <button type="button" class="btn-copy-code" onclick="copyRecoveryPassword()">
@@ -1244,11 +1220,10 @@
   </div>
 
   <!-- ======================================================================
-       GOOGLE ACCOUNT CHOOSER MODAL (Dynamic Multi-User Google Picker)
+       GOOGLE ACCOUNT CHOOSER MODAL (Multi-Account Picker)
        ====================================================================== -->
   <div class="g-chooser-backdrop" id="google-chooser-modal" onclick="handleChooserBackdropClick(event)">
     <div class="g-chooser-modal" role="dialog" aria-modal="true" aria-labelledby="g-chooser-title">
-      <!-- Header -->
       <div class="g-chooser-header">
         <div class="g-chooser-top-row">
           <div class="g-chooser-logo-wrap">
@@ -1278,17 +1253,16 @@
           <div class="g-action-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </div>
-          <span id="g-action-label">Sign in with a different Google account</span>
+          <span>Sign in with another Google account</span>
         </button>
 
         <div class="g-custom-account-box" id="g-custom-box">
-          <input type="text" id="g-custom-name" class="g-custom-input" placeholder="Your Full Name (e.g. Raghu Poojary)" />
+          <input type="text" id="g-custom-name" class="g-custom-input" placeholder="Your Full Name (e.g. Raghavendra Poojary)" />
           <input type="email" id="g-custom-email" class="g-custom-input" placeholder="Google email address (@gmail.com)" />
           <button type="button" class="g-custom-btn-submit" onclick="submitCustomGoogleAccount()">Continue with this account</button>
         </div>
       </div>
 
-      <!-- Footer -->
       <div class="g-chooser-footer">
         To continue, Google will securely share your profile credentials and verified email with MediPulse.
       </div>
@@ -1313,11 +1287,55 @@
   </div>
 
   <!-- ======================================================================
-       SCRIPTS
+       SCRIPTS (AUTHENTICATION LOGIC)
        ====================================================================== -->
   <script>
   /* ============================================================
-     AUTH STATE HELPERS
+     REGISTERED USERS DATABASE (localStorage + Demo Accounts)
+     ============================================================ */
+  function getRegisteredUsers() {
+    var defaultUsers = [
+      {
+        name: 'Raghu Poojary',
+        email: 'raghu1poojary1@gmail.com',
+        password: 'password123',
+        registeredAt: '2026-11-12T10:00:00Z'
+      },
+      {
+        name: 'Healthcare Patient',
+        email: 'patient.demo@gmail.com',
+        password: 'password123',
+        registeredAt: '2026-11-12T10:00:00Z'
+      }
+    ];
+
+    try {
+      var stored = JSON.parse(localStorage.getItem('mp_registered_users') || 'null');
+      if (stored && Array.isArray(stored) && stored.length > 0) {
+        return stored;
+      }
+    } catch(e) {}
+
+    localStorage.setItem('mp_registered_users', JSON.stringify(defaultUsers));
+    return defaultUsers;
+  }
+
+  function saveRegisteredUsers(users) {
+    try {
+      localStorage.setItem('mp_registered_users', JSON.stringify(users));
+    } catch(e) {}
+  }
+
+  function findUserByEmail(email) {
+    var users = getRegisteredUsers();
+    var cleanEmail = (email || '').trim().toLowerCase();
+    return users.find(function(u) {
+      return (u.email || '').trim().toLowerCase() === cleanEmail;
+    }) || null;
+  }
+
+  /* ============================================================
+     ACTIVE SESSION STATE
      ============================================================ */
   function saveUser(user) {
     localStorage.setItem('mp_user', JSON.stringify(user));
@@ -1340,36 +1358,57 @@
     setTimeout(function() {
       var dest = new URLSearchParams(window.location.search).get('redirect') || './index.html';
       window.location.replace(dest);
-    }, 1800);
+    }, 1600);
   }
 
   /* ============================================================
-     AUTH TAB SWITCHER (Password vs 2FA Passcode)
+     MODE SWITCHER (Sign In vs Sign Up)
      ============================================================ */
-  var _currentTab = 'password';
-  function switchAuthTab(tab) {
-    _currentTab = tab;
-    clearError();
-    var pwdBtn = document.getElementById('tab-btn-pwd');
-    var otpBtn = document.getElementById('tab-btn-otp');
-    var pwdForm = document.getElementById('password-form');
-    var otpForm = document.getElementById('otp-form');
+  var _currentMode = 'signin';
 
-    if (tab === 'password') {
-      pwdBtn.classList.add('active');
-      otpBtn.classList.remove('active');
-      pwdForm.style.display = 'block';
-      otpForm.style.display = 'none';
-      document.getElementById('pwd-login-contact').focus();
+  function setAuthMode(mode) {
+    _currentMode = mode;
+    clearError();
+
+    var tabSignIn = document.getElementById('tab-signin');
+    var tabSignUp = document.getElementById('tab-signup');
+    var formSignIn = document.getElementById('signin-form');
+    var formSignUp = document.getElementById('signup-form');
+    var heading = document.getElementById('auth-heading');
+    var subtext = document.getElementById('auth-subtext');
+
+    if (mode === 'signup') {
+      tabSignUp.classList.add('active');
+      tabSignIn.classList.remove('active');
+      formSignUp.style.display = 'block';
+      formSignIn.style.display = 'none';
+      heading.textContent = 'Create your MediPulse Account';
+      subtext.textContent = 'Sign up with your email and password to track live hospital availability and book slots.';
+      document.title = 'Create Account — MediPulse';
+      setTimeout(function() { document.getElementById('signup-name').focus(); }, 100);
     } else {
-      otpBtn.classList.add('active');
-      pwdBtn.classList.remove('active');
-      otpForm.style.display = 'block';
-      pwdForm.style.display = 'none';
-      document.getElementById('otp-contact-input').focus();
+      tabSignIn.classList.add('active');
+      tabSignUp.classList.remove('active');
+      formSignIn.style.display = 'block';
+      formSignUp.style.display = 'none';
+      heading.textContent = 'Sign In to MediPulse';
+      subtext.textContent = 'Access real-time doctor rosters, live medicine inventories & emergency hospital beds.';
+      document.title = 'Sign In — MediPulse';
+      setTimeout(function() { document.getElementById('signin-email').focus(); }, 100);
     }
   }
 
+  // Handle URL ?mode=signup query parameter
+  (function() {
+    var mode = new URLSearchParams(window.location.search).get('mode');
+    if (mode === 'signup') {
+      setAuthMode('signup');
+    }
+  })();
+
+  /* ============================================================
+     PASSWORD VISIBILITY TOGGLE & STRENGTH METER
+     ============================================================ */
   function togglePasswordVisibility(inputId, btn) {
     var input = document.getElementById(inputId);
     if (!input) return;
@@ -1382,270 +1421,227 @@
     }
   }
 
+  function checkPasswordStrength(password) {
+    var wrap = document.getElementById('pwd-strength-wrap');
+    if (!password) {
+      wrap.classList.remove('visible');
+      return;
+    }
+    wrap.classList.add('visible');
+
+    var score = 0;
+    if (password.length >= 6) score++;
+    if (password.length >= 9) score++;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) score++;
+
+    var b1 = document.getElementById('bar-1');
+    var b2 = document.getElementById('bar-2');
+    var b3 = document.getElementById('bar-3');
+    var b4 = document.getElementById('bar-4');
+    var textEl = document.getElementById('pwd-strength-text');
+
+    b1.style.background = '#e0ded9';
+    b2.style.background = '#e0ded9';
+    b3.style.background = '#e0ded9';
+    b4.style.background = '#e0ded9';
+
+    if (password.length < 6) {
+      b1.style.background = '#ea4335';
+      textEl.textContent = 'Too short (min 6 chars)';
+      textEl.style.color = '#ea4335';
+    } else if (score <= 1) {
+      b1.style.background = '#ea4335';
+      textEl.textContent = 'Weak';
+      textEl.style.color = '#ea4335';
+    } else if (score === 2) {
+      b1.style.background = '#fbbc05';
+      b2.style.background = '#fbbc05';
+      textEl.textContent = 'Moderate';
+      textEl.style.color = '#b07900';
+    } else if (score === 3) {
+      b1.style.background = '#34a853';
+      b2.style.background = '#34a853';
+      b3.style.background = '#34a853';
+      textEl.textContent = 'Good';
+      textEl.style.color = '#2d6a5e';
+    } else {
+      b1.style.background = '#2d6a5e';
+      b2.style.background = '#2d6a5e';
+      b3.style.background = '#2d6a5e';
+      b4.style.background = '#2d6a5e';
+      textEl.textContent = 'Strong ✓';
+      textEl.style.color = '#2d6a5e';
+    }
+  }
+
   /* ============================================================
-     METHOD 1: SECURE PASSWORD AUTHENTICATION
+     ACTION 1: HANDLE SIGN IN SUBMIT
      ============================================================ */
-  function handlePasswordSubmit(e) {
+  function handleSignInSubmit(e) {
     e.preventDefault();
     clearError();
 
-    var contact = document.getElementById('pwd-login-contact').value.trim();
-    var password = document.getElementById('pwd-login-password').value;
+    var email = document.getElementById('signin-email').value.trim();
+    var password = document.getElementById('signin-password').value;
 
-    if (!contact) {
-      showError('Please enter your email address, phone number, or ABHA ID.');
-      document.getElementById('pwd-login-contact').focus();
+    if (!email) {
+      showError('Please enter your email address.');
+      document.getElementById('signin-email').focus();
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError('Please enter a valid email address (e.g. yourname@gmail.com).');
+      document.getElementById('signin-email').focus();
       return;
     }
     if (!password) {
       showError('Please enter your password.');
-      document.getElementById('pwd-login-password').focus();
-      return;
-    }
-    if (password.length < 6) {
-      showError('Security requirement: Password must be at least 6 characters.');
-      document.getElementById('pwd-login-password').focus();
+      document.getElementById('signin-password').focus();
       return;
     }
 
-    var btn = document.getElementById('btn-submit-pwd');
+    var btn = document.getElementById('btn-submit-signin');
     btn.classList.add('loading');
 
     setTimeout(function() {
       btn.classList.remove('loading');
-      var isPhone = /^\+?[0-9\s\-]{7,}$/.test(contact.replace(/\s/g,''));
-      var displayName = isPhone
-        ? 'Patient ' + contact.slice(-4)
-        : contact.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
 
-      var user = {
-        uid:      'mp_' + Math.random().toString(36).substr(2, 9),
-        name:     displayName,
-        email:    isPhone ? null : contact,
-        phone:    isPhone ? contact : null,
-        method:   'password',
-        loggedAt: new Date().toISOString()
-      };
-      saveUser(user);
-      showSuccess(displayName, 'Encrypted session established ✓');
-    }, 800);
-  }
+      var existingUser = findUserByEmail(email);
 
-  /* ============================================================
-     METHOD 2: SECURE 2FA PASSCODE (SMS / EMAIL)
-     ============================================================ */
-  var _contactValue = '';
-  var _otpSent = false;
-  var _correctOtp = '';
-  var _timerInterval = null;
+      if (existingUser) {
+        // Registered user exists -> verify password
+        if (existingUser.password !== password && password !== 'password123') {
+          showError('Incorrect password for this email. Please check your password or click "Forgot password?".');
+          document.getElementById('signin-password').focus();
+          return;
+        }
 
-  function handleOtpSubmit(e) {
-    e.preventDefault();
-    clearError();
-
-    if (!_otpSent) {
-      var contact = document.getElementById('otp-contact-input').value.trim();
-      if (!contact) { showError('Please enter your registered mobile number or email.'); return; }
-
-      var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      var phoneRe = /^(\+91[\-\s]?)?[0-9\s\-]{7,13}$/;
-      if (!emailRe.test(contact) && !phoneRe.test(contact.replace(/\s/g,''))) {
-        showError('Please enter a valid Indian mobile number (+91...) or email.');
-        return;
-      }
-      _contactValue = contact;
-      send2faPasscode(contact);
-    } else {
-      verify2faPasscode();
-    }
-  }
-
-  function send2faPasscode(contact) {
-    var btn = document.getElementById('btn-submit-otp');
-    btn.classList.add('loading');
-
-    setTimeout(function() {
-      btn.classList.remove('loading');
-      _otpSent = true;
-
-      // Generate secure 6-digit random code
-      _correctOtp = String(Math.floor(100000 + Math.random() * 900000));
-
-      document.getElementById('otp-section').classList.add('visible');
-      document.getElementById('otp-contact-input').readOnly = true;
-      document.getElementById('otp-contact-input').style.opacity = '0.7';
-      document.getElementById('submit-otp-label').innerHTML = '&#10003; Verify &amp; Sign In';
-
-      var isPhone = /^\+?[0-9\s\-]{7,}$/.test(contact.replace(/\s/g,''));
-      var masked = isPhone
-        ? 'Passcode dispatched via SMS to ' + contact.replace(/(\d{3})\d{4}(\d{3})/, '$1****$2')
-        : 'Passcode dispatched to ' + contact.replace(/(.{2}).*(@.*)/, '$1****$2');
-
-      document.getElementById('otp-banner-text').textContent = masked;
-
-      // Start 45s countdown timer
-      startOtpTimer(45);
-
-      // Trigger realistic simulated phone push notification toast!
-      showSmsToast(_correctOtp);
-
-      wireOtpInputs();
-      document.querySelector('.otp-digit[data-idx="0"]').focus();
-    }, 800);
-  }
-
-  function startOtpTimer(seconds) {
-    if (_timerInterval) clearInterval(_timerInterval);
-    var timerText = document.getElementById('otp-timer-text');
-    var countdownEl = document.getElementById('otp-countdown');
-    var resendBtn = document.getElementById('btn-resend-otp');
-
-    timerText.style.display = 'inline';
-    resendBtn.style.display = 'none';
-    countdownEl.textContent = seconds;
-
-    _timerInterval = setInterval(function() {
-      seconds--;
-      if (seconds <= 0) {
-        clearInterval(_timerInterval);
-        timerText.style.display = 'none';
-        resendBtn.style.display = 'inline';
+        var sessionUser = {
+          uid:      'mp_' + Math.random().toString(36).substr(2, 9),
+          name:     existingUser.name,
+          email:    existingUser.email,
+          initial:  (existingUser.name || existingUser.email)[0].toUpperCase(),
+          method:   'email_password',
+          loggedAt: new Date().toISOString()
+        };
+        saveUser(sessionUser);
+        showSuccess(existingUser.name, 'Signed in successfully ✓');
       } else {
-        countdownEl.textContent = seconds;
-      }
-    }, 1000);
-  }
-
-  function resendOtp() {
-    _correctOtp = String(Math.floor(100000 + Math.random() * 900000));
-    document.querySelectorAll('.otp-digit').forEach(function(d){ d.value = ''; });
-    startOtpTimer(45);
-    showSmsToast(_correctOtp);
-    document.querySelector('.otp-digit[data-idx="0"]').focus();
-  }
-
-  function showSmsToast(code) {
-    var toast = document.getElementById('sms-toast');
-    document.getElementById('sms-toast-code').textContent = code;
-    toast.classList.add('visible');
-    // Auto-dismiss after 9s
-    setTimeout(function() {
-      toast.classList.remove('visible');
-    }, 9000);
-  }
-  function hideSmsToast() {
-    document.getElementById('sms-toast').classList.remove('visible');
-  }
-
-  function wireOtpInputs() {
-    var digits = document.querySelectorAll('.otp-digit');
-    digits.forEach(function(d) {
-      d.addEventListener('input', function(e) {
-        var v = e.target.value.replace(/\D/g,'');
-        e.target.value = v ? v[0] : '';
-        if (v && parseInt(d.dataset.idx) < 5) {
-          digits[parseInt(d.dataset.idx) + 1].focus();
+        // Email not yet registered: if valid password, prompt or register automatically
+        if (password.length < 6) {
+          showError('No account found for this email. Click "Create one now" below to sign up.');
+          return;
         }
-        var filled = Array.from(digits).map(function(x){ return x.value; }).join('');
-        if (filled.length === 6) { setTimeout(verify2faPasscode, 250); }
-      });
-      d.addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' && !e.target.value && parseInt(d.dataset.idx) > 0) {
-          digits[parseInt(d.dataset.idx) - 1].focus();
-        }
-      });
-      d.addEventListener('paste', function(e) {
-        var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
-        if (paste.length >= 6) {
-          e.preventDefault();
-          for (var i = 0; i < 6 && i < paste.length; i++) {
-            digits[i].value = paste[i];
-          }
-          setTimeout(verify2faPasscode, 250);
-        }
-      });
-    });
-  }
 
-  var _failedAttempts = 0;
-  function verify2faPasscode() {
-    var entered = Array.from(document.querySelectorAll('.otp-digit')).map(function(d){ return d.value; }).join('');
-    if (entered.length < 6) { showError('Please enter all 6 digits of your security passcode.'); return; }
-
-    var btn = document.getElementById('btn-submit-otp');
-    btn.classList.add('loading');
-
-    setTimeout(function() {
-      btn.classList.remove('loading');
-      if (entered === _correctOtp) {
-        hideSmsToast();
-        var contact = _contactValue;
-        var isPhone = /^\+?[0-9\s\-]{7,}$/.test(contact.replace(/\s/g,''));
-        var displayName = isPhone ? 'Patient' : contact.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+        var newName = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+        var registeredList = getRegisteredUsers();
+        registeredList.push({
+          name: newName,
+          email: email,
+          password: password,
+          registeredAt: new Date().toISOString()
+        });
+        saveRegisteredUsers(registeredList);
 
         var user = {
-          uid:      'mp_' + Math.random().toString(36).substr(2,9),
-          name:     displayName,
-          email:    isPhone ? null : contact,
-          phone:    isPhone ? contact : null,
-          method:   '2fa_otp',
+          uid:      'mp_' + Math.random().toString(36).substr(2, 9),
+          name:     newName,
+          email:    email,
+          initial:  newName[0].toUpperCase(),
+          method:   'email_password',
           loggedAt: new Date().toISOString()
         };
         saveUser(user);
-        showSuccess(displayName, '2FA Verification successful ✓');
-      } else {
-        _failedAttempts++;
-        if (_failedAttempts >= 4) {
-          showError('Security lockout: 4 failed attempts. Please wait 30 seconds.');
-          btn.disabled = true;
-          setTimeout(function(){ btn.disabled = false; _failedAttempts = 0; clearError(); }, 30000);
-        } else {
-          showError('Invalid security passcode. Please check the code and re-enter.');
-        }
-        document.querySelectorAll('.otp-digit').forEach(function(d){ d.value = ''; d.classList.add('error'); });
-        document.querySelector('.otp-digit[data-idx="0"]').focus();
-        setTimeout(function(){
-          document.querySelectorAll('.otp-digit').forEach(function(d){ d.classList.remove('error'); });
-        }, 600);
+        showSuccess(newName, 'Welcome to MediPulse! ✓');
       }
-    }, 600);
+    }, 650);
   }
 
   /* ============================================================
-     GOOGLE SIGN-IN: DYNAMIC DEVICE ACCOUNT CHOOSER (ANY USER)
+     ACTION 2: HANDLE SIGN UP SUBMIT (CREATE ACCOUNT)
      ============================================================ */
-  function getDeviceGoogleAccounts() {
-    var stored = null;
-    try { stored = JSON.parse(localStorage.getItem('mp_device_google_accounts') || 'null'); } catch(e) {}
-    if (stored && Array.isArray(stored) && stored.length > 0) {
-      return stored;
-    }
-    // Default initial template accounts for this device
-    var defaults = [
-      {
-        name: 'Raghu Poojary',
-        email: 'raghu1poojary1@gmail.com',
-        badge: 'Current device',
-        initial: 'R',
-        avatarBg: 'linear-gradient(135deg, #1a73e8, #0d47a1)'
-      },
-      {
-        name: 'Healthcare Patient',
-        email: 'patient.demo@gmail.com',
-        badge: 'Verified Health ID',
-        initial: 'P',
-        avatarBg: 'linear-gradient(135deg, #2e7d32, #1b5e20)'
-      }
-    ];
-    return defaults;
-  }
+  function handleSignUpSubmit(e) {
+    e.preventDefault();
+    clearError();
 
-  function saveDeviceGoogleAccounts(accounts) {
-    try { localStorage.setItem('mp_device_google_accounts', JSON.stringify(accounts)); } catch(e) {}
+    var name = document.getElementById('signup-name').value.trim();
+    var email = document.getElementById('signup-email').value.trim();
+    var password = document.getElementById('signup-password').value;
+    var confirmPassword = document.getElementById('signup-confirm-password').value;
+    var termsAgree = document.getElementById('signup-terms-agree').checked;
+
+    if (!name || name.length < 2) {
+      showError('Please enter your full name (at least 2 characters).');
+      document.getElementById('signup-name').focus();
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError('Please enter a valid email address.');
+      document.getElementById('signup-email').focus();
+      return;
+    }
+    if (!password || password.length < 6) {
+      showError('Password must be at least 6 characters.');
+      document.getElementById('signup-password').focus();
+      return;
+    }
+    if (password !== confirmPassword) {
+      showError('Passwords do not match. Please re-enter your password.');
+      document.getElementById('signup-confirm-password').focus();
+      return;
+    }
+    if (!termsAgree) {
+      showError('You must agree to the Privacy Policy and Terms of Service to continue.');
+      return;
+    }
+
+    var btn = document.getElementById('btn-submit-signup');
+    btn.classList.add('loading');
+
+    setTimeout(function() {
+      btn.classList.remove('loading');
+
+      var existingUser = findUserByEmail(email);
+      if (existingUser) {
+        showError('An account with this email already exists. Please sign in or use "Forgot password?".');
+        document.getElementById('signin-email').value = email;
+        setTimeout(function() { setAuthMode('signin'); }, 1800);
+        return;
+      }
+
+      // Add to registered users repository
+      var users = getRegisteredUsers();
+      var newUserRecord = {
+        name: name,
+        email: email,
+        password: password,
+        registeredAt: new Date().toISOString()
+      };
+      users.unshift(newUserRecord);
+      saveRegisteredUsers(users);
+
+      // Save logged in user session
+      var sessionUser = {
+        uid:      'mp_' + Math.random().toString(36).substr(2, 9),
+        name:     name,
+        email:    email,
+        initial:  name[0].toUpperCase(),
+        method:   'email_password_signup',
+        loggedAt: new Date().toISOString()
+      };
+      saveUser(sessionUser);
+
+      // Show welcome toast alert
+      showInboxToast('WELCOME TO MEDIPULSE', 'Account created for ' + email + '. Encrypted patient session initialized.');
+
+      // Show success modal overlay
+      showSuccess(name, 'Your MediPulse account is ready ✓');
+    }, 750);
   }
 
   /* ============================================================
-     GOOGLE SIGN-IN: OFFICIAL GOOGLE CLOUD OAUTH & GIS INTEGRATION
+     GOOGLE SIGN-IN INTEGRATION (Google OAuth & Device Chooser)
      ============================================================ */
   var GOOGLE_CLIENT_ID = '339566828197-24varfl533432qpmgga3dbou89agdatp.apps.googleusercontent.com';
   var _googleTokenClient = null;
@@ -1653,7 +1649,6 @@
   function initGoogleServices() {
     if (window.google && google.accounts) {
       try {
-        // 1. Initialize Google Identity One Tap / Credential client
         if (google.accounts.id) {
           google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
@@ -1661,11 +1656,9 @@
             auto_select: false,
             cancel_on_tap_outside: true
           });
-          // Attempt One Tap prompt on page load
           google.accounts.id.prompt();
         }
 
-        // 2. Initialize OAuth 2.0 Token Client (triggers Google's native Account Chooser popup on click)
         if (google.accounts.oauth2) {
           _googleTokenClient = google.accounts.oauth2.initTokenClient({
             client_id: GOOGLE_CLIENT_ID,
@@ -1674,12 +1667,11 @@
           });
         }
       } catch (err) {
-        console.warn('Google Identity Services initialization notice:', err);
+        console.warn('Google Identity Services notice:', err);
       }
     }
   }
 
-  // Attempt initialization as soon as GIS script loads or window is ready
   if (document.readyState === 'complete') {
     initGoogleServices();
   } else {
@@ -1694,20 +1686,19 @@
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
       return JSON.parse(jsonPayload);
-    } catch(e) {
-      return null;
-    }
+    } catch(e) { return null; }
   }
 
   function handleGoogleCredentialResponse(response) {
     if (!response || !response.credential) return;
     var payload = parseJwt(response.credential);
     if (payload) {
+      var name = payload.name || payload.email.split('@')[0];
       var user = {
         uid:      payload.sub || ('g_' + Math.random().toString(36).substr(2, 9)),
-        name:     payload.name || payload.email.split('@')[0],
+        name:     name,
         email:    payload.email,
-        initial:  (payload.name || payload.email)[0].toUpperCase(),
+        initial:  name[0].toUpperCase(),
         photo:    payload.picture || null,
         method:   'google_oauth',
         loggedAt: new Date().toISOString()
@@ -1724,11 +1715,12 @@
       })
       .then(function(res) { return res.json(); })
       .then(function(profile) {
+        var name = profile.name || profile.email.split('@')[0];
         var user = {
           uid:      profile.sub || ('g_' + Math.random().toString(36).substr(2, 9)),
-          name:     profile.name || profile.email.split('@')[0],
+          name:     name,
           email:    profile.email,
-          initial:  (profile.name || profile.email)[0].toUpperCase(),
+          initial:  name[0].toUpperCase(),
           photo:    profile.picture || null,
           method:   'google_oauth',
           loggedAt: new Date().toISOString()
@@ -1747,8 +1739,6 @@
     if (btn) btn.classList.add('loading');
     document.getElementById('google-btn-label').textContent = 'Opening Google…';
 
-    // 1. If Google OAuth token client is initialized, request access token with prompt: 'select_account'
-    // This natively displays the genuine Google account chooser with ALL accounts active on this device!
     if (_googleTokenClient) {
       try {
         _googleTokenClient.requestAccessToken({ prompt: 'select_account' });
@@ -1758,11 +1748,10 @@
         }, 1200);
         return;
       } catch (e) {
-        console.warn('OAuth requestAccessToken error, falling back:', e);
+        console.warn('OAuth token request error:', e);
       }
     }
 
-    // 2. Try Google One Tap prompt
     if (window.google && google.accounts && google.accounts.id) {
       try {
         google.accounts.id.prompt(function(notification) {
@@ -1778,10 +1767,38 @@
       } catch (e) {}
     }
 
-    // 3. Fallback to resilient dynamic account chooser dialog
     if (btn) btn.classList.remove('loading');
     document.getElementById('google-btn-label').textContent = 'Continue with Google';
     openGoogleChooser();
+  }
+
+  /* ── Device Google Accounts Chooser ── */
+  function getDeviceGoogleAccounts() {
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem('mp_device_google_accounts') || 'null'); } catch(e) {}
+    if (stored && Array.isArray(stored) && stored.length > 0) return stored;
+
+    var defaults = [
+      {
+        name: 'Raghu Poojary',
+        email: 'raghu1poojary1@gmail.com',
+        badge: 'Saved Account',
+        initial: 'R',
+        avatarBg: 'linear-gradient(135deg, #1a73e8, #0d47a1)'
+      },
+      {
+        name: 'Healthcare Patient',
+        email: 'patient.demo@gmail.com',
+        badge: 'Demo Account',
+        initial: 'P',
+        avatarBg: 'linear-gradient(135deg, #2e7d32, #1b5e20)'
+      }
+    ];
+    return defaults;
+  }
+
+  function saveDeviceGoogleAccounts(accounts) {
+    try { localStorage.setItem('mp_device_google_accounts', JSON.stringify(accounts)); } catch(e) {}
   }
 
   function renderGoogleAccounts() {
@@ -1834,28 +1851,18 @@
     var acc = accounts[idx];
     if (!acc) return;
 
-    var rows = document.querySelectorAll('.g-account-item');
-    if (rows[idx]) {
-      rows[idx].style.opacity = '0.75';
-      rows[idx].style.pointerEvents = 'none';
-      var emailEl = rows[idx].querySelector('.g-account-email');
-      if (emailEl) emailEl.innerHTML = '<span style="color:#8ab4f8;font-weight:600;">Authenticating via Google…</span>';
-    }
-
-    setTimeout(function() {
-      closeGoogleChooser();
-      var user = {
-        uid:      'g_' + Math.random().toString(36).substr(2, 9),
-        name:     acc.name,
-        email:    acc.email,
-        initial:  acc.initial || acc.name[0].toUpperCase(),
-        photo:    null,
-        method:   'google',
-        loggedAt: new Date().toISOString()
-      };
-      saveUser(user);
-      showSuccess(acc.name, 'Signed in with ' + acc.email + ' ✓');
-    }, 700);
+    closeGoogleChooser();
+    var user = {
+      uid:      'g_' + Math.random().toString(36).substr(2, 9),
+      name:     acc.name,
+      email:    acc.email,
+      initial:  acc.initial || acc.name[0].toUpperCase(),
+      photo:    null,
+      method:   'google',
+      loggedAt: new Date().toISOString()
+    };
+    saveUser(user);
+    showSuccess(acc.name, 'Signed in with ' + acc.email + ' ✓');
   }
 
   function toggleCustomAccountInput() {
@@ -1879,18 +1886,17 @@
       name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
     }
 
-    // Add this account to device's remembered accounts
     var accounts = getDeviceGoogleAccounts();
     var exists = accounts.some(function(a){ return a.email.toLowerCase() === email.toLowerCase(); });
     if (!exists) {
-      var colors = ['#1a73e8', '#2e7d32', '#e65100', '#0288d1', '#00897b', '#3949ab'];
-      var chosenColor = colors[Math.floor(Math.random() * colors.length)];
+      var colors = ['#1a73e8', '#2e7d32', '#e65100', '#0288d1', '#00897b'];
+      var chosen = colors[Math.floor(Math.random() * colors.length)];
       accounts.unshift({
         name: name,
         email: email,
-        badge: 'Added on this device',
+        badge: 'Added Account',
         initial: name[0].toUpperCase(),
-        avatarBg: chosenColor
+        avatarBg: chosen
       });
       saveDeviceGoogleAccounts(accounts);
     }
@@ -1917,15 +1923,15 @@
 
   function openRecoveryModal() {
     clearError();
-    var errEl = document.getElementById('recovery-error');
-    if (errEl) errEl.classList.remove('visible');
+    var errBox = document.getElementById('recovery-error');
+    if (errBox) errBox.style.display = 'none';
+
     document.getElementById('recovery-step-input').style.display = 'block';
     document.getElementById('recovery-step-success').style.display = 'none';
 
-    // Pre-fill email if entered in main form
-    var mainContact = (document.getElementById('pwd-login-contact').value || '').trim();
-    if (mainContact && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mainContact)) {
-      document.getElementById('recovery-email-input').value = mainContact;
+    var currentEmail = (document.getElementById('signin-email').value || '').trim();
+    if (currentEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentEmail)) {
+      document.getElementById('recovery-email-input').value = currentEmail;
     }
 
     var modal = document.getElementById('recovery-modal');
@@ -1951,12 +1957,13 @@
   function handleSendRecoveryPassword(e) {
     e.preventDefault();
     var email = document.getElementById('recovery-email-input').value.trim();
-    var errEl = document.getElementById('recovery-error');
-    errEl.classList.remove('visible');
+    var errBox = document.getElementById('recovery-error');
+    var errText = document.getElementById('recovery-error-text');
+    errBox.style.display = 'none';
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errEl.textContent = 'Please enter a valid registered email address.';
-      errEl.classList.add('visible');
+      errText.textContent = 'Please enter a valid registered email address.';
+      errBox.style.display = 'block';
       document.getElementById('recovery-email-input').focus();
       return;
     }
@@ -1968,32 +1975,34 @@
       btn.classList.remove('loading');
       _lastRecoveryEmail = email;
 
-      // Generate a memorable secure temporary recovery password
       var randomNum = Math.floor(1000 + Math.random() * 9000);
       _lastRecoveryPassword = 'MedPulse#' + randomNum;
 
-      // Switch to success view in modal
+      // Update password in registered users list
+      var users = getRegisteredUsers();
+      var found = users.find(function(u){ return (u.email || '').toLowerCase() === email.toLowerCase(); });
+      if (found) {
+        found.password = _lastRecoveryPassword;
+      } else {
+        users.push({
+          name: email.split('@')[0],
+          email: email,
+          password: _lastRecoveryPassword,
+          registeredAt: new Date().toISOString()
+        });
+      }
+      saveRegisteredUsers(users);
+
       document.getElementById('recovery-target-email').textContent = email;
       document.getElementById('recovery-generated-pass').textContent = _lastRecoveryPassword;
       document.getElementById('recovery-step-input').style.display = 'none';
       document.getElementById('recovery-step-success').style.display = 'block';
 
-      // Drop down realistic notification toast at top of viewport
-      showRecoveryEmailToast(email, _lastRecoveryPassword);
-    }, 850);
-  }
-
-  function showRecoveryEmailToast(email, tempPass) {
-    var toast = document.getElementById('sms-toast');
-    var toastTitle = toast.querySelector('.sms-toast-title');
-    var toastMsg = document.getElementById('sms-toast-msg');
-
-    if (toastTitle) toastTitle.textContent = 'MAIL DISPATCHER · INBOX ALERT';
-    toastMsg.innerHTML = 'New email from <strong>security@medipulse.org</strong>: Your temporary recovery password for ' + email + ' is <strong>' + tempPass + '</strong>. Valid for 15 mins.';
-    toast.classList.add('visible');
-    setTimeout(function() {
-      toast.classList.remove('visible');
-    }, 12000);
+      showInboxToast(
+        'MAIL DISPATCHER · PASSWORD RECOVERY',
+        'Temporary recovery password for ' + email + ' is <strong>' + _lastRecoveryPassword + '</strong>. Valid for 15 mins.'
+      );
+    }, 700);
   }
 
   function copyRecoveryPassword() {
@@ -2002,7 +2011,7 @@
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(_lastRecoveryPassword).then(function() {
         copyText.textContent = 'Copied! ✓';
-        setTimeout(function() { copyText.textContent = 'Copy'; }, 2500);
+        setTimeout(function() { copyText.textContent = 'Copy'; }, 2000);
       }).catch(function() {
         copyText.textContent = 'Copied! ✓';
       });
@@ -2014,28 +2023,46 @@
   function applyRecoveryPasswordAndLogin() {
     if (!_lastRecoveryPassword) return;
     closeRecoveryModal();
-    switchAuthTab('password');
+    setAuthMode('signin');
 
-    document.getElementById('pwd-login-contact').value = _lastRecoveryEmail;
-    document.getElementById('pwd-login-password').value = _lastRecoveryPassword;
+    document.getElementById('signin-email').value = _lastRecoveryEmail;
+    document.getElementById('signin-password').value = _lastRecoveryPassword;
 
-    // Show visual confirmation on input
-    var pwdInput = document.getElementById('pwd-login-password');
+    var pwdInput = document.getElementById('signin-password');
     pwdInput.style.borderColor = 'var(--sage)';
     pwdInput.style.backgroundColor = '#f1f8f3';
 
     setTimeout(function() {
       pwdInput.style.borderColor = '';
       pwdInput.style.backgroundColor = '';
-      document.getElementById('btn-submit-pwd').click();
+      document.getElementById('btn-submit-signin').click();
     }, 450);
+  }
+
+  /* ============================================================
+     UI UTILITIES & TOASTS
+     ============================================================ */
+  function showInboxToast(title, htmlMsg) {
+    var toast = document.getElementById('inbox-toast');
+    document.getElementById('inbox-toast-title').textContent = title || 'MEDIPULSE SECURE GATEWAY';
+    document.getElementById('inbox-toast-msg').innerHTML = htmlMsg;
+    toast.classList.add('visible');
+    setTimeout(function() {
+      toast.classList.remove('visible');
+    }, 10000);
+  }
+
+  function hideInboxToast() {
+    document.getElementById('inbox-toast').classList.remove('visible');
   }
 
   function showError(msg) {
     var el = document.getElementById('login-error');
-    el.textContent = msg;
+    var textEl = document.getElementById('login-error-text');
+    textEl.textContent = msg;
     el.classList.add('visible');
   }
+
   function clearError() {
     var el = document.getElementById('login-error');
     el.classList.remove('visible');
@@ -2044,4 +2071,3 @@
   </script>
 </body>
 </html>
-

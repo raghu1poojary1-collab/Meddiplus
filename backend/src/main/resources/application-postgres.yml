@@ -47,3 +47,4 @@ spring:
       - hospitalSearchResults
     caffeine:
       spec: maximumSize=1000,expireAfterWrite=15s,recordStats
+
