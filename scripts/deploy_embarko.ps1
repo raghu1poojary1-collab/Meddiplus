@@ -18,3 +18,4 @@ tar -czf C:\Users\raghu\AppData\Local\Temp\medflow-static.tar.gz -C $dest .
   -H "X-Agent-Name: antigravity" `
   --oauth2-bearer "emb_8c678fa4d6eeed3000f1d79394414cccded8f4920491cea57238da18dbc826fe" `
   -F "source=@C:\Users\raghu\AppData\Local\Temp\medflow-static.tar.gz;type=application/gzip"
+
