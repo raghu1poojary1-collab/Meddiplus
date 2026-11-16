@@ -294,7 +294,18 @@
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
           <h2 style="font-size: 24px; margin-bottom: 6px;">Hospital Staff Authentication</h2>
-          <p style="font-size: 14px; color: var(--slate);">Access live desk controls to toggle doctor shifts, update medicine inventories, and sync vaccine batches.</p>
+          <p style="font-size: 14px; color: var(--slate); margin-bottom: 20px;">Access live desk controls to toggle doctor shifts, update medicine inventories, and sync vaccine batches.</p>
+
+          <a href="./staff-login.html" class="btn-search-submit" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 13px; background: #2d6a5e; color: #fff; border-radius: 10px; font-weight: 600; font-size: 14.5px; box-shadow: 0 4px 14px rgba(45,106,94,0.25); margin-bottom: 16px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span>Open Staff &amp; Doctor Login Portal (with Google) &rarr;</span>
+          </a>
+
+          <div style="display: flex; align-items: center; margin: 18px 0; font-size: 12px; color: var(--slate); text-transform: lowercase;">
+            <span style="flex: 1; height: 1px; background: var(--line); margin-right: 12px;"></span>
+            <span>or sign in below</span>
+            <span style="flex: 1; height: 1px; background: var(--line); margin-left: 12px;"></span>
+          </div>
         </div>
 
         <form id="page2-login-form">
@@ -503,13 +514,27 @@
      */
     class AdminPageController {
       constructor() {
-        this.currentHospitalId = 'hosp-alvas';
         this.isAuthenticated = localStorage.getItem('medipulse_admin_auth') === 'true';
+        this.staffSession = null;
+        try {
+          this.staffSession = JSON.parse(localStorage.getItem('mp_staff_session') || 'null');
+        } catch(e) {}
+
+        this.currentHospitalId = (this.staffSession && this.staffSession.facilityId) ? this.staffSession.facilityId : 'hosp-alvas';
 
         this.init();
       }
 
       init() {
+        // If unauthenticated, redirect to dedicated staff login page
+        if (!this.isAuthenticated) {
+          var params = new URLSearchParams(window.location.search);
+          if (params.get('stay') !== 'true') {
+            window.location.replace('./staff-login.html?redirect=admin.html');
+            return;
+          }
+        }
+
         this.setupAuth();
         this.setupTabs();
         this.setupFacilitySelector();
@@ -543,15 +568,40 @@
           const user = document.getElementById('page2-input-username').value.trim();
           const pass = document.getElementById('page2-input-password').value.trim();
 
-          if (user === 'admin' && pass === 'medipulse2025') {
+          const isUniversalAdmin = (user === 'admin' && pass === 'medipulse2025');
+          const isDbAdmin = (['admin_alvas', 'admin_chc', 'admin_prasad', 'admin_yenepoya'].includes(user.toLowerCase()) && (pass === 'admin123' || pass === 'medipulse2025'));
+
+          if (isUniversalAdmin || isDbAdmin) {
             this.isAuthenticated = true;
             localStorage.setItem('medipulse_admin_auth', 'true');
+
+            // Set facility mapping for db admin
+            const facilityMap = {
+              'admin_alvas': 'hosp-alvas',
+              'admin_chc': 'hosp-chc',
+              'admin_prasad': 'hosp-prasad',
+              'admin_yenepoya': 'hosp-yenepoya'
+            };
+            if (facilityMap[user.toLowerCase()]) {
+              this.currentHospitalId = facilityMap[user.toLowerCase()];
+            }
+
+            this.staffSession = {
+              uid: 'staff_' + Math.random().toString(36).substr(2, 9),
+              id: user,
+              name: user.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+              facilityId: this.currentHospitalId,
+              role: 'ROLE_HOSPITAL_ADMIN',
+              authenticatedAt: new Date().toISOString()
+            };
+            localStorage.setItem('mp_staff_session', JSON.stringify(this.staffSession));
+
             errorMsg.classList.remove('visible');
             loginBox.classList.remove('shake-error');
             this.showDashboard();
-            this.showToast("Authenticated as Hospital Administrator!");
+            this.showToast(`Authenticated as ${this.staffSession.name}!`);
           } else {
-            // 10. Horizontal shake animation on invalid credentials
+            // Horizontal shake animation on invalid credentials
             loginBox.classList.remove('shake-error');
             void loginBox.offsetWidth; // trigger reflow
             loginBox.classList.add('shake-error');
@@ -562,8 +612,8 @@
         logoutBtn?.addEventListener('click', () => {
           this.isAuthenticated = false;
           localStorage.removeItem('medipulse_admin_auth');
-          this.showLogin();
-          this.showToast("Logged out from Hospital Admin Portal.");
+          localStorage.removeItem('mp_staff_session');
+          window.location.replace('./staff-login.html?reauth=true');
         });
       }
 
@@ -577,6 +627,22 @@
         document.getElementById('page2-login-section').style.display = 'none';
         document.getElementById('page2-dashboard-section').style.display = 'block';
         document.getElementById('btn-admin-logout').style.display = 'inline-flex';
+
+        // Update header role badge if staff session exists
+        if (this.staffSession) {
+          const badge = document.querySelector('.admin-badge-role');
+          if (badge) {
+            badge.innerHTML = `
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>${this.staffSession.name || 'Staff Desk'} • ${this.staffSession.role || 'Verified Staff'}</span>
+            `;
+          }
+          const facilitySelect = document.getElementById('page2-facility-select');
+          if (facilitySelect && this.currentHospitalId) {
+            facilitySelect.value = this.currentHospitalId;
+          }
+        }
+
         this.renderDashboard();
       }
 

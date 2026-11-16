@@ -178,3 +178,4 @@ if __name__ == '__main__':
     port = int(os.environ.get("AUTH_PORT", 5002))
     print(f"Starting MediPulse PostgreSQL Auth API Server on port {port}...")
     app.run(host='0.0.0.0', port=port, debug=False)
+

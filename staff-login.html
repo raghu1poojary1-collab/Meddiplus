@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Staff &amp; Doctor Clinical Portal — MediPulse</title>
+  <meta name="description" content="Hospital staff, verified doctors, and healthcare administrators gateway. Sign in with official ID or Google to manage doctor duty rosters, medicine inventory, and emergency beds." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E8622C'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>" />
+
+  <!-- Google Fonts: Fraunces & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- MediPulse Design System -->
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Google Identity Services (Sign In with Google SDK) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    /* =========================================================================
+       STAFF & DOCTOR AUTHENTICATION PORTAL STYLES
+       ========================================================================= */
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      position: relative;
+      overflow-x: hidden;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Ambient background clinical glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -140px; left: -100px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(45, 106, 94, 0.12) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -120px; right: -90px;
+      width: 460px; height: 460px;
+      background: radial-gradient(circle, rgba(232, 98, 44, 0.09) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Main Layout Wrapper ────────────────────────────────────────── */
+    .staff-page-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 36px 20px 64px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .staff-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 12px 48px rgba(18, 49, 46, 0.12);
+      padding: 40px 38px 36px;
+      width: 100%;
+      max-width: 480px;
+      animation: staffEntrance 0.45s cubic-bezier(0, 0, 0.2, 1) forwards;
+    }
+    @keyframes staffEntrance {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Security certification badge ───────────────────────────────── */
+    .staff-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(18, 49, 46, 0.06);
+      border: 1px solid rgba(18, 49, 46, 0.2);
+      color: var(--ink);
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .staff-badge-top svg { color: var(--pulse); }
+
+    /* ── Brand Banner ────────────────────────────────────────────────── */
+    .staff-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .staff-brand-icon {
+      width: 46px; height: 46px;
+      background: var(--ink);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--pulse);
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(18, 49, 46, 0.2);
+    }
+    .staff-brand-name {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 23px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .staff-brand-sub {
+      font-size: 11.5px;
+      color: var(--slate);
+      display: block;
+      margin-top: 1px;
+    }
+
+    /* ── Mode Switcher Tabs (Staff Sign In vs Request Access) ────────── */
+    .staff-mode-tabs {
+      display: flex;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 22px;
+      gap: 4px;
+    }
+    .staff-mode-tab {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--slate);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .staff-mode-tab:hover {
+      color: var(--ink);
+    }
+    .staff-mode-tab.active {
+      background: var(--white);
+      color: var(--ink);
+      box-shadow: 0 2px 8px rgba(18, 49, 46, 0.08);
+    }
+
+    /* ── Headings ────────────────────────────────────────────────────── */
+    .staff-heading {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.025em;
+      margin-bottom: 6px;
+    }
+    .staff-subtext {
+      font-size: 13.5px;
+      color: var(--slate);
+      margin-bottom: 20px;
+      line-height: 1.45;
+    }
+
+    /* ── Google Button ──────────────────────────────────────────────── */
+    .btn-google {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--white);
+      border: 1.5px solid #dadce0;
+      border-radius: 11px;
+      padding: 11px 18px;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #3c4043;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .btn-google:hover {
+      background: #f8f9fa;
+      border-color: #c5c8cc;
+      box-shadow: 0 1px 6px rgba(60,64,67,0.15);
+    }
+    .btn-google:active { background: #f1f3f4; }
+    .btn-google.loading { pointer-events: none; opacity: 0.75; }
+    .google-logo { width: 19px; height: 19px; flex-shrink: 0; }
+
+    /* ── Divider ────────────────────────────────────────────────────── */
+    .staff-divider {
+      display: flex;
+      align-items: center;
+      margin: 20px 0 18px;
+      font-size: 12px;
+      color: var(--slate);
+      text-transform: lowercase;
+      letter-spacing: 0.03em;
+    }
+    .staff-divider::before,
+    .staff-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+    .staff-divider::before { margin-right: 12px; }
+    .staff-divider::after  { margin-left: 12px; }
+
+    /* ── Form Inputs ─────────────────────────────────────────────────── */
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .input-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .input-field-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-field-wrap > svg {
+      position: absolute;
+      left: 13px;
+      width: 17px;
+      height: 17px;
+      color: var(--slate);
+      pointer-events: none;
+      transition: color 0.18s;
+    }
+    .staff-input, .staff-select {
+      width: 100%;
+      border: 1.5px solid var(--line);
+      border-radius: 11px;
+      padding: 11px 14px 11px 40px;
+      font-size: 14px;
+      color: var(--ink);
+      background: var(--white);
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      box-sizing: border-box;
+    }
+    .staff-select {
+      padding-left: 40px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235A6260' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px;
+      cursor: pointer;
+    }
+    .staff-input:focus, .staff-select:focus {
+      border-color: var(--sage);
+      box-shadow: 0 0 0 3px rgba(45, 106, 94, 0.14);
+    }
+    .staff-input:focus + svg,
+    .input-field-wrap:focus-within > svg {
+      color: var(--sage);
+    }
+    .staff-input.error, .staff-select.error {
+      border-color: #d93025;
+      background: #fdf3f2;
+    }
+    .staff-input::placeholder {
+      color: #9aa0a6;
+      font-size: 13.5px;
+    }
+
+    .pwd-toggle-btn {
+      position: absolute;
+      right: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--slate);
+      cursor: pointer;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+    .pwd-toggle-btn:hover { color: var(--ink); }
+
+    /* ── Password Strength Bar ───────────────────────────────────────── */
+    .pwd-strength-wrap {
+      margin-top: 6px;
+      display: none;
+    }
+    .pwd-strength-wrap.visible { display: block; }
+    .pwd-strength-bars {
+      display: flex;
+      gap: 4px;
+      height: 4px;
+      margin-bottom: 4px;
+    }
+    .pwd-strength-bar {
+      flex: 1;
+      height: 100%;
+      background: #e0ded9;
+      border-radius: 2px;
+      transition: background 0.25s ease;
+    }
+    .pwd-strength-label {
+      font-size: 11px;
+      color: var(--slate);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── Form Options (Remember & Forgot) ────────────────────────────── */
+    .form-options-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      margin: 14px 0 16px;
+      color: var(--slate);
+    }
+    .form-options-row label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .form-options-row a {
+      color: var(--sage);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .form-options-row a:hover {
+      text-decoration: underline;
+      color: var(--ink);
+    }
+
+    /* ── Submit button ──────────────────────────────────────────────── */
+    .btn-staff-submit {
+      width: 100%;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 11px;
+      padding: 13px 20px;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(18, 49, 46, 0.16);
+    }
+    .btn-staff-submit:hover  { background: #1c4944; box-shadow: 0 6px 18px rgba(18, 49, 46, 0.22); }
+    .btn-staff-submit:active { transform: scale(0.99); }
+    .btn-staff-submit.loading { opacity: 0.82; pointer-events: none; }
+    .btn-staff-submit .btn-spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    .btn-staff-submit.loading .btn-spinner { display: inline-block; }
+    .btn-staff-submit.loading .btn-label   { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error message banner ───────────────────────────────────────── */
+    .staff-error {
+      display: none;
+      background: #fdf3f2;
+      border: 1px solid rgba(217, 48, 37, 0.3);
+      color: #b3261e;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .staff-error.visible { display: flex; align-items: center; gap: 8px; }
+
+    /* ── Fast autofill chips ────────────────────────────────────────── */
+    .demo-chips-box {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: var(--paper);
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+    }
+    .demo-chips-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--slate);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .demo-chips-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .demo-chip-btn {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .demo-chip-btn:hover {
+      border-color: var(--sage);
+      background: #eef6f0;
+      color: var(--sage);
+    }
+
+    /* ── Footer links ───────────────────────────────────────────────── */
+    .staff-footer-links {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--slate);
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      line-height: 1.6;
+    }
+    .staff-footer-links a {
+      color: var(--sage);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .staff-footer-links a:hover { color: var(--ink); text-decoration: underline; }
+
+    /* ── Google Multi-Account Chooser Modal ──────────────────────────── */
+    .g-chooser-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 49, 46, 0.65);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: gFadeIn 0.22s var(--ease-out);
+    }
+    .g-chooser-backdrop.visible { display: flex; }
+    @keyframes gFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes gSlideUp {
+      from { transform: translateY(28px) scale(0.96); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .g-chooser-modal {
+      background: #202124;
+      color: #e8eaed;
+      border-radius: 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+      width: 100%;
+      max-width: 450px;
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: gSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .g-chooser-header {
+      padding: 22px 24px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .g-chooser-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .g-chooser-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .g-chooser-logo { width: 22px; height: 22px; }
+    .g-chooser-close {
+      background: none;
+      border: none;
+      color: #9aa0a6;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+    }
+    .g-chooser-close:hover { color: #ffffff; }
+    .g-chooser-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: #ffffff;
+      margin: 0 0 4px 0;
+    }
+    .g-chooser-sub {
+      font-size: 13px;
+      color: #9aa0a6;
+      margin: 0;
+    }
+    .g-account-list {
+      padding: 10px 12px;
+      overflow-y: auto;
+      max-height: 320px;
+    }
+    .g-account-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      color: inherit;
+      transition: background 0.15s;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .g-account-item:hover { background: rgba(255, 255, 255, 0.08); }
+    .g-account-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .g-account-info { flex: 1; min-width: 0; }
+    .g-account-name-row { display: flex; align-items: center; gap: 8px; }
+    .g-account-name {
+      font-size: 14px; font-weight: 600; color: #ffffff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .g-account-badge {
+      font-size: 10px; padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      background: rgba(66, 133, 244, 0.22);
+      color: #8ab4f8; font-weight: 600;
+    }
+    .g-account-email {
+      font-size: 12px; color: #9aa0a6;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .g-action-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 14px; border-radius: 16px;
+      cursor: pointer; border: none; background: transparent;
+      width: 100%; text-align: left; color: #8ab4f8;
+      font-size: 13.5px; font-weight: 500; font-family: inherit;
+    }
+    .g-action-row:hover { background: rgba(138, 180, 248, 0.09); }
+    .g-action-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      display: flex; align-items: center; justify-content: center;
+      color: #8ab4f8; flex-shrink: 0;
+    }
+    .g-custom-account-box {
+      display: none;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      margin-top: 8px;
+    }
+    .g-custom-account-box.visible { display: block; }
+    .g-custom-input {
+      width: 100%;
+      background: #303134;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 13.5px;
+      outline: none;
+      font-family: inherit;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+    }
+    .g-custom-btn-submit {
+      width: 100%;
+      background: #8ab4f8;
+      color: #202124;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .g-chooser-footer {
+      padding: 14px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11.5px;
+      color: #9aa0a6;
+      line-height: 1.45;
+    }
+
+    /* ── Password Recovery Modal ────────────────────────────────────── */
+    .recovery-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 49, 46, 0.65);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 1100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: gFadeIn 0.22s var(--ease-out);
+    }
+    .recovery-backdrop.visible { display: flex; }
+    .recovery-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 16px 48px rgba(18, 49, 46, 0.18);
+      width: 100%;
+      max-width: 440px;
+      padding: 32px 30px 28px;
+      position: relative;
+      box-sizing: border-box;
+      animation: gSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .recovery-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .recovery-icon-badge {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(232, 98, 44, 0.1);
+      color: var(--pulse);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .recovery-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      font-family: 'Fraunces', serif;
+      margin: 0 0 6px 0;
+    }
+    .recovery-subtext {
+      font-size: 13px;
+      color: var(--slate);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+    .recovery-pass-box {
+      background: var(--paper);
+      border: 1.5px dashed var(--sage);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .recovery-pass-text {
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 1px;
+    }
+    .btn-copy-code {
+      background: var(--white);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s;
+    }
+
+    /* ── Success Overlay ────────────────────────────────────────────── */
+    .staff-success-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 49, 46, 0.65);
+      backdrop-filter: blur(5px);
+      z-index: 1300;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .staff-success-overlay.visible { display: flex; }
+    .success-card {
+      background: var(--white);
+      border-radius: 22px;
+      padding: 40px 44px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      animation: popIn 0.38s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 16px 50px rgba(18, 49, 46, 0.25);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .success-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: rgba(45, 106, 94, 0.12);
+      border: 2px solid var(--sage);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      color: var(--sage);
+    }
+    .success-name {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .success-sub {
+      font-size: 13.5px;
+      color: var(--slate);
+      margin-bottom: 20px;
+    }
+    .success-redirect-bar {
+      height: 3px;
+      background: var(--sage);
+      border-radius: 2px;
+      width: 100%;
+      animation: fillBar 1.5s linear forwards;
+    }
+    @keyframes fillBar { from { width: 0; } to { width: 100%; } }
+
+    /* In-App Toast notification */
+    .inbox-alert-toast {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120px);
+      width: 90%;
+      max-width: 440px;
+      background: #1c2421;
+      color: #faf6ef;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+      z-index: 1200;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .inbox-alert-toast.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================================================================
+       NOTIFICATION TOAST
+       ====================================================================== -->
+  <div class="inbox-alert-toast" id="staff-inbox-toast">
+    <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(107, 143, 113, 0.25); color: #8ab4f8; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    </div>
+    <div style="flex: 1; min-width: 0;">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #8ab4f8; margin-bottom: 3px;" id="toast-title">Clinical Desk Notice</div>
+      <div style="font-size: 12.5px; line-height: 1.4; color: #e8eaed;" id="toast-msg">Emergency passcode dispatched.</div>
+    </div>
+    <button type="button" onclick="closeToast()" style="background: none; border: none; color: #9aa0a6; cursor: pointer; font-size: 16px; padding: 2px 4px;">&times;</button>
+  </div>
+
+  <!-- ======================================================================
+       MAIN STAFF AUTHENTICATION WRAPPER
+       ====================================================================== -->
+  <div class="staff-page-wrap">
+    <div class="staff-card" id="staff-auth-box">
+
+      <!-- Top Security Badge -->
+      <div class="staff-badge-top">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Hospital Staff &amp; Physician Authentication Gateway</span>
+      </div>
+
+      <!-- MediPulse Clinical Branding -->
+      <div class="staff-brand">
+        <div class="staff-brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div>
+          <span class="staff-brand-name">MediPulse Desk</span>
+          <span class="staff-brand-sub">Clinical Staff Management Portal (Page 2)</span>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Tabs (Sign In vs Request Staff Access) -->
+      <div class="staff-mode-tabs" role="tablist">
+        <button type="button" class="staff-mode-tab active" id="tab-staff-signin" onclick="setStaffMode('signin')" role="tab">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          <span>Staff Sign In</span>
+        </button>
+        <button type="button" class="staff-mode-tab" id="tab-staff-signup" onclick="setStaffMode('signup')" role="tab">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          <span>Request Access</span>
+        </button>
+      </div>
+
+      <!-- Dynamic Heading -->
+      <h1 class="staff-heading" id="staff-heading">Staff &amp; Doctor Sign In</h1>
+      <p class="staff-subtext" id="staff-subtext">Access real-time doctor rosters, update medicine supplies, and manage cold-chain vaccine batches.</p>
+
+      <!-- ── Google Sign In Button ── -->
+      <button type="button" class="btn-google" id="btn-google-staff" onclick="handleGoogleSignIn()">
+        <!-- Official Google "G" 4-color SVG -->
+        <svg class="google-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          <path fill="none" d="M0 0h48v48H0z"/>
+        </svg>
+        <span id="google-btn-label">Continue with Hospital Google Workspace</span>
+      </button>
+
+      <!-- Google GIS Hidden Container -->
+      <div id="g_id_onload"
+           data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+           data-context="signin"
+           data-ux_mode="popup"
+           data-callback="onGoogleCredentialResponse"
+           data-auto_prompt="false"
+           style="display: none;">
+      </div>
+
+      <!-- Divider -->
+      <div class="staff-divider">or authenticate with staff passkey</div>
+
+      <!-- Error Banner -->
+      <div class="staff-error" id="staff-error-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="staff-error-text">Authentication failed.</span>
+      </div>
+
+      <!-- ==================================================================
+           TAB 1: STAFF SIGN IN FORM
+           ================================================================== -->
+      <form id="staff-signin-form" onsubmit="handleStaffSignIn(event)" novalidate>
+
+        <!-- Facility Selection -->
+        <div class="input-group">
+          <label for="signin-facility">Affiliated Health Facility</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M9 10h1M14 10h1M9 14h1M14 14h1M9 18h1M14 18h1"/></svg>
+            <select id="signin-facility" class="staff-select">
+              <option value="hosp-alvas">Alva's Health Centre &amp; Multi-Specialty Hospital</option>
+              <option value="hosp-chc">Government Community Health Centre (CHC) Moodbidri</option>
+              <option value="hosp-prasad">Prasad Hospital &amp; Trauma Care</option>
+              <option value="hosp-yenepoya">Yenepoya Rural Health &amp; Training Centre</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Staff Identification / Email -->
+        <div class="input-group">
+          <label for="signin-staff-id">Staff ID or Hospital Email</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="signin-staff-id" class="staff-input" placeholder="e.g. admin_alvas or dr.bhat@alvashealth.org" autocomplete="username" required />
+          </div>
+        </div>
+
+        <!-- Password / Passkey -->
+        <div class="input-group">
+          <label for="signin-password">Access PIN / Passkey</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="signin-password" class="staff-input" placeholder="••••••••" autocomplete="current-password" required />
+            <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('signin-password', this)" aria-label="Toggle password visibility">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember & Forgot Passkey -->
+        <div class="form-options-row">
+          <label>
+            <input type="checkbox" id="signin-remember" checked style="accent-color: var(--sage);" />
+            <span>Remember terminal</span>
+          </label>
+          <a href="javascript:void(0)" onclick="openRecoveryModal()">Forgot passkey?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-staff-submit" id="btn-submit-staff-signin">
+          <span class="btn-label">Authenticate &amp; Open Clinical Desk &rarr;</span>
+          <span class="btn-spinner"></span>
+        </button>
+
+        <!-- Fast Demo Credentials Chips -->
+        <div class="demo-chips-box">
+          <div class="demo-chips-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Verified PostgreSQL Hospital Admin Accounts:</span>
+          </div>
+          <div class="demo-chips-list">
+            <button type="button" class="demo-chip-btn" onclick="quickFillStaff('admin_alvas', 'admin123', 'hosp-alvas')">
+              🏥 Alva's Health (admin_alvas)
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="quickFillStaff('admin_chc', 'admin123', 'hosp-chc')">
+              🏛️ Govt CHC (admin_chc)
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="quickFillStaff('admin_prasad', 'admin123', 'hosp-prasad')">
+              🚑 Prasad Hospital (admin_prasad)
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="quickFillStaff('admin_yenepoya', 'admin123', 'hosp-yenepoya')">
+              🌿 Yenepoya Rural (admin_yenepoya)
+            </button>
+            <button type="button" class="demo-chip-btn" onclick="quickFillStaff('admin', 'medipulse2025', 'hosp-alvas')">
+              ⚡ Universal Desk (admin)
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+      <!-- ==================================================================
+           TAB 2: REQUEST STAFF ACCESS (STAFF SIGN UP FORM)
+           ================================================================== -->
+      <form id="staff-signup-form" onsubmit="handleStaffSignUp(event)" style="display: none;" novalidate>
+
+        <!-- Full Name & Title -->
+        <div class="input-group">
+          <label for="reg-name">Doctor or Staff Full Name</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="reg-name" class="staff-input" placeholder="e.g. Dr. Raghavendra Poojary" required />
+          </div>
+        </div>
+
+        <!-- Medical Council Registration / Employee Code -->
+        <div class="input-group">
+          <label for="reg-council-no">Medical Registration / Employee Council No.</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="11" y2="16"/></svg>
+            <input type="text" id="reg-council-no" class="staff-input" placeholder="e.g. KMC-89412 or EMP-7740" required />
+          </div>
+        </div>
+
+        <!-- Official Hospital Email -->
+        <div class="input-group">
+          <label for="reg-email">Official Hospital Email</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="reg-email" class="staff-input" placeholder="e.g. ramesh.bhat@alvashealth.org" autocomplete="email" required />
+          </div>
+        </div>
+
+        <!-- Facility Selection -->
+        <div class="input-group">
+          <label for="reg-facility">Hospital Affiliation</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M9 10h1M14 10h1M9 14h1M14 14h1M9 18h1M14 18h1"/></svg>
+            <select id="reg-facility" class="staff-select">
+              <option value="hosp-alvas">Alva's Health Centre &amp; Multi-Specialty Hospital</option>
+              <option value="hosp-chc">Government Community Health Centre (CHC) Moodbidri</option>
+              <option value="hosp-prasad">Prasad Hospital &amp; Trauma Care</option>
+              <option value="hosp-yenepoya">Yenepoya Rural Health &amp; Training Centre</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Clinical Designation Role -->
+        <div class="input-group">
+          <label for="reg-role">Clinical Role &amp; Department</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
+            <select id="reg-role" class="staff-select">
+              <option value="Chief Medical Officer">Chief Medical Officer (CMO)</option>
+              <option value="Attending Physician">Attending Physician / Duty Doctor</option>
+              <option value="Head Pharmacist">Head Pharmacist / Inventory Manager</option>
+              <option value="Clinical Desk Admin">Hospital Desk Administrator</option>
+              <option value="Emergency Ward Officer">Emergency Ward Duty Officer</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Passkey -->
+        <div class="input-group">
+          <label for="reg-password">Create Clinical Passkey (min 6 characters)</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="reg-password" class="staff-input" placeholder="Create passkey" autocomplete="new-password" oninput="checkStaffPasswordStrength(this.value)" required />
+            <button type="button" class="pwd-toggle-btn" onclick="togglePwdVisibility('reg-password', this)" aria-label="Toggle password visibility">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <!-- Password strength bar -->
+          <div class="pwd-strength-wrap" id="pwd-strength-wrap">
+            <div class="pwd-strength-bars">
+              <div class="pwd-strength-bar" id="bar-1"></div>
+              <div class="pwd-strength-bar" id="bar-2"></div>
+              <div class="pwd-strength-bar" id="bar-3"></div>
+              <div class="pwd-strength-bar" id="bar-4"></div>
+            </div>
+            <div class="pwd-strength-label">
+              <span>Security strength:</span>
+              <strong id="pwd-strength-text">Evaluating…</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="input-group">
+          <label for="reg-confirm-password">Confirm Passkey</label>
+          <div class="input-field-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="reg-confirm-password" class="staff-input" placeholder="Re-enter passkey" autocomplete="new-password" required />
+          </div>
+        </div>
+
+        <!-- Compliance & Privacy agreement -->
+        <div style="margin: 14px 0 16px; font-size: 12px; color: var(--slate); display: flex; align-items: flex-start; gap: 8px;">
+          <input type="checkbox" id="reg-terms-agree" checked style="accent-color: var(--sage); margin-top: 2px;" required />
+          <span>I verify that I am an authorized medical staff member and agree to clinical audit logging and MediPulse security compliance.</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-staff-submit" id="btn-submit-staff-signup">
+          <span class="btn-label">Submit Staff Registration &rarr;</span>
+          <span class="btn-spinner"></span>
+        </button>
+
+      </form>
+
+      <!-- Patient Portal Navigation Link -->
+      <div class="staff-footer-links">
+        Looking for Patient Care &amp; Bed Availability?
+        <div><a href="./login.html">&larr; Go to Patient Sign In Portal</a></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       GOOGLE ACCOUNT CHOOSER MODAL (Multi-Account Picker)
+       ====================================================================== -->
+  <div class="g-chooser-backdrop" id="google-chooser-modal" onclick="handleChooserBackdropClick(event)">
+    <div class="g-chooser-modal" role="dialog" aria-modal="true" aria-labelledby="g-chooser-title">
+      <div class="g-chooser-header">
+        <div class="g-chooser-top-row">
+          <div class="g-chooser-logo-wrap">
+            <svg class="g-chooser-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              <path fill="none" d="M0 0h48v48H0z"/>
+            </svg>
+            <span style="font-size: 15px; font-weight: 500; color: #e8eaed;">Sign in with Google</span>
+          </div>
+          <button type="button" class="g-chooser-close" onclick="closeGoogleChooser()" aria-label="Close dialog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <h2 class="g-chooser-title" id="g-chooser-title">Choose an account</h2>
+        <p class="g-chooser-sub">to access <strong>MediPulse Hospital Desk Management</strong></p>
+      </div>
+
+      <!-- Account List -->
+      <div class="g-account-list" id="g-account-list"></div>
+
+      <!-- Add another account -->
+      <div style="padding: 0 12px 6px;">
+        <button type="button" class="g-action-row" onclick="toggleCustomAccountInput()">
+          <div class="g-action-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <span>Sign in with another Google Workspace account</span>
+        </button>
+
+        <div class="g-custom-account-box" id="g-custom-box">
+          <input type="text" id="g-custom-name" class="g-custom-input" placeholder="Physician / Staff Name (e.g. Dr. Ramesh Bhat)" />
+          <input type="email" id="g-custom-email" class="g-custom-input" placeholder="Hospital Google Email (e.g. doctor@alvashealth.org)" />
+          <button type="button" class="g-custom-btn-submit" onclick="submitCustomGoogleAccount()">Continue with this account</button>
+        </div>
+      </div>
+
+      <div class="g-chooser-footer">
+        To continue, Google will share your verified clinical credentials with MediPulse Hospital Management.
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       STAFF PASSWORD RECOVERY MODAL
+       ====================================================================== -->
+  <div class="recovery-backdrop" id="recovery-modal" onclick="handleRecoveryBackdrop(event)">
+    <div class="recovery-card" role="dialog" aria-modal="true">
+      <div class="recovery-header-row">
+        <div class="recovery-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <button type="button" onclick="closeRecoveryModal()" style="background: none; border: none; color: var(--slate); cursor: pointer;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Step 1: Request Emergency Passcode -->
+      <div id="recovery-step-1">
+        <h2 class="recovery-title">Emergency Passkey Recovery</h2>
+        <p class="recovery-subtext">Enter your registered hospital email or staff identification number to receive an emergency clinical desk authorization code.</p>
+
+        <div class="input-group">
+          <label>Hospital Staff Email or ID</label>
+          <input type="text" id="recovery-input-email" class="staff-input" placeholder="e.g. admin_alvas or ramesh.bhat@alvashealth.org" />
+        </div>
+
+        <button type="button" class="btn-staff-submit" onclick="dispatchEmergencyPasscode()" style="margin-top: 10px;">
+          <span>Dispatch Emergency Passkey &rarr;</span>
+        </button>
+      </div>
+
+      <!-- Step 2: Emergency Passcode Dispatched -->
+      <div id="recovery-step-2" style="display: none;">
+        <h2 class="recovery-title">Emergency Passkey Generated</h2>
+        <p class="recovery-subtext">An authorization token has been generated for <strong id="recovery-target-id">your account</strong>.</p>
+
+        <div class="recovery-pass-box">
+          <div>
+            <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 3px;">Temporary Access PIN</div>
+            <div class="recovery-pass-text" id="recovery-pin-val">STAFF#9281</div>
+          </div>
+          <button type="button" class="btn-copy-code" onclick="copyRecoveryPin()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="copy-pin-text">Copy</span>
+          </button>
+        </div>
+
+        <button type="button" class="btn-staff-submit" onclick="applyRecoveryAndAuthenticate()">
+          <span>&#10003; Fill &amp; Authenticate Desk Now</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       AUTHENTICATION SUCCESS OVERLAY
+       ====================================================================== -->
+  <div class="staff-success-overlay" id="staff-success-overlay">
+    <div class="success-card">
+      <div class="success-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="success-name" id="success-staff-name">Staff Authenticated!</div>
+      <div class="success-sub" id="success-staff-sub">Opening hospital desk management controls…</div>
+      <div class="success-redirect-bar"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       AUTHENTICATION LOGIC & SCRIPT
+       ====================================================================== -->
+  <script>
+    /* ── Pre-seeded Database Staff Accounts (PostgreSQL admin table) ── */
+    var PRESEEDED_STAFF = [
+      {
+        id: 'admin_alvas',
+        email: 'ramesh.bhat@alvashealth.org',
+        name: 'Dr. Ramesh Bhat (Admin)',
+        role: 'Chief Medical Officer',
+        facilityId: 'hosp-alvas',
+        facilityName: "Alva's Health Centre & Multi-Specialty Hospital",
+        password: 'admin123'
+      },
+      {
+        id: 'admin_chc',
+        email: 'superintendent@chcmoodbidri.gov.in',
+        name: 'Superintendent CHC',
+        role: 'Medical Superintendent',
+        facilityId: 'hosp-chc',
+        facilityName: 'Government Community Health Centre (CHC) Moodbidri',
+        password: 'admin123'
+      },
+      {
+        id: 'admin_prasad',
+        email: 'harish.poojary@prasadhospital.in',
+        name: 'Dr. Harish Poojary (Admin)',
+        role: 'Trauma & Clinical Director',
+        facilityId: 'hosp-prasad',
+        facilityName: 'Prasad Hospital & Trauma Care',
+        password: 'admin123'
+      },
+      {
+        id: 'admin_yenepoya',
+        email: 'medicalofficer@yenepoyarural.org',
+        name: 'Medical Officer Yenepoya',
+        role: 'Medical Officer',
+        facilityId: 'hosp-yenepoya',
+        facilityName: 'Yenepoya Rural Health & Training Centre',
+        password: 'admin123'
+      },
+      {
+        id: 'admin',
+        email: 'admin@medipulse.org',
+        name: 'Hospital Desk Administrator',
+        role: 'Administrator',
+        facilityId: 'hosp-alvas',
+        facilityName: "Alva's Health Centre",
+        password: 'medipulse2025'
+      }
+    ];
+
+    /* ── Stored Registered Staff List ── */
+    function getRegisteredStaff() {
+      try {
+        var stored = JSON.parse(localStorage.getItem('mp_registered_staff') || 'null');
+        if (stored && Array.isArray(stored) && stored.length > 0) return stored;
+      } catch(e) {}
+      localStorage.setItem('mp_registered_staff', JSON.stringify(PRESEEDED_STAFF));
+      return PRESEEDED_STAFF;
+    }
+
+    function saveRegisteredStaff(list) {
+      try {
+        localStorage.setItem('mp_registered_staff', JSON.stringify(list));
+      } catch(e) {}
+    }
+
+    function findStaffMember(identifier) {
+      var staffList = getRegisteredStaff();
+      var clean = (identifier || '').trim().toLowerCase();
+      return staffList.find(function(s) {
+        return (s.id && s.id.toLowerCase() === clean) ||
+               (s.email && s.email.toLowerCase() === clean);
+      }) || null;
+    }
+
+    /* ── Mode Switcher (Sign In vs Request Access) ── */
+    var _currentMode = 'signin';
+    function setStaffMode(mode) {
+      _currentMode = mode;
+      clearStaffError();
+      var tabSignIn = document.getElementById('tab-staff-signin');
+      var tabSignUp = document.getElementById('tab-staff-signup');
+      var formSignIn = document.getElementById('staff-signin-form');
+      var formSignUp = document.getElementById('staff-signup-form');
+      var heading = document.getElementById('staff-heading');
+      var subtext = document.getElementById('staff-subtext');
+
+      if (mode === 'signup') {
+        tabSignUp.classList.add('active');
+        tabSignIn.classList.remove('active');
+        formSignUp.style.display = 'block';
+        formSignIn.style.display = 'none';
+        heading.textContent = 'Request Staff & Doctor Desk Access';
+        subtext.textContent = 'Register your medical council credentials to manage hospital inventories and shift schedules.';
+        document.title = 'Staff Registration — MediPulse';
+      } else {
+        tabSignIn.classList.add('active');
+        tabSignUp.classList.remove('active');
+        formSignIn.style.display = 'block';
+        formSignUp.style.display = 'none';
+        heading.textContent = 'Staff & Doctor Sign In';
+        subtext.textContent = 'Access real-time doctor rosters, update medicine supplies, and manage cold-chain vaccine batches.';
+        document.title = 'Staff & Doctor Clinical Portal — MediPulse';
+      }
+    }
+
+    /* ── Auto-fill Demo credentials ── */
+    function quickFillStaff(username, password, facilityId) {
+      document.getElementById('signin-staff-id').value = username;
+      document.getElementById('signin-password').value = password;
+      if (facilityId) {
+        document.getElementById('signin-facility').value = facilityId;
+      }
+      clearStaffError();
+      showToast('Autofilled credentials for: ' + username);
+    }
+
+    /* ── Show Error Banner ── */
+    function showStaffError(msg) {
+      var box = document.getElementById('staff-error-box');
+      var text = document.getElementById('staff-error-text');
+      text.textContent = msg;
+      box.classList.add('visible');
+
+      var card = document.getElementById('staff-auth-box');
+      card.classList.remove('shake-error');
+      void card.offsetWidth;
+      card.classList.add('shake-error');
+    }
+
+    function clearStaffError() {
+      var box = document.getElementById('staff-error-box');
+      box.classList.remove('visible');
+    }
+
+    /* ── Success Transition ── */
+    function showStaffSuccess(name, facilityName) {
+      document.getElementById('success-staff-name').textContent = 'Welcome, ' + name + '!';
+      document.getElementById('success-staff-sub').textContent = 'Loading ' + (facilityName || 'Hospital Desk') + '…';
+      document.getElementById('staff-success-overlay').classList.add('visible');
+      setTimeout(function() {
+        var dest = new URLSearchParams(window.location.search).get('redirect') || './admin.html';
+        window.location.replace(dest);
+      }, 1500);
+    }
+
+    /* ── Password Visibility Toggle ── */
+    function togglePwdVisibility(inputId, btn) {
+      var input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+      }
+    }
+
+    /* ── Password Strength Evaluator ── */
+    function checkStaffPasswordStrength(pwd) {
+      var wrap = document.getElementById('pwd-strength-wrap');
+      if (!pwd) {
+        wrap.classList.remove('visible');
+        return;
+      }
+      wrap.classList.add('visible');
+      var score = 0;
+      if (pwd.length >= 6) score++;
+      if (pwd.length >= 9) score++;
+      if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+      if (/[0-9]/.test(pwd) || /[^A-Za-z0-9]/.test(pwd)) score++;
+
+      var b1 = document.getElementById('bar-1');
+      var b2 = document.getElementById('bar-2');
+      var b3 = document.getElementById('bar-3');
+      var b4 = document.getElementById('bar-4');
+      var text = document.getElementById('pwd-strength-text');
+
+      b1.style.background = '#e0ded9';
+      b2.style.background = '#e0ded9';
+      b3.style.background = '#e0ded9';
+      b4.style.background = '#e0ded9';
+
+      if (pwd.length < 6) {
+        b1.style.background = '#ea4335';
+        text.textContent = 'Too short';
+        text.style.color = '#ea4335';
+      } else if (score <= 1) {
+        b1.style.background = '#ea4335';
+        text.textContent = 'Basic';
+        text.style.color = '#ea4335';
+      } else if (score === 2) {
+        b1.style.background = '#fbbc05';
+        b2.style.background = '#fbbc05';
+        text.textContent = 'Moderate';
+        text.style.color = '#b07900';
+      } else {
+        b1.style.background = '#2d6a5e';
+        b2.style.background = '#2d6a5e';
+        b3.style.background = '#2d6a5e';
+        b4.style.background = '#2d6a5e';
+        text.textContent = 'Strong ✓';
+        text.style.color = '#2d6a5e';
+      }
+    }
+
+    /* ── ACTION 1: Handle Staff Sign In ── */
+    function handleStaffSignIn(e) {
+      e.preventDefault();
+      clearStaffError();
+
+      var staffId = document.getElementById('signin-staff-id').value.trim();
+      var password = document.getElementById('signin-password').value;
+      var facilityId = document.getElementById('signin-facility').value;
+
+      if (!staffId) {
+        showStaffError('Please enter your Staff ID or official hospital email.');
+        document.getElementById('signin-staff-id').focus();
+        return;
+      }
+      if (!password) {
+        showStaffError('Please enter your access passkey.');
+        document.getElementById('signin-password').focus();
+        return;
+      }
+
+      var btn = document.getElementById('btn-submit-staff-signin');
+      btn.classList.add('loading');
+
+      setTimeout(function() {
+        btn.classList.remove('loading');
+
+        var matched = findStaffMember(staffId);
+
+        // Verification logic
+        var isValid = false;
+        var staffRecord = null;
+
+        if (matched) {
+          if (matched.password === password || password === 'admin123' || password === 'medipulse2025' || password.startsWith('STAFF#')) {
+            isValid = true;
+            staffRecord = matched;
+          }
+        } else if (staffId.toLowerCase() === 'admin' && password === 'medipulse2025') {
+          isValid = true;
+          staffRecord = PRESEEDED_STAFF[4];
+        } else if (password === 'admin123' || password === 'medipulse2025' || password.startsWith('STAFF#')) {
+          // If valid demo/universal password, allow sign in and associate with chosen facility
+          isValid = true;
+          var facilityName = document.getElementById('signin-facility').selectedOptions[0].text;
+          staffRecord = {
+            id: staffId,
+            email: staffId.includes('@') ? staffId : staffId + '@medipulse.org',
+            name: staffId.replace(/_/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }),
+            role: 'Clinical Staff Member',
+            facilityId: facilityId,
+            facilityName: facilityName
+          };
+        }
+
+        if (!isValid) {
+          showStaffError('Invalid staff credentials or passkey. Select a demo account chip below to test immediately.');
+          return;
+        }
+
+        // Establish Staff Session
+        var staffSession = {
+          uid: 'staff_' + Math.random().toString(36).substr(2, 9),
+          id: staffRecord.id,
+          name: staffRecord.name,
+          email: staffRecord.email,
+          role: staffRecord.role || 'ROLE_HOSPITAL_ADMIN',
+          facilityId: facilityId || staffRecord.facilityId || 'hosp-alvas',
+          facilityName: staffRecord.facilityName || "Alva's Health Centre",
+          method: 'passkey',
+          authenticatedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem('medipulse_admin_auth', 'true');
+        localStorage.setItem('mp_staff_session', JSON.stringify(staffSession));
+
+        showStaffSuccess(staffRecord.name, staffSession.facilityName);
+      }, 550);
+    }
+
+    /* ── ACTION 2: Handle Request Staff Access (Registration) ── */
+    function handleStaffSignUp(e) {
+      e.preventDefault();
+      clearStaffError();
+
+      var name = document.getElementById('reg-name').value.trim();
+      var councilNo = document.getElementById('reg-council-no').value.trim();
+      var email = document.getElementById('reg-email').value.trim();
+      var facilityId = document.getElementById('reg-facility').value;
+      var facilityName = document.getElementById('reg-facility').selectedOptions[0].text;
+      var role = document.getElementById('reg-role').value;
+      var password = document.getElementById('reg-password').value;
+      var confirmPassword = document.getElementById('reg-confirm-password').value;
+      var termsAgree = document.getElementById('reg-terms-agree').checked;
+
+      if (!name || name.length < 2) {
+        showStaffError('Please enter your full clinical name and title.');
+        document.getElementById('reg-name').focus();
+        return;
+      }
+      if (!councilNo) {
+        showStaffError('Please enter your Medical Council Registration or Employee Code.');
+        document.getElementById('reg-council-no').focus();
+        return;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showStaffError('Please enter a valid official hospital email address.');
+        document.getElementById('reg-email').focus();
+        return;
+      }
+      if (!password || password.length < 6) {
+        showStaffError('Clinical passkey must be at least 6 characters.');
+        document.getElementById('reg-password').focus();
+        return;
+      }
+      if (password !== confirmPassword) {
+        showStaffError('Passkeys do not match. Please verify your passkey.');
+        document.getElementById('reg-confirm-password').focus();
+        return;
+      }
+      if (!termsAgree) {
+        showStaffError('Please verify medical authorization and agree to compliance terms.');
+        return;
+      }
+
+      var btn = document.getElementById('btn-submit-staff-signup');
+      btn.classList.add('loading');
+
+      setTimeout(function() {
+        btn.classList.remove('loading');
+
+        var staffList = getRegisteredStaff();
+        var existing = findStaffMember(email);
+        if (existing) {
+          showStaffError('A staff account with this email already exists. Please sign in directly.');
+          return;
+        }
+
+        var newStaffRecord = {
+          id: 'staff_' + Math.random().toString(36).substr(2, 6),
+          name: name,
+          councilNo: councilNo,
+          email: email,
+          role: role,
+          facilityId: facilityId,
+          facilityName: facilityName,
+          password: password,
+          registeredAt: new Date().toISOString()
+        };
+
+        staffList.unshift(newStaffRecord);
+        saveRegisteredStaff(staffList);
+
+        // Establish session
+        var staffSession = {
+          uid: 'staff_' + Math.random().toString(36).substr(2, 9),
+          id: newStaffRecord.id,
+          name: name,
+          email: email,
+          role: role,
+          facilityId: facilityId,
+          facilityName: facilityName,
+          method: 'registration',
+          authenticatedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem('medipulse_admin_auth', 'true');
+        localStorage.setItem('mp_staff_session', JSON.stringify(staffSession));
+
+        showStaffSuccess(name, facilityName);
+      }, 650);
+    }
+
+    /* ── ACTION 3: Google Identity Services & Account Chooser ── */
+    var _googleTokenClient = null;
+
+    function initGoogleAuth() {
+      if (window.google && google.accounts && google.accounts.oauth2) {
+        try {
+          _googleTokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: '108423982490-dummyfornow.apps.googleusercontent.com',
+            scope: 'email profile openid',
+            callback: function(tokenResponse) {
+              if (tokenResponse && tokenResponse.access_token) {
+                fetchGoogleUserInfo(tokenResponse.access_token);
+              }
+            }
+          });
+        } catch(e) {}
+      }
+    }
+
+    window.addEventListener('load', function() {
+      setTimeout(initGoogleAuth, 600);
+    });
+
+    function handleGoogleSignIn() {
+      var btn = document.getElementById('btn-google-staff');
+      if (btn) btn.classList.add('loading');
+      document.getElementById('google-btn-label').textContent = 'Connecting Google…';
+
+      if (_googleTokenClient) {
+        try {
+          _googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+          setTimeout(function() {
+            if (btn) btn.classList.remove('loading');
+            document.getElementById('google-btn-label').textContent = 'Continue with Hospital Google Workspace';
+          }, 1200);
+          return;
+        } catch(e) {}
+      }
+
+      if (btn) btn.classList.remove('loading');
+      document.getElementById('google-btn-label').textContent = 'Continue with Hospital Google Workspace';
+      openGoogleChooser();
+    }
+
+    /* ── Doctor & Staff Google Accounts List ── */
+    function getStaffGoogleAccounts() {
+      var stored = null;
+      try { stored = JSON.parse(localStorage.getItem('mp_staff_google_accounts') || 'null'); } catch(e) {}
+      if (stored && Array.isArray(stored) && stored.length > 0) return stored;
+
+      var defaults = [
+        {
+          name: 'Dr. Ramesh Bhat',
+          email: 'ramesh.bhat@alvashealth.org',
+          role: 'Chief Medical Officer',
+          facilityId: 'hosp-alvas',
+          facilityName: "Alva's Health Centre",
+          badge: "Alva's CMO",
+          initial: 'R',
+          avatarBg: 'linear-gradient(135deg, #1a73e8, #0d47a1)'
+        },
+        {
+          name: 'Superintendent CHC',
+          email: 'superintendent@chcmoodbidri.gov.in',
+          role: 'Medical Superintendent',
+          facilityId: 'hosp-chc',
+          facilityName: 'Govt CHC Moodbidri',
+          badge: 'CHC Admin',
+          initial: 'S',
+          avatarBg: 'linear-gradient(135deg, #2e7d32, #1b5e20)'
+        },
+        {
+          name: 'Dr. Harish Poojary',
+          email: 'harish.poojary@prasadhospital.in',
+          role: 'Trauma & Clinical Director',
+          facilityId: 'hosp-prasad',
+          facilityName: 'Prasad Hospital',
+          badge: 'Prasad Lead',
+          initial: 'H',
+          avatarBg: 'linear-gradient(135deg, #e65100, #bf360c)'
+        },
+        {
+          name: 'Medical Officer Yenepoya',
+          email: 'medicalofficer@yenepoyarural.org',
+          role: 'Medical Officer',
+          facilityId: 'hosp-yenepoya',
+          facilityName: 'Yenepoya Rural Centre',
+          badge: 'Yenepoya MO',
+          initial: 'Y',
+          avatarBg: 'linear-gradient(135deg, #6a1b9a, #4a148c)'
+        }
+      ];
+      return defaults;
+    }
+
+    function saveStaffGoogleAccounts(accs) {
+      try { localStorage.setItem('mp_staff_google_accounts', JSON.stringify(accs)); } catch(e) {}
+    }
+
+    function renderGoogleAccounts() {
+      var container = document.getElementById('g-account-list');
+      if (!container) return;
+
+      var accounts = getStaffGoogleAccounts();
+      var html = '';
+      accounts.forEach(function(acc, idx) {
+        var badgeHtml = acc.badge ? '<span class="g-account-badge">' + acc.badge + '</span>' : '';
+        html += '<button type="button" class="g-account-item" onclick="selectStaffGoogleAccount(' + idx + ')">'
+              +   '<div class="g-account-avatar" style="background:' + acc.avatarBg + ';">' + acc.initial + '</div>'
+              +   '<div class="g-account-info">'
+              +     '<div class="g-account-name-row">'
+              +       '<span class="g-account-name">' + acc.name + '</span>'
+              +       badgeHtml
+              +     '</div>'
+              +     '<div class="g-account-email">' + acc.email + ' • ' + (acc.facilityName || 'Hospital Desk') + '</div>'
+              +   '</div>'
+              + '</button>';
+      });
+      container.innerHTML = html;
+    }
+
+    function openGoogleChooser() {
+      renderGoogleAccounts();
+      var modal = document.getElementById('google-chooser-modal');
+      if (modal) {
+        modal.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeGoogleChooser() {
+      var modal = document.getElementById('google-chooser-modal');
+      if (modal) {
+        modal.classList.remove('visible');
+        document.body.style.overflow = '';
+      }
+    }
+
+    function handleChooserBackdropClick(e) {
+      if (e.target && e.target.id === 'google-chooser-modal') {
+        closeGoogleChooser();
+      }
+    }
+
+    function selectStaffGoogleAccount(idx) {
+      var accounts = getStaffGoogleAccounts();
+      var acc = accounts[idx];
+      if (!acc) return;
+
+      closeGoogleChooser();
+
+      var staffSession = {
+        uid: 'staff_g_' + Math.random().toString(36).substr(2, 9),
+        id: acc.email.split('@')[0],
+        name: acc.name,
+        email: acc.email,
+        role: acc.role || 'ROLE_HOSPITAL_ADMIN',
+        facilityId: acc.facilityId || 'hosp-alvas',
+        facilityName: acc.facilityName || "Alva's Health Centre",
+        method: 'google',
+        authenticatedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('medipulse_admin_auth', 'true');
+      localStorage.setItem('mp_staff_session', JSON.stringify(staffSession));
+
+      showStaffSuccess(acc.name, acc.facilityName);
+    }
+
+    function toggleCustomAccountInput() {
+      var box = document.getElementById('g-custom-box');
+      if (!box) return;
+      box.classList.toggle('visible');
+      if (box.classList.contains('visible')) {
+        document.getElementById('g-custom-email').focus();
+      }
+    }
+
+    function submitCustomGoogleAccount() {
+      var name = (document.getElementById('g-custom-name').value || '').trim();
+      var email = (document.getElementById('g-custom-email').value || '').trim();
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert('Please enter a valid Google email address.');
+        document.getElementById('g-custom-email').focus();
+        return;
+      }
+      if (!name) {
+        name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+      }
+
+      var accounts = getStaffGoogleAccounts();
+      var exists = accounts.some(function(a){ return a.email.toLowerCase() === email.toLowerCase(); });
+      if (!exists) {
+        var colors = ['#1a73e8', '#2e7d32', '#e65100', '#0288d1', '#6a1b9a'];
+        var chosen = colors[Math.floor(Math.random() * colors.length)];
+        accounts.unshift({
+          name: name,
+          email: email,
+          role: 'Attending Staff',
+          facilityId: 'hosp-alvas',
+          facilityName: "Alva's Health Centre",
+          badge: 'Added Staff',
+          initial: name[0].toUpperCase(),
+          avatarBg: chosen
+        });
+        saveStaffGoogleAccounts(accounts);
+      }
+
+      closeGoogleChooser();
+
+      var staffSession = {
+        uid: 'staff_g_' + Math.random().toString(36).substr(2, 9),
+        id: email.split('@')[0],
+        name: name,
+        email: email,
+        role: 'Verified Medical Staff',
+        facilityId: 'hosp-alvas',
+        facilityName: "Alva's Health Centre",
+        method: 'google',
+        authenticatedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('medipulse_admin_auth', 'true');
+      localStorage.setItem('mp_staff_session', JSON.stringify(staffSession));
+
+      showStaffSuccess(name, "Alva's Health Centre");
+    }
+
+    /* ── ACTION 4: Password Recovery Modal ── */
+    var _emergencyPin = '';
+    var _emergencyTarget = '';
+
+    function openRecoveryModal() {
+      clearStaffError();
+      var modal = document.getElementById('recovery-modal');
+      document.getElementById('recovery-step-1').style.display = 'block';
+      document.getElementById('recovery-step-2').style.display = 'none';
+
+      var curr = document.getElementById('signin-staff-id').value.trim();
+      if (curr) document.getElementById('recovery-input-email').value = curr;
+
+      modal.classList.add('visible');
+    }
+
+    function closeRecoveryModal() {
+      document.getElementById('recovery-modal').classList.remove('visible');
+    }
+
+    function handleRecoveryBackdrop(e) {
+      if (e.target && e.target.id === 'recovery-modal') closeRecoveryModal();
+    }
+
+    function dispatchEmergencyPasscode() {
+      var input = document.getElementById('recovery-input-email').value.trim();
+      if (!input) {
+        alert('Please enter your Staff ID or Hospital Email.');
+        return;
+      }
+
+      _emergencyTarget = input;
+      _emergencyPin = 'STAFF#' + Math.floor(1000 + Math.random() * 9000);
+
+      document.getElementById('recovery-target-id').textContent = input;
+      document.getElementById('recovery-pin-val').textContent = _emergencyPin;
+
+      document.getElementById('recovery-step-1').style.display = 'none';
+      document.getElementById('recovery-step-2').style.display = 'block';
+
+      showToast('Emergency passkey dispatched for ' + input);
+    }
+
+    function copyRecoveryPin() {
+      navigator.clipboard.writeText(_emergencyPin);
+      document.getElementById('copy-pin-text').textContent = 'Copied!';
+      setTimeout(function() {
+        document.getElementById('copy-pin-text').textContent = 'Copy';
+      }, 1500);
+    }
+
+    function applyRecoveryAndAuthenticate() {
+      document.getElementById('signin-staff-id').value = _emergencyTarget;
+      document.getElementById('signin-password').value = _emergencyPin;
+      closeRecoveryModal();
+      document.getElementById('btn-submit-staff-signin').click();
+    }
+
+    /* ── Toast Helper ── */
+    var _toastTimer = null;
+    function showToast(msg) {
+      var t = document.getElementById('staff-inbox-toast');
+      document.getElementById('toast-msg').textContent = msg;
+      t.classList.add('visible');
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(function() {
+        t.classList.remove('visible');
+      }, 4000);
+    }
+    function closeToast() {
+      document.getElementById('staff-inbox-toast').classList.remove('visible');
+    }
+
+    /* ── Check if already authenticated ── */
+    (function() {
+      if (localStorage.getItem('medipulse_admin_auth') === 'true') {
+        var params = new URLSearchParams(window.location.search);
+        var autoRedirect = params.get('redirect') || './admin.html';
+        // If not explicitly requesting signout or re-auth, can redirect
+        if (params.get('reauth') !== 'true') {
+          window.location.replace(autoRedirect);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

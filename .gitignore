@@ -23,3 +23,6 @@ backend/bin/
 .vscode/
 .idea/
 *.iml
+
+# Binaries & Executables
+*.exe

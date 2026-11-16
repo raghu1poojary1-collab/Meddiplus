@@ -57,3 +57,4 @@ if __name__ == '__main__':
     print(f"  Email:    {res[2]}")
     print(f"  Role:     {res[3]}")
     print(f"  Created:  {res[4]}")
+

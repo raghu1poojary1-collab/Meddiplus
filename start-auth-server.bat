@@ -7,3 +7,4 @@ echo ===================================================
 cd /d "%~dp0"
 python scripts\auth_server.py
 pause
+
