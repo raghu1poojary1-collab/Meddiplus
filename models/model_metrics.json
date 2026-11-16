@@ -1,0 +1,154 @@
+{
+  "dataset_total_records": 25000,
+  "train_samples": 20000,
+  "test_samples": 5000,
+  "specialty_accuracy": 1.0,
+  "urgency_accuracy": 1.0,
+  "specialties_covered": [
+    "Cardiology",
+    "Dermatology",
+    "ENT",
+    "Emergency Medicine",
+    "Endocrinology",
+    "General Medicine",
+    "General Surgery",
+    "Neurology",
+    "Obstetrics & Gynecology",
+    "Orthopedics",
+    "Pediatrics",
+    "Pulmonology"
+  ],
+  "triage_classes": [
+    "Emergency",
+    "Routine",
+    "Urgent"
+  ],
+  "hospitals_covered": [
+    "Alva's Health Centre & Multi-Specialty Hospital",
+    "Arogya Hospital",
+    "City Life Hospital",
+    "Government Community Health Centre (CHC)",
+    "Kasturba Medical College (KMC) Hospital",
+    "Sunrise Clinic"
+  ],
+  "specialty_classification_report": {
+    "Cardiology": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 429.0
+    },
+    "Dermatology": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 413.0
+    },
+    "ENT": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 416.0
+    },
+    "Emergency Medicine": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 419.0
+    },
+    "Endocrinology": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 408.0
+    },
+    "General Medicine": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 412.0
+    },
+    "General Surgery": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 419.0
+    },
+    "Neurology": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 414.0
+    },
+    "Obstetrics & Gynecology": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 416.0
+    },
+    "Orthopedics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 424.0
+    },
+    "Pediatrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 401.0
+    },
+    "Pulmonology": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 429.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5000.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5000.0
+    }
+  },
+  "urgency_classification_report": {
+    "Emergency": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1140.0
+    },
+    "Routine": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1910.0
+    },
+    "Urgent": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1950.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5000.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5000.0
+    }
+  }
+}

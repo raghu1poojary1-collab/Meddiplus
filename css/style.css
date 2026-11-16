@@ -2336,3 +2336,166 @@ input:checked + .toggle-slider::before {
 .card-matched-medicines {
   animation: authCardEntrance 0.3s var(--ease-out);
 }
+
+/* ==========================================================================
+   MediPulse Clinical AI Insight Card (Trained on 25,000+ Records)
+   ========================================================================== */
+.ai-clinical-insight {
+  background: linear-gradient(135deg, #ffffff 0%, #f7faf8 100%);
+  border: 1.5px solid rgba(45, 106, 94, 0.35);
+  border-radius: var(--radius-card);
+  padding: 20px 24px;
+  box-shadow: 0 4px 20px rgba(18, 49, 46, 0.06);
+  position: relative;
+  overflow: hidden;
+  animation: authCardEntrance 0.35s var(--ease-out);
+}
+
+.ai-clinical-insight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--sage), var(--pulse), #10b981);
+}
+
+.ai-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ai-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-sparkle-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #eef6f0;
+  color: var(--sage);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.ai-card-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.ai-card-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  background: #eef6f0;
+  color: var(--sage);
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ai-triage-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.2px;
+}
+
+.ai-triage-routine {
+  background: #eef9f2;
+  color: #0d8a56;
+  border: 1px solid rgba(13, 138, 86, 0.3);
+}
+
+.ai-triage-urgent {
+  background: #fff8e6;
+  color: #b45309;
+  border: 1px solid rgba(180, 83, 9, 0.3);
+}
+
+.ai-triage-emergency {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  animation: pulseGlow 1.8s infinite;
+}
+
+.ai-grid-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.ai-detail-box {
+  background: #ffffff;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+.ai-detail-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--slate);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.ai-detail-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ai-meds-chips-wrap {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.ai-med-chip {
+  background: #f0f7f2;
+  border: 1px solid rgba(45, 106, 94, 0.25);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ai-indication-chip {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+

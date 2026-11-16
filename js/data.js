@@ -56,6 +56,26 @@ const INITIAL_HOSPITALS = [
         "shift": "16:00 - 20:00 (Evening)",
         "queueCount": 0,
         "room": "OPD-3"
+      },
+      {
+        "id": "Dhosp-alvas-CARD",
+        "name": "Dr. Deepak Varma, MD, DM",
+        "qualification": "MD, DM Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": true,
+        "shift": "09:00 - 15:00",
+        "queueCount": 2,
+        "room": "OPD-Cardio"
+      },
+      {
+        "id": "Dhosp-alvas-EMERG",
+        "name": "Dr. Gautham Kamath, MEM",
+        "qualification": "MBBS, MEM (Emergency)",
+        "specialty": "Emergency Medicine",
+        "onDuty": true,
+        "shift": "24/7 Casualty",
+        "queueCount": 1,
+        "room": "ER-1"
       }
     ],
     "medicines": [
@@ -103,6 +123,96 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 20,
         "price": "Subsidized (\u20b9\u20b912/strip)"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 47,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M201"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 97,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M202"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 57,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M203"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 72,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M204"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 27,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M205"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 182,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M206"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 62,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M207"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 40,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M208"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 52,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M209"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 34,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M210"
       }
     ],
     "vaccines": [
@@ -222,6 +332,96 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 20,
         "price": "Subsidized (\u20b9Free (Govt Supply))"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 27,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M211"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 54,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M212"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 104,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M213"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 64,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M214"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 79,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M215"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 34,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M216"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 69,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M217"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 47,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M218"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 59,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M219"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 41,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M220"
       }
     ],
     "vaccines": [
@@ -284,6 +484,26 @@ const INITIAL_HOSPITALS = [
         "shift": "16:00-20:00",
         "queueCount": 0,
         "room": "OPD-16"
+      },
+      {
+        "id": "DH003-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
+      },
+      {
+        "id": "DH003-EMERG",
+        "name": "Dr. Gautham Kamath, MEM",
+        "qualification": "MBBS, MEM (Emergency)",
+        "specialty": "Emergency Medicine",
+        "onDuty": true,
+        "shift": "24/7 Casualty",
+        "queueCount": 1,
+        "room": "ER-1"
       }
     ],
     "medicines": [
@@ -340,6 +560,96 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 89,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M221"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 27,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M222"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 129,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M223"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 104,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M224"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 64,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M225"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 79,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M226"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 34,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M227"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 69,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M228"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 59,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M229"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 41,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M230"
       }
     ],
     "vaccines": [
@@ -404,6 +714,16 @@ const INITIAL_HOSPITALS = [
         "shift": "18:00 - 22:00 (Night)",
         "queueCount": 0,
         "room": "OPD-9"
+      },
+      {
+        "id": "Dhosp-prasad-EMERG",
+        "name": "Dr. Gautham Kamath, MEM",
+        "qualification": "MBBS, MEM (Emergency)",
+        "specialty": "Emergency Medicine",
+        "onDuty": true,
+        "shift": "24/7 Casualty",
+        "queueCount": 1,
+        "room": "ER-1"
       }
     ],
     "medicines": [
@@ -451,6 +771,96 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 15,
         "price": "Subsidized (\u20b9\u20b915/strip)"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 61,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M231"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 111,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M232"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 71,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M233"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 86,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M234"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 41,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M235"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 196,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M236"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 76,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M237"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 54,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M238"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 66,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M239"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 48,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M240"
       }
     ],
     "vaccines": [
@@ -534,6 +944,132 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 20,
         "price": "Subsidized (\u20b9\u20b910/strip)"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 88,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M241"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 103,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M242"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 41,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M243"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 143,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M244"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 68,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M245"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 118,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M246"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 78,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M247"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 93,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M248"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 48,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M249"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 203,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M250"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 83,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M251"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 61,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M252"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 73,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M253"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 55,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M254"
       }
     ],
     "vaccines": [
@@ -596,6 +1132,26 @@ const INITIAL_HOSPITALS = [
         "shift": "16:00-20:00",
         "queueCount": 0,
         "room": "OPD-18"
+      },
+      {
+        "id": "DH005-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
+      },
+      {
+        "id": "DH005-EMERG",
+        "name": "Dr. Gautham Kamath, MEM",
+        "qualification": "MBBS, MEM (Emergency)",
+        "specialty": "Emergency Medicine",
+        "onDuty": true,
+        "shift": "24/7 Casualty",
+        "queueCount": 1,
+        "room": "ER-1"
       }
     ],
     "medicines": [
@@ -625,6 +1181,114 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Paracetamol 650mg",
+        "category": "Analgesic & Antipyretic",
+        "stock": 171,
+        "unit": "strips",
+        "threshold": 30,
+        "price": "Subsidized (\u20b915/strip)",
+        "id": "M255"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 81,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M256"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 34,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M257"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 136,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M258"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 111,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M259"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 71,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M260"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 41,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M261"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 196,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M262"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 76,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M263"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 54,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M264"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 66,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M265"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 48,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M266"
       }
     ],
     "vaccines": [
@@ -697,6 +1361,16 @@ const INITIAL_HOSPITALS = [
         "shift": "14:00-18:00",
         "queueCount": 24,
         "room": "OPD-21"
+      },
+      {
+        "id": "DH008-EMERG",
+        "name": "Dr. Gautham Kamath, MEM",
+        "qualification": "MBBS, MEM (Emergency)",
+        "specialty": "Emergency Medicine",
+        "onDuty": true,
+        "shift": "24/7 Casualty",
+        "queueCount": 1,
+        "room": "ER-1"
       }
     ],
     "medicines": [
@@ -726,6 +1400,123 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 88,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M267"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 103,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M268"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 41,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M269"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 143,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M270"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 68,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M271"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 118,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M272"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 78,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M273"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 93,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M274"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 48,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M275"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 203,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M276"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 61,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M277"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 73,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M278"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 55,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M279"
       }
     ],
     "vaccines": [
@@ -772,6 +1563,16 @@ const INITIAL_HOSPITALS = [
         "shift": "16:00-20:00",
         "queueCount": 25,
         "room": "OPD-23"
+      },
+      {
+        "id": "DH009-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
       }
     ],
     "medicines": [
@@ -810,6 +1611,114 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Paracetamol 650mg",
+        "category": "Analgesic & Antipyretic",
+        "stock": 150,
+        "unit": "strips",
+        "threshold": 30,
+        "price": "Subsidized (\u20b915/strip)",
+        "id": "M280"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 60,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M281"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 75,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M282"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 115,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M283"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 40,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M284"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 90,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M285"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 65,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M286"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 175,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M287"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 55,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M288"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 33,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M289"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 45,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M290"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 27,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M291"
       }
     ],
     "vaccines": [
@@ -928,6 +1837,16 @@ const INITIAL_HOSPITALS = [
         "shift": "16:00-20:00",
         "queueCount": 0,
         "room": "OPD-29"
+      },
+      {
+        "id": "DH006-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
       }
     ],
     "medicines": [
@@ -939,6 +1858,132 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Paracetamol 650mg",
+        "category": "Analgesic & Antipyretic",
+        "stock": 157,
+        "unit": "strips",
+        "threshold": 30,
+        "price": "Subsidized (\u20b915/strip)",
+        "id": "M292"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 67,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M293"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 82,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M294"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 20,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M295"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 122,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M296"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 47,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M297"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 97,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M298"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 57,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M299"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 72,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M300"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 27,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M301"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 62,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M302"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 40,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M303"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 52,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M304"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 34,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M305"
       }
     ],
     "vaccines": [
@@ -1067,6 +2112,96 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Paracetamol 650mg",
+        "category": "Analgesic & Antipyretic",
+        "stock": 164,
+        "unit": "strips",
+        "threshold": 30,
+        "price": "Subsidized (\u20b915/strip)",
+        "id": "M306"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 74,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M307"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 89,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M308"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 27,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M309"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 54,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M310"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 79,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M311"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 189,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M312"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 47,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M313"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 59,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M314"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 41,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M315"
       }
     ],
     "vaccines": [
@@ -1081,7 +2216,7 @@ const INITIAL_HOSPITALS = [
     ]
   },
   {
-    "id": "H005",
+    "id": "hosp-kmc",
     "dbId": 5,
     "name": "Kasturba Medical College (KMC) Hospital",
     "type": "Super-Specialty Tertiary",
@@ -1103,13 +2238,202 @@ const INITIAL_HOSPITALS = [
         "shift": "09:00 - 17:00",
         "queueCount": 7,
         "room": "OPD-13"
+      },
+      {
+        "id": "Dhosp-kmc-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
+      },
+      {
+        "id": "Dhosp-kmc-EMERG",
+        "name": "Dr. Gautham Kamath, MEM",
+        "qualification": "MBBS, MEM (Emergency)",
+        "specialty": "Emergency Medicine",
+        "onDuty": true,
+        "shift": "24/7 Casualty",
+        "queueCount": 1,
+        "room": "ER-1"
       }
     ],
-    "medicines": [],
-    "vaccines": []
+    "medicines": [
+      {
+        "name": "Paracetamol 650mg",
+        "category": "Analgesic & Antipyretic",
+        "stock": 150,
+        "unit": "strips",
+        "threshold": 30,
+        "price": "Subsidized (\u20b915/strip)",
+        "id": "M316"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 60,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M317"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 75,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M318"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 13,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M319"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 115,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M320"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 40,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M321"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 90,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M322"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 50,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M323"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 65,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M324"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 20,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M325"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 175,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M326"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 55,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M327"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 33,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M328"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 45,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M329"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 27,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M330"
+      }
+    ],
+    "vaccines": [
+      {
+        "id": "V-TT",
+        "name": "Tetanus Toxoid (TT)",
+        "batch": "TT-2026-880",
+        "doses": 85,
+        "expiry": "12/2027",
+        "coldChainStatus": "Optimal (3.2\u00b0C)"
+      },
+      {
+        "id": "V-RAB",
+        "name": "Rabies Vaccine (Rabivax-S)",
+        "batch": "RAB-2026-302",
+        "doses": 40,
+        "expiry": "10/2027",
+        "coldChainStatus": "Optimal (3.5\u00b0C)"
+      },
+      {
+        "id": "V-HEPB",
+        "name": "Hepatitis B (Pediatric)",
+        "batch": "HEPB-2026-112",
+        "doses": 35,
+        "expiry": "09/2027",
+        "coldChainStatus": "Optimal (3.8\u00b0C)"
+      },
+      {
+        "id": "V-COV",
+        "name": "Covaxin (BBV152)",
+        "batch": "COV-2026-904",
+        "doses": 50,
+        "expiry": "06/2027",
+        "coldChainStatus": "Optimal (4.0\u00b0C)"
+      }
+    ]
   },
   {
-    "id": "H006",
+    "id": "hosp-muller",
     "dbId": 6,
     "name": "Father Muller Medical College Hospital",
     "type": "Super-Specialty Hospital",
@@ -1131,10 +2455,209 @@ const INITIAL_HOSPITALS = [
         "shift": "10:00 - 16:00",
         "queueCount": 4,
         "room": "OPD-14"
+      },
+      {
+        "id": "Dhosp-muller-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
+      },
+      {
+        "id": "Dhosp-muller-CARD",
+        "name": "Dr. Deepak Varma, MD, DM",
+        "qualification": "MD, DM Cardiology",
+        "specialty": "Cardiology",
+        "onDuty": true,
+        "shift": "09:00 - 15:00",
+        "queueCount": 2,
+        "room": "OPD-Cardio"
+      },
+      {
+        "id": "Dhosp-muller-EMERG",
+        "name": "Dr. Gautham Kamath, MEM",
+        "qualification": "MBBS, MEM (Emergency)",
+        "specialty": "Emergency Medicine",
+        "onDuty": true,
+        "shift": "24/7 Casualty",
+        "queueCount": 1,
+        "room": "ER-1"
       }
     ],
-    "medicines": [],
-    "vaccines": []
+    "medicines": [
+      {
+        "name": "Paracetamol 650mg",
+        "category": "Analgesic & Antipyretic",
+        "stock": 157,
+        "unit": "strips",
+        "threshold": 30,
+        "price": "Subsidized (\u20b915/strip)",
+        "id": "M331"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 67,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M332"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 82,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M333"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 20,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M334"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 122,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M335"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 47,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M336"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 97,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M337"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 57,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M338"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 72,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M339"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 27,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M340"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 182,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M341"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 62,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M342"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 40,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M343"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 52,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M344"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 34,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M345"
+      }
+    ],
+    "vaccines": [
+      {
+        "id": "V-TT",
+        "name": "Tetanus Toxoid (TT)",
+        "batch": "TT-2026-880",
+        "doses": 85,
+        "expiry": "12/2027",
+        "coldChainStatus": "Optimal (3.2\u00b0C)"
+      },
+      {
+        "id": "V-RAB",
+        "name": "Rabies Vaccine (Rabivax-S)",
+        "batch": "RAB-2026-302",
+        "doses": 40,
+        "expiry": "10/2027",
+        "coldChainStatus": "Optimal (3.5\u00b0C)"
+      },
+      {
+        "id": "V-HEPB",
+        "name": "Hepatitis B (Pediatric)",
+        "batch": "HEPB-2026-112",
+        "doses": 35,
+        "expiry": "09/2027",
+        "coldChainStatus": "Optimal (3.8\u00b0C)"
+      },
+      {
+        "id": "V-COV",
+        "name": "Covaxin (BBV152)",
+        "batch": "COV-2026-904",
+        "doses": 50,
+        "expiry": "06/2027",
+        "coldChainStatus": "Optimal (4.0\u00b0C)"
+      }
+    ]
   },
   {
     "id": "H004",
@@ -1189,6 +2712,16 @@ const INITIAL_HOSPITALS = [
         "shift": "09:00-13:00",
         "queueCount": 1,
         "room": "OPD-36"
+      },
+      {
+        "id": "DH004-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
       }
     ],
     "medicines": [
@@ -1227,6 +2760,105 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Paracetamol 650mg",
+        "category": "Analgesic & Antipyretic",
+        "stock": 171,
+        "unit": "strips",
+        "threshold": 30,
+        "price": "Subsidized (\u20b915/strip)",
+        "id": "M346"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 96,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M347"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 34,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M348"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 136,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M349"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 111,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M350"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 71,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M351"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 41,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M352"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 196,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M353"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 76,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M354"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 66,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M355"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 48,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M356"
       }
     ],
     "vaccines": [
@@ -1279,6 +2911,16 @@ const INITIAL_HOSPITALS = [
         "shift": "14:00-18:00",
         "queueCount": 0,
         "room": "OPD-37"
+      },
+      {
+        "id": "DH007-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
       }
     ],
     "medicines": [
@@ -1317,6 +2959,114 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 88,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M357"
+      },
+      {
+        "name": "Metformin 500mg",
+        "category": "Diabetes Care",
+        "stock": 103,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b922/strip)",
+        "id": "M358"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 68,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M359"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 118,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M360"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 78,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M361"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 93,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M362"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 48,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M363"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 203,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M364"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 83,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M365"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 61,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M366"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 73,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M367"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 55,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M368"
       }
     ],
     "vaccines": [
@@ -1421,6 +3171,16 @@ const INITIAL_HOSPITALS = [
         "shift": "10:00-14:00",
         "queueCount": 4,
         "room": "OPD-44"
+      },
+      {
+        "id": "DH002-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
       }
     ],
     "medicines": [
@@ -1459,6 +3219,114 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Paracetamol 650mg",
+        "category": "Analgesic & Antipyretic",
+        "stock": 150,
+        "unit": "strips",
+        "threshold": 30,
+        "price": "Subsidized (\u20b915/strip)",
+        "id": "M369"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 13,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M370"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 40,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M371"
+      },
+      {
+        "name": "Pantoprazole 40 mg",
+        "category": "Antacid / PPI",
+        "stock": 90,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b935/strip)",
+        "id": "M372"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 50,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M373"
+      },
+      {
+        "name": "Amlodipine 5 mg",
+        "category": "Antihypertensive",
+        "stock": 65,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b918/strip)",
+        "id": "M374"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 20,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M375"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 175,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M376"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 55,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M377"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 33,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M378"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 45,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M379"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 27,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M380"
       }
     ],
     "vaccines": [
@@ -1511,6 +3379,16 @@ const INITIAL_HOSPITALS = [
         "shift": "10:00-14:00",
         "queueCount": 0,
         "room": "OPD-45"
+      },
+      {
+        "id": "DH010-GM",
+        "name": "Dr. Sujay Kumar, MBBS",
+        "qualification": "MBBS, General Medicine",
+        "specialty": "General Medicine",
+        "onDuty": true,
+        "shift": "08:00 - 16:00",
+        "queueCount": 3,
+        "room": "OPD-GM"
       }
     ],
     "medicines": [
@@ -1549,6 +3427,105 @@ const INITIAL_HOSPITALS = [
         "unit": "strips",
         "threshold": 10,
         "price": "Subsidized (\u20b9\u20b920/strip)"
+      },
+      {
+        "name": "Amoxicillin 500mg",
+        "category": "Antibiotic",
+        "stock": 67,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b945/strip)",
+        "id": "M381"
+      },
+      {
+        "name": "Insulin Glargine 100IU",
+        "category": "Injectable Insulin",
+        "stock": 20,
+        "unit": "vials",
+        "threshold": 8,
+        "price": "Subsidized (\u20b9280/vial)",
+        "id": "M382"
+      },
+      {
+        "name": "Cetirizine 10mg",
+        "category": "Antihistamine / Allergy",
+        "stock": 122,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b912/strip)",
+        "id": "M383"
+      },
+      {
+        "name": "Azithromycin 500 mg",
+        "category": "Antibiotic",
+        "stock": 47,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b965/strip)",
+        "id": "M384"
+      },
+      {
+        "name": "Atorvastatin 10 mg",
+        "category": "Cardiovascular / Lipid",
+        "stock": 57,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b942/strip)",
+        "id": "M385"
+      },
+      {
+        "name": "Salbutamol Inhaler",
+        "category": "Respiratory / Bronchodilator",
+        "stock": 27,
+        "unit": "inhalers",
+        "threshold": 10,
+        "price": "Subsidized (\u20b9110/unit)",
+        "id": "M386"
+      },
+      {
+        "name": "ORS Electrolyte Sachets",
+        "category": "Rehydration / Electrolyte",
+        "stock": 182,
+        "unit": "sachets",
+        "threshold": 30,
+        "price": "Subsidized (\u20b96/sachet)",
+        "id": "M387"
+      },
+      {
+        "name": "Ibuprofen 400 mg",
+        "category": "NSAID Pain Relief",
+        "stock": 62,
+        "unit": "strips",
+        "threshold": 20,
+        "price": "Subsidized (\u20b916/strip)",
+        "id": "M388"
+      },
+      {
+        "name": "Cough Syrup",
+        "category": "Antitussive / Expectorant",
+        "stock": 40,
+        "unit": "bottles",
+        "threshold": 10,
+        "price": "Subsidized (\u20b955/bottle)",
+        "id": "M389"
+      },
+      {
+        "name": "Ciprofloxacin 500mg",
+        "category": "Broad-Spectrum Antibiotic",
+        "stock": 52,
+        "unit": "strips",
+        "threshold": 15,
+        "price": "Subsidized (\u20b938/strip)",
+        "id": "M390"
+      },
+      {
+        "name": "Clotrimazole 1% Cream",
+        "category": "Antifungal",
+        "stock": 34,
+        "unit": "tubes",
+        "threshold": 10,
+        "price": "Subsidized (\u20b940/tube)",
+        "id": "M391"
       }
     ],
     "vaccines": [

@@ -221,8 +221,11 @@
     <section class="results-map-layout">
       <!-- Left Column: Hospital Cards List -->
       <div class="cards-column">
+        <!-- AI Clinical Prediction & Triage Insight Card (Trained on 25k records) -->
+        <div id="ai-clinical-insight" class="ai-clinical-insight" style="display: none; margin-bottom: 20px;"></div>
+
         <div class="results-header-bar">
-          <div class="results-counter" id="results-counter">4 verified health facilities near Moodbidri</div>
+          <div class="results-counter" id="results-counter">16 verified health facilities near Moodbidri</div>
           <div class="results-legend">
             <span class="legend-item">
               <span class="pulse-dot-live"></span>
@@ -523,6 +526,7 @@
   <!-- Application Modules -->
   <script src="./js/i18n.js"></script>
   <script src="./js/data.js"></script>
+  <script src="./js/ai-inference.js"></script>
   <script src="./js/app.js"></script>
 
   <!-- User Session & Logout Handler -->
