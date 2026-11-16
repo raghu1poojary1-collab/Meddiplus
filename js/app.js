@@ -311,6 +311,40 @@ class MediPulseApp {
   /* ==========================================================================
      PRESCRIPTION UPLOAD (OCR Simulation)
      ========================================================================== */
+  filterByPrescriptionMed(medName) {
+    if (!medName || medName === 'all') {
+      if (this.activePrescriptionMeds && this.activePrescriptionMeds.length > 0) {
+        this.searchQuery = this.activePrescriptionMeds.join(', ');
+        const mainInput = document.getElementById('search-main-input');
+        if (mainInput) mainInput.value = this.activePrescriptionMeds.join(', ');
+      } else {
+        this.searchQuery = '';
+      }
+    } else {
+      this.searchQuery = medName;
+      const mainInput = document.getElementById('search-main-input');
+      if (mainInput) mainInput.value = medName;
+    }
+
+    // Highlight active pill
+    document.querySelectorAll('.rx-pill-btn').forEach(btn => {
+      const match = (medName === 'all' && btn.dataset.med === 'all') || (btn.dataset.med === medName);
+      btn.classList.toggle('active', match);
+    });
+
+    this.renderResults();
+  }
+
+  clearPrescriptionFilter() {
+    this.activePrescriptionMeds = null;
+    this.searchQuery = '';
+    const mainInput = document.getElementById('search-main-input');
+    if (mainInput) mainInput.value = '';
+    const uploadStatus = document.getElementById('upload-status-result');
+    if (uploadStatus) uploadStatus.innerHTML = '';
+    this.renderResults();
+  }
+
   setupPrescriptionUpload() {
     const dropzone = document.getElementById('upload-dropzone');
     const fileInput = document.getElementById('rx-file-input');
@@ -319,19 +353,33 @@ class MediPulseApp {
     const uploadStatus = document.getElementById('upload-status-result');
 
     const handlePrescriptionText = (extractedText, medList) => {
+      this.activePrescriptionMeds = medList;
+      this.searchQuery = medList.join(', ');
+      const mainInput = document.getElementById('search-main-input');
+      if (mainInput) mainInput.value = medList.join(', ');
+
       if (uploadStatus) {
         uploadStatus.innerHTML = `
-          <div style="margin-top: 12px; padding: 10px 14px; background: #eaf5ed; border-radius: 8px; border: 1px solid var(--sage); color: var(--ink);">
-            <strong>${window.i18n.get('uploadSuccess')}</strong>
-            <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
-              ${medList.map(m => `<span style="background: var(--white); padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; border: 1px solid var(--line);">${m}</span>`).join('')}
+          <div style="margin-top: 12px; padding: 12px 16px; background: #eef6f0; border-radius: 12px; border: 1.5px solid var(--sage); color: var(--ink);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <strong style="color: var(--ink); font-size: 14px;">${window.i18n.get('uploadSuccess')}</strong>
+              <button type="button" onclick="window.mediPulseApp.clearPrescriptionFilter()" style="background: none; border: none; color: var(--pulse); font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: underline;">Clear Prescription</button>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center;">
+              <span style="font-size: 12px; color: var(--slate); font-weight: 500;">Filter by:</span>
+              <button type="button" class="rx-pill-btn active" data-med="all" onclick="window.mediPulseApp.filterByPrescriptionMed('all')" style="background: var(--white); border: 1px solid var(--line); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;">All Extracted (${medList.length})</button>
+              ${medList.map(m => `
+                <button type="button" class="rx-pill-btn" data-med="${m.replace(/"/g, '&quot;')}" onclick="window.mediPulseApp.filterByPrescriptionMed('${m.replace(/'/g, "\\'")}')" style="background: var(--white); border: 1px solid var(--line); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                  💊 ${m}
+                </button>
+              `).join('')}
+            </div>
+            <div style="margin-top: 8px; font-size: 12px; color: var(--sage); font-weight: 600;">
+              ✓ Displaying nearest hospitals in Moodbidri &amp; Coastal belt with matching stock…
             </div>
           </div>
         `;
       }
-      this.searchQuery = medList[0].toLowerCase();
-      const mainInput = document.getElementById('search-main-input');
-      if (mainInput) mainInput.value = medList.join(', ');
       this.renderResults();
     };
 
@@ -346,11 +394,10 @@ class MediPulseApp {
     dropzone?.addEventListener('click', () => fileInput?.click());
     fileInput?.addEventListener('change', () => {
       if (fileInput.files.length > 0) {
-        // Simulate OCR analysis
         if (uploadStatus) uploadStatus.innerHTML = `<span style="color: var(--pulse); font-weight: 500;">Analyzing prescription handwriting with OCR...</span>`;
         setTimeout(() => {
           handlePrescriptionText("Extracted Rx", ["Paracetamol 650mg", "Amoxicillin 500mg"]);
-        }, 800);
+        }, 600);
       }
     });
   }
@@ -599,19 +646,69 @@ class MediPulseApp {
   }
 
   hospitalMatchesQuery(h, rawQuery) {
-    const q = (rawQuery || '').toLowerCase().trim();
-    if (!q) return true;
-    const matchesName = (h.name || '').toLowerCase().includes(q);
-    const matchesAddr = (h.address || '').toLowerCase().includes(q);
-    const matchesType = (h.type || '').toLowerCase().includes(q);
-    const matchesDoctor = h.doctors.some(
-      d => d.name.toLowerCase().includes(q) || d.specialty.toLowerCase().includes(q)
-    );
-    const matchesMed = h.medicines.some(
-      m => m.name.toLowerCase().includes(q) || m.category.toLowerCase().includes(q)
-    );
-    const matchesVac = h.vaccines.some(v => v.name.toLowerCase().includes(q));
-    return matchesName || matchesAddr || matchesType || matchesDoctor || matchesMed || matchesVac;
+    const raw = (rawQuery || '').trim();
+    if (!raw) return true;
+
+    // Helper: Normalize term for fuzzy matching (strips dosages like 650mg, 500 mg, 100iu, units, and punctuation)
+    const normalizeTerm = (str) => {
+      return (str || '')
+        .toLowerCase()
+        .replace(/\b\d+(\.\d+)?\s*(mg|g|mcg|ml|iu|units?|tablets?|capsules?|drops?|%)\b/gi, '')
+        .replace(/[^a-z0-9\s]/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    };
+
+    // Split query by commas, semicolons, "+", or "and"
+    let queryTerms = raw.split(/[,;+]|\band\b/i).map(t => t.trim()).filter(Boolean);
+    if (queryTerms.length === 0) queryTerms = [raw];
+
+    // Hospital matches if ANY of the query terms match
+    return queryTerms.some(term => {
+      const q = term.toLowerCase();
+      const normTerm = normalizeTerm(term);
+
+      // 1. Direct name, address, or type match
+      if (h.name.toLowerCase().includes(q) || h.address.toLowerCase().includes(q) || (h.type && h.type.toLowerCase().includes(q))) {
+        return true;
+      }
+
+      // 2. Doctor matching (name or specialty)
+      if (h.doctors && h.doctors.some(d => {
+        const dName = (d.name || '').toLowerCase();
+        const dSpec = (d.specialty || '').toLowerCase();
+        return dName.includes(q) || dSpec.includes(q) || (normTerm && normTerm.length >= 3 && (dName.includes(normTerm) || dSpec.includes(normTerm)));
+      })) {
+        return true;
+      }
+
+      // 3. Medicine matching (handles dosages, units, and brand variations)
+      if (h.medicines && h.medicines.some(m => {
+        const mName = (m.name || '').toLowerCase();
+        const mCat = (m.category || '').toLowerCase();
+        const normMed = normalizeTerm(m.name);
+
+        if (mName.includes(q) || mCat.includes(q)) return true;
+        if (normTerm && normTerm.length >= 3) {
+          if (mName.includes(normTerm) || (normMed && (normMed.includes(normTerm) || normTerm.includes(normMed)))) {
+            return true;
+          }
+        }
+        return false;
+      })) {
+        return true;
+      }
+
+      // 4. Vaccine matching
+      if (h.vaccines && h.vaccines.some(v => {
+        const vName = (v.name || '').toLowerCase();
+        return vName.includes(q) || (normTerm && normTerm.length >= 3 && vName.includes(normTerm));
+      })) {
+        return true;
+      }
+
+      return false;
+    });
   }
 
   /* ==========================================================================
@@ -938,7 +1035,9 @@ class MediPulseApp {
     if (this.searchQuery) {
       hospitals = hospitals.filter(h => this.hospitalMatchesQuery(h, this.searchQuery));
     }
-    return hospitals;
+
+    // Sort by distance (nearest to Moodbidri center first)
+    return [...hospitals].sort((a, b) => a.distanceKm - b.distanceKm);
   }
 
   createPopupContent(hospital) {
@@ -1186,6 +1285,48 @@ class MediPulseApp {
       const inStockMeds = h.medicines.filter(m => m.stock > 0);
       const totalVaccineDoses = h.vaccines.reduce((acc, v) => acc + v.doses, 0);
 
+      // Find matching medicines in this facility for the active search or prescription
+      let matchedMedsHtml = '';
+      if (this.searchQuery) {
+        const normalizeTerm = (str) => (str || '').toLowerCase().replace(/\b\d+(\.\d+)?\s*(mg|g|mcg|ml|iu|units?|tablets?|capsules?|drops?|%)\b/gi, '').replace(/[^a-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+        const queryTerms = this.searchQuery.split(/[,;+]|\band\b/i).map(t => t.trim()).filter(Boolean);
+
+        const matchedMedicines = h.medicines.filter(m => {
+          const mLower = m.name.toLowerCase();
+          const normM = normalizeTerm(m.name);
+          return queryTerms.some(term => {
+            const tLower = term.toLowerCase();
+            const normT = normalizeTerm(term);
+            return mLower.includes(tLower) || (normT.length >= 3 && (mLower.includes(normT) || normM.includes(normT) || normT.includes(normM)));
+          });
+        });
+
+        if (matchedMedicines.length > 0) {
+          matchedMedsHtml = `
+            <div class="card-matched-medicines" style="margin-top: 12px; padding: 10px 14px; background: #eef6f0; border-radius: 10px; border: 1px solid rgba(45,106,94,0.3); font-size: 13px;">
+              <div style="font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                <span>Stock for Searched Medicines:</span>
+              </div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                ${matchedMedicines.map(m => {
+                  const inStock = m.stock > 0;
+                  const bg = inStock ? '#ffffff' : '#fdf3f2';
+                  const border = inStock ? 'var(--sage)' : '#ea4335';
+                  const color = inStock ? 'var(--ink)' : '#c5221f';
+                  return `
+                    <span style="background: ${bg}; border: 1.5px solid ${border}; color: ${color}; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                      <span>${inStock ? '✓' : '⚠'} ${m.name}:</span>
+                      <strong>${inStock ? `${m.stock} ${m.unit || 'in stock'}` : 'Out of stock'}</strong>
+                    </span>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+      }
+
       return `
         <article class="hospital-card" data-id="${h.id}" style="animation-delay: ${idx * 60}ms;">
           <div class="card-top-row">
@@ -1230,6 +1371,9 @@ class MediPulseApp {
               </div>
             </div>
           </div>
+
+          <!-- Matched Medicines Banner (when searching for medicines or prescription) -->
+          ${matchedMedsHtml}
 
           <!-- View Full Details Link -->
           <a href="./hospital.html?id=${h.id}" class="card-view-details-btn" onclick="event.stopPropagation();">

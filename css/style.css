@@ -2305,3 +2305,34 @@ input:checked + .toggle-slider::before {
   from { width: 100%; }
   to { width: 0%; }
 }
+
+/* Prescription Pill Filter Buttons & Matched Medicine Cards */
+.rx-pill-btn {
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.18s var(--ease-standard);
+  font-family: inherit;
+}
+.rx-pill-btn:hover {
+  border-color: var(--sage);
+  background: #f0f7f2;
+}
+.rx-pill-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+  box-shadow: 0 2px 8px rgba(18, 49, 46, 0.18);
+}
+
+.card-matched-medicines {
+  animation: authCardEntrance 0.3s var(--ease-out);
+}
