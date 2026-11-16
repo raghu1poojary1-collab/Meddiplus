@@ -41,7 +41,7 @@ const translations = {
     filterEmergency: "24/7 Emergency",
 
     // Results Header
-    resultsFound: "verified health facilities near Moodbidri",
+    resultsFound: "verified health facilities across Karnataka & Coastal Region",
     sortByDistance: "Nearest first",
     legendLive: "Live signal active",
     legendStatic: "Unavailable / Off duty",
@@ -174,7 +174,7 @@ const translations = {
     filterVaccine: "तैयार वैक्सीन",
     filterEmergency: "24/7 आपातकालीन",
 
-    resultsFound: "मूडबिद्री के निकट सत्यापित स्वास्थ्य केंद्र",
+    resultsFound: "कर्नाटक एवं तटीय क्षेत्र में सत्यापित स्वास्थ्य केंद्र",
     sortByDistance: "निकटतम पहले",
     legendLive: "लाइव सिग्नल सक्रिय",
     legendStatic: "अनुपलब्ध / ड्यूटी समाप्त",
@@ -300,7 +300,7 @@ const translations = {
     filterVaccine: "ಲಭ್ಯವಿರುವ ಲಸಿಕೆಗಳು",
     filterEmergency: "24/7 ತುರ್ತು ಸೇವೆ",
 
-    resultsFound: "ಮೂಡುಬಿದಿರೆ ಸುತ್ತಮುತ್ತಲಿನ ದೃಢೀಕೃತ ಆಸ್ಪತ್ರೆಗಳು",
+    resultsFound: "ಕರ್ನಾಟಕ ಮತ್ತು ಕರಾವಳಿ ಪ್ರದೇಶದ ದೃಢೀಕೃತ ಆಸ್ಪತ್ರೆಗಳು",
     sortByDistance: "ಹತ್ತಿರದ ಆಸ್ಪತ್ರೆಗಳು ಮೊದಲು",
     legendLive: "ಲೈವ್ ಸಿಗ್ನಲ್ ಸಕ್ರಿಯ",
     legendStatic: "ಲಭ್ಯವಿಲ್ಲ / ಕರ್ತವ್ಯ ಮುಗಿದಿದೆ",
@@ -426,7 +426,7 @@ const translations = {
     filterVaccine: "సిద్ధంగా ఉన్న వ్యాక్సిన్లు",
     filterEmergency: "24/7 ఎమర్జెన్సీ",
 
-    resultsFound: "మూడుబిద్రి సమీపంలోని ధృవీకరించబడిన ఆరోగ్య కేంద్రాలు",
+    resultsFound: "కర్ణాటక వ్యాప్తంగా ధృవీకరించబడిన ఆరోగ్య కేంద్రాలు",
     sortByDistance: "సమీపంలోనివి మొదట",
     legendLive: "లైవ్ సిగ్నల్ సక్రియం",
     legendStatic: "అందుబాటులో లేదు / డ్యూటీ ముగిసింది",
@@ -552,7 +552,7 @@ const translations = {
     filterVaccine: "தயாராக உள்ள தடுப்பூசிகள்",
     filterEmergency: "24/7 அவசர சிகிச்சை",
 
-    resultsFound: "மூடுபிதிரி அருகிலுள்ள சரிபார்க்கப்பட்ட மருத்துவ மையங்கள்",
+    resultsFound: "கர்நாடகா முழுவதும் சரிபார்க்கப்பட்ட மருத்துவ மையங்கள்",
     sortByDistance: "அருகிலுள்ளவை முதலில்",
     legendLive: "நேரலை சிக்னல் செயலில் உள்ளது",
     legendStatic: "கிடைக்கவில்லை / பணி நேரம் முடிந்தது",
@@ -678,7 +678,7 @@ const translations = {
     filterVaccine: "ലഭ്യമായ വാക്സിനുകൾ",
     filterEmergency: "24/7 അത്യാഹിത വിഭാഗം",
 
-    resultsFound: "മൂഡബിദ്രിക്ക് സമീപമുള്ള പരിശോധിച്ച ആരോഗ്യ കേന്ദ്രങ്ങൾ",
+    resultsFound: "കർണാടകയിലെ പരിശോധിച്ച ആരോഗ്യ കേന്ദ്രങ്ങൾ",
     sortByDistance: "ഏറ്റവും അടുത്തുള്ളവ ആദ്യം",
     legendLive: "ലൈവ് സിഗ്നൽ സജീവം",
     legendStatic: "ലഭ്യമല്ല / ഡ്യൂട്ടി കഴിഞ്ഞു",
@@ -804,7 +804,7 @@ const translations = {
     filterVaccine: "तयार लस",
     filterEmergency: "24/7 आपत्कालीन",
 
-    resultsFound: "मूडबिद्री जवळील पडताळणी झालेली आरोग्य केंद्रे",
+    resultsFound: "कर्नाटक राज्यभरातील पडताळणी झालेली आरोग्य केंद्रे",
     sortByDistance: "जवळचे आधी",
     legendLive: "लाइव्ह सिग्नल सक्रिय",
     legendStatic: "उपलब्ध नाही / ड्युटी समाप्त",
@@ -930,7 +930,7 @@ const translations = {
     filterVaccine: "ಇತ್ತಿನ ಲಸಿಕೆಲು",
     filterEmergency: "24/7 ತುರ್ತು ಸೇವೆ",
 
-    resultsFound: "ಮೂಡುಬಿದಿರೆ ಕೈತಲ್ದ ಆಸ್ಪತ್ರೆಲು",
+    resultsFound: "ಕರ್ನಾಟಕ ಬೊಕ್ಕ ಕರಾವಳಿದ ದೃಢೀಕೃತ ಆಸ್ಪತ್ರೆಲು",
     sortByDistance: "ಕೈತಲ್ದವು ಸುರುಕು",
     legendLive: "ಲೈವ್ ಸಿಗ್ನಲ್ ಉಂಡು",
     legendStatic: "ಇಜ್ಜಿ / ಡ್ಯೂಟಿ ಮುಗಿದ್ಂಡ್",
@@ -1056,7 +1056,7 @@ const translations = {
     filterVaccine: "تیار ویکسین",
     filterEmergency: "24/7 ایمرجنسی",
 
-    resultsFound: "مودبدری کے قریب تصدیق شدہ صحت مراکز",
+    resultsFound: "کرناٹک بھر میں تصدیق شدہ صحت مراکز",
     sortByDistance: "قریب ترین پہلے",
     legendLive: "لائیو سگنل فعال",
     legendStatic: "دستیاب نہیں / ڈیوٹی ختم",
@@ -1182,7 +1182,7 @@ const translations = {
     filterVaccine: "প্রস্তুত ভ্যাকসিন",
     filterEmergency: "২৪/৭ জরুরি পরিষেবা",
 
-    resultsFound: "মুদবিদ্রি সংলগ্ন যাচাইকৃত স্বাস্থ্যকেন্দ্র",
+    resultsFound: "কর্ণাটক রাজ্য জুড়ে যাচাইকৃত স্বাস্থ্যকেন্দ্র",
     sortByDistance: "নিকটবর্তী কেন্দ্র আগে",
     legendLive: "লাইভ সিগন্যাল সক্রিয়",
     legendStatic: "অনুপলব্ধ / ডিউটি শেষ",

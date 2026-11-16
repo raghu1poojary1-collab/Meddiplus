@@ -646,10 +646,85 @@ class MediPulseApp {
   }
 
   hospitalMatchesQuery(h, rawQuery) {
-    const raw = (rawQuery || '').trim();
-    if (!raw) return true;
+    let raw = (rawQuery || '').trim().toLowerCase();
+    if (!raw || ['all', 'karnataka', 'everywhere', 'anywhere', 'state', 'hospital', 'hospitals'].includes(raw)) {
+      return true;
+    }
 
-    // Helper: Normalize term for fuzzy matching (strips dosages like 650mg, 500 mg, 100iu, units, and punctuation)
+    // Aliases for Sample 1 and Sample 2
+    if (raw.includes('sample 1')) raw = 'paracetamol 650mg, amoxicillin 500mg';
+    if (raw.includes('sample 2')) raw = 'metformin 500mg, insulin glargine';
+
+    // City aliases mapping (not only Moodbidri - everywhere)
+    const cityAliases = {
+      'mangalore': 'mangaluru',
+      'bangalore': 'bengaluru',
+      'blr': 'bengaluru',
+      'mysore': 'mysuru',
+      'hubli': 'hubballi',
+      'belgaum': 'belagavi',
+      'kundapur': 'kundapura',
+      'mudbidri': 'moodbidri'
+    };
+    for (const [alias, standard] of Object.entries(cityAliases)) {
+      if (raw.includes(alias)) {
+        raw = raw.replace(new RegExp('\\b' + alias + '\\b', 'g'), standard);
+      }
+    }
+
+    // Drug brand synonyms
+    const drugSynonyms = {
+      'dolo': 'paracetamol',
+      'crocin': 'paracetamol',
+      'calpol': 'paracetamol',
+      'pcm': 'paracetamol',
+      'augmentin': 'amoxicillin',
+      'glycomet': 'metformin',
+      'lantus': 'insulin',
+      'atorva': 'atorvastatin',
+      'lipitor': 'atorvastatin',
+      'amlong': 'amlodipine',
+      'asthalin': 'salbutamol',
+      'pan 40': 'pantoprazole',
+      'pan': 'pantoprazole',
+      'azithral': 'azithromycin',
+      'allegra': 'cetirizine',
+      'electral': 'ors',
+      'brufen': 'ibuprofen',
+      'combiflam': 'ibuprofen',
+      'aspirin': 'atorvastatin',
+      'disprin': 'paracetamol'
+    };
+
+    // Clinical symptom to department & medicine mapping
+    const symptomMap = {
+      'fever': ['general medicine', 'pediatrics', 'paracetamol'],
+      'pyrexia': ['general medicine', 'paracetamol'],
+      'cold': ['general medicine', 'ent', 'cetirizine', 'cough syrup'],
+      'cough': ['pulmonology', 'general medicine', 'cough syrup', 'salbutamol', 'azithromycin'],
+      'headache': ['general medicine', 'neurology', 'paracetamol', 'ibuprofen'],
+      'heart': ['cardiology', 'emergency medicine', 'atorvastatin', 'amlodipine'],
+      'chest pain': ['cardiology', 'pulmonology', 'emergency medicine', 'atorvastatin'],
+      'bone': ['orthopedics', 'ibuprofen', 'paracetamol'],
+      'joint': ['orthopedics', 'ibuprofen'],
+      'knee': ['orthopedics'],
+      'fracture': ['orthopedics', 'emergency medicine'],
+      'diabetes': ['endocrinology', 'metformin', 'insulin'],
+      'sugar': ['endocrinology', 'metformin', 'insulin'],
+      'asthma': ['pulmonology', 'salbutamol'],
+      'breathless': ['pulmonology', 'emergency medicine', 'salbutamol'],
+      'skin': ['dermatology', 'clotrimazole', 'cetirizine'],
+      'rash': ['dermatology', 'cetirizine', 'clotrimazole'],
+      'allergy': ['dermatology', 'cetirizine'],
+      'ear': ['ent'],
+      'eye': ['ophthalmology', 'general medicine'],
+      'dental': ['dentistry', 'general medicine'],
+      'emergency': ['emergency medicine', 'trauma'],
+      'accident': ['emergency medicine', 'trauma', 'orthopedics'],
+      'child': ['pediatrics', 'vaccine']
+    };
+
+    // Helper: Normalize term (strips dosages like 650mg, 500 mg, etc.)
     const normalizeTerm = (str) => {
       return (str || '')
         .toLowerCase()
@@ -663,17 +738,33 @@ class MediPulseApp {
     let queryTerms = raw.split(/[,;+]|\band\b/i).map(t => t.trim()).filter(Boolean);
     if (queryTerms.length === 0) queryTerms = [raw];
 
-    // Hospital matches if ANY of the query terms match
-    return queryTerms.some(term => {
+    const expandedTerms = new Set(queryTerms);
+    queryTerms.forEach(t => {
+      for (const [brand, generic] of Object.entries(drugSynonyms)) {
+        if (t.includes(brand)) expandedTerms.add(generic);
+      }
+      for (const [symptom, targets] of Object.entries(symptomMap)) {
+        if (t.includes(symptom)) {
+          targets.forEach(tgt => expandedTerms.add(tgt));
+        }
+      }
+    });
+
+    const hFullText = `${h.name} ${h.city || ''} ${h.district || ''} ${h.state || ''} ${h.address || ''} ${h.type || ''}`.toLowerCase();
+
+    return Array.from(expandedTerms).some(term => {
       const q = term.toLowerCase();
       const normTerm = normalizeTerm(term);
 
-      // 1. Direct name, address, or type match
-      if (h.name.toLowerCase().includes(q) || h.address.toLowerCase().includes(q) || (h.type && h.type.toLowerCase().includes(q))) {
+      // 1. City / District / State / Facility name match
+      if (hFullText.includes(q)) return true;
+
+      // 2. Emergency capability filter
+      if (['emergency', 'casualty', 'trauma', '24/7', '24x7'].includes(q) && h.emergency24x7) {
         return true;
       }
 
-      // 2. Doctor matching (name or specialty)
+      // 3. Doctor matching (name or specialty)
       if (h.doctors && h.doctors.some(d => {
         const dName = (d.name || '').toLowerCase();
         const dSpec = (d.specialty || '').toLowerCase();
@@ -682,12 +773,11 @@ class MediPulseApp {
         return true;
       }
 
-      // 3. Medicine matching (handles dosages, units, and brand variations)
+      // 4. Medicine matching
       if (h.medicines && h.medicines.some(m => {
         const mName = (m.name || '').toLowerCase();
         const mCat = (m.category || '').toLowerCase();
         const normMed = normalizeTerm(m.name);
-
         if (mName.includes(q) || mCat.includes(q)) return true;
         if (normTerm && normTerm.length >= 3) {
           if (mName.includes(normTerm) || (normMed && (normMed.includes(normTerm) || normTerm.includes(normMed)))) {
@@ -699,7 +789,7 @@ class MediPulseApp {
         return true;
       }
 
-      // 4. Vaccine matching
+      // 5. Vaccine matching
       if (h.vaccines && h.vaccines.some(v => {
         const vName = (v.name || '').toLowerCase();
         return vName.includes(q) || (normTerm && normTerm.length >= 3 && vName.includes(normTerm));
@@ -1408,7 +1498,11 @@ class MediPulseApp {
     const hospitals = this.getFilteredHospitals();
 
     if (counterEl) {
-      counterEl.textContent = `${hospitals.length} ${window.i18n.get('resultsFound')}`;
+      if (this.searchQuery) {
+        counterEl.textContent = `${hospitals.length} verified health facilities matching "${this.escapeHtml(this.searchQuery)}"`;
+      } else {
+        counterEl.textContent = `${hospitals.length} ${window.i18n.get('resultsFound')}`;
+      }
     }
 
     if (this.map && this.mapEngine === 'osm') {

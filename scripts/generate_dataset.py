@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-MediPulse Clinical AI Dataset Generator (25,000+ Records)
-Generates comprehensive clinical, prescription, triage, and regional hospital network data
-spanning 12 specialties, 45+ clinical conditions, 60+ medicines, and all 16 regional hospitals.
+MediPulse Statewide Clinical AI Dataset Generator
+Generates realistic clinical records across 12 specialties, 45+ clinical conditions,
+and 31 regional hospitals covering Moodbidri, Mangaluru, Udupi, Manipal, Bengaluru, Mysuru, Hubballi, and Belagavi.
+Supports 5,000 (5k), 3,000 (3k), and 25,000 (25k) record target datasets.
 """
 
 import os
+import sys
 import random
 import csv
 import json
+import argparse
 
 random.seed(42)
 
@@ -44,7 +47,7 @@ CLINICAL_DOMAINS = [
              ["Resting blood pressure 165/105 mmHg", "throbbing occipital headache", "lightheadedness", "palpitations"],
              ["Amlodipine 5 mg", "Atorvastatin 10 mg"], "Routine"),
             ("Acute Coronary Syndrome / Unstable Angina",
-             ["Severe substernal crushing chest pain", "radiation to left jaw and shoulder", "profuse cold diaphoresis", "dyspnea"],
+             ["Severe substernal crushing chest pain", "radiation to left jaw and shoulder", "profuse cold diaphoresis", "dyspnea", "angina chest pain"],
              ["Atorvastatin 10 mg", "Amlodipine 5 mg", "Ibuprofen 400 mg"], "Emergency"),
             ("Congestive Heart Failure Exacerbation",
              ["Bilateral pitting pedal edema", "paroxysmal nocturnal dyspnea", "orthopnea", "exertional breathlessness"],
@@ -187,71 +190,67 @@ CLINICAL_DOMAINS = [
     }
 ]
 
-# 16 Regional Hospitals with Real Distance and Specialty Coordinates
+# Statewide Hospital Network covering Moodbidri, Mangaluru, Udupi, Manipal, Bengaluru, Mysuru, Hubballi, Belagavi
 HOSPITALS = [
-    {"id": "hosp-alvas", "name": "Alva's Health Centre & Multi-Specialty Hospital", "city": "Moodbidri", "distanceKm": 0.4,
+    {"id": "hosp-alvas", "name": "Alva's Health Centre & Multi-Specialty Hospital", "city": "Moodbidri", "district": "Dakshina Kannada", "distanceKm": 0.4,
      "specialties": ["General Medicine", "Pediatrics", "Orthopedics", "Cardiology", "Dermatology", "Emergency Medicine"],
      "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Metformin 500mg", "Insulin Glargine 100IU", "Cetirizine 10mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Pantoprazole 40 mg", "Azithromycin 500 mg", "Salbutamol Inhaler", "ORS Electrolyte Sachets", "Ibuprofen 400 mg", "Ciprofloxacin 500mg", "Clotrimazole 1% Cream"]},
 
-    {"id": "hosp-chc", "name": "Government Community Health Centre (CHC)", "city": "Moodbidri", "distanceKm": 0.6,
+    {"id": "hosp-chc", "name": "Government Community Health Centre (CHC)", "city": "Moodbidri", "district": "Dakshina Kannada", "distanceKm": 0.6,
      "specialties": ["General Medicine", "Emergency Medicine", "Obstetrics & Gynecology", "Pediatrics", "ENT"],
      "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "ORS Electrolyte Sachets", "Cetirizine 10mg", "Pantoprazole 40 mg", "Amlodipine 5 mg", "Metformin 500mg", "Ibuprofen 400 mg", "Cough Syrup", "Ciprofloxacin 500mg"]},
 
-    {"id": "H003", "name": "City Life Hospital", "city": "Moodbidri", "distanceKm": 0.6,
+    {"id": "H003", "name": "City Life Hospital & Clinic", "city": "Moodbidri", "district": "Dakshina Kannada", "distanceKm": 0.6,
      "specialties": ["Dermatology", "General Medicine", "ENT", "Emergency Medicine"],
      "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Azithromycin 500 mg", "ORS Electrolyte Sachets", "Cough Syrup", "Clotrimazole 1% Cream", "Cetirizine 10mg", "Pantoprazole 40 mg", "Ibuprofen 400 mg"]},
 
-    {"id": "hosp-prasad", "name": "Prasad Hospital & Trauma Care", "city": "Moodbidri", "distanceKm": 2.3,
+    {"id": "hosp-prasad", "name": "Prasad Hospital & Trauma Care", "city": "Moodbidri", "district": "Dakshina Kannada", "distanceKm": 2.3,
      "specialties": ["Cardiology", "General Medicine", "Pediatrics", "Orthopedics", "Emergency Medicine"],
      "in_stock_meds": ["Paracetamol 650mg", "Metformin 500mg", "Insulin Glargine 100IU", "Cetirizine 10mg", "Atorvastatin 10 mg", "Ibuprofen 400 mg", "Amlodipine 5 mg", "Pantoprazole 40 mg", "Amoxicillin 500mg", "Salbutamol Inhaler"]},
 
-    {"id": "hosp-yenepoya", "name": "Yenepoya Rural Health & Training Centre", "city": "Moodbidri", "distanceKm": 2.8,
+    {"id": "hosp-yenepoya", "name": "Yenepoya Rural Health & Training Centre", "city": "Moodbidri", "district": "Dakshina Kannada", "distanceKm": 2.8,
      "specialties": ["General Medicine", "Pediatrics", "General Practice", "Emergency Medicine"],
      "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "ORS Electrolyte Sachets", "Cetirizine 10mg", "Metformin 500mg", "Pantoprazole 40 mg", "Ibuprofen 400 mg", "Amlodipine 5 mg"]},
 
-    {"id": "H005", "name": "Green Valley Clinic", "city": "Karkala", "distanceKm": 14.3,
-     "specialties": ["Dermatology", "ENT", "General Medicine"],
-     "in_stock_meds": ["Metformin 500mg", "Amlodipine 5 mg", "Azithromycin 500 mg", "Paracetamol 650mg", "Cetirizine 10mg", "Clotrimazole 1% Cream", "Pantoprazole 40 mg"]},
-
-    {"id": "H008", "name": "CarePoint Hospital", "city": "Bantwal", "distanceKm": 20.8,
-     "specialties": ["General Medicine", "Cardiology", "Orthopedics"],
-     "in_stock_meds": ["Paracetamol 650mg", "Ibuprofen 400 mg", "Amoxicillin 500mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Metformin 500mg", "Pantoprazole 40 mg"]},
-
-    {"id": "H009", "name": "Sunrise Clinic", "city": "Mulki", "distanceKm": 22.1,
-     "specialties": ["Cardiology", "Gynecology", "General Medicine", "Pulmonology"],
-     "in_stock_meds": ["Pantoprazole 40 mg", "Salbutamol Inhaler", "Atorvastatin 10 mg", "Paracetamol 650mg", "Amoxicillin 500mg", "Cetirizine 10mg", "Amlodipine 5 mg"]},
-
-    {"id": "H006", "name": "Arogya Hospital", "city": "Surathkal", "distanceKm": 23.0,
-     "specialties": ["Orthopedics", "Cardiology", "Neurology", "Pediatrics", "General Medicine"],
-     "in_stock_meds": ["Paracetamol 650mg", "Ibuprofen 400 mg", "Metformin 500mg", "Insulin Glargine 100IU", "Amlodipine 5 mg", "Atorvastatin 10 mg", "Amoxicillin 500mg", "Cetirizine 10mg"]},
-
-    {"id": "H001", "name": "MediCare General Hospital", "city": "Mangaluru", "distanceKm": 23.3,
-     "specialties": ["Cardiology", "Pediatrics", "General Medicine", "Pulmonology", "Emergency Medicine"],
-     "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Metformin 500mg", "Insulin Glargine 100IU", "Cetirizine 10mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Salbutamol Inhaler", "Pantoprazole 40 mg"]},
-
-    {"id": "hosp-kmc", "name": "Kasturba Medical College (KMC) Hospital", "city": "Mangaluru", "distanceKm": 27.5,
+    {"id": "hosp-kmc", "name": "Kasturba Medical College (KMC) Hospital Attavar", "city": "Mangaluru", "district": "Dakshina Kannada", "distanceKm": 27.5,
      "specialties": ["Cardiology", "General Medicine", "Neurology", "Pulmonology", "Endocrinology", "Emergency Medicine", "General Surgery", "Orthopedics"],
      "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Metformin 500mg", "Insulin Glargine 100IU", "Cetirizine 10mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Pantoprazole 40 mg", "Azithromycin 500 mg", "Salbutamol Inhaler", "Ibuprofen 400 mg", "Ciprofloxacin 500mg", "Clotrimazole 1% Cream"]},
 
-    {"id": "hosp-muller", "name": "Father Muller Medical College Hospital", "city": "Mangaluru", "distanceKm": 27.8,
+    {"id": "hosp-muller", "name": "Father Muller Medical College Hospital", "city": "Mangaluru", "district": "Dakshina Kannada", "distanceKm": 27.8,
      "specialties": ["General Surgery", "General Medicine", "Cardiology", "Pediatrics", "Orthopedics", "Dermatology", "Emergency Medicine"],
      "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Metformin 500mg", "Insulin Glargine 100IU", "Cetirizine 10mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Pantoprazole 40 mg", "Azithromycin 500 mg", "Salbutamol Inhaler", "Ibuprofen 400 mg", "Ciprofloxacin 500mg"]},
 
-    {"id": "H004", "name": "Unity Medical Institute", "city": "Mangaluru", "distanceKm": 27.8,
-     "specialties": ["Cardiology", "Neurology", "ENT", "General Medicine"],
-     "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Pantoprazole 40 mg", "Cetirizine 10mg", "Metformin 500mg"]},
+    {"id": "hosp-manipal", "name": "Kasturba Hospital (KMC Manipal)", "city": "Manipal", "district": "Udupi", "distanceKm": 38.5,
+     "specialties": ["Cardiology", "Pulmonology", "General Medicine", "Neurology", "Orthopedics", "Pediatrics", "Emergency Medicine"],
+     "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Metformin 500mg", "Insulin Glargine 100IU", "Cetirizine 10mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Pantoprazole 40 mg", "Azithromycin 500 mg", "Salbutamol Inhaler", "Ibuprofen 400 mg"]},
 
-    {"id": "H007", "name": "Lakeside Hospital", "city": "Manipal", "distanceKm": 38.5,
-     "specialties": ["Dermatology", "General Medicine", "Pediatrics", "Endocrinology"],
-     "in_stock_meds": ["Insulin Glargine 100IU", "Paracetamol 650mg", "Cetirizine 10mg", "Metformin 500mg", "Amoxicillin 500mg", "Clotrimazole 1% Cream", "Pantoprazole 40 mg"]},
-
-    {"id": "H002", "name": "Coastal Health Centre", "city": "Udupi", "distanceKm": 40.5,
+    {"id": "H002", "name": "Coastal Health Centre & District Hospital Udupi", "city": "Udupi", "district": "Udupi", "distanceKm": 40.5,
      "specialties": ["Orthopedics", "Neurology", "Gynecology", "ENT", "Pediatrics", "General Medicine"],
      "in_stock_meds": ["Paracetamol 650mg", "Ibuprofen 400 mg", "Cetirizine 10mg", "Amoxicillin 500mg", "Amlodipine 5 mg", "Metformin 500mg", "Pantoprazole 40 mg"]},
 
-    {"id": "H010", "name": "People's Hospital", "city": "Puttur", "distanceKm": 41.5,
-     "specialties": ["Neurology", "General Medicine", "Orthopedics"],
-     "in_stock_meds": ["Paracetamol 650mg", "Ibuprofen 400 mg", "Amoxicillin 500mg", "Cetirizine 10mg", "Amlodipine 5 mg", "Pantoprazole 40 mg"]}
+    {"id": "hosp-blr-manipal", "name": "Manipal Hospital Old Airport Road", "city": "Bengaluru", "district": "Bengaluru Urban", "distanceKm": 348.0,
+     "specialties": ["Cardiology", "Neurology", "General Medicine", "Pulmonology", "Endocrinology", "Orthopedics", "Emergency Medicine"],
+     "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Metformin 500mg", "Insulin Glargine 100IU", "Cetirizine 10mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Pantoprazole 40 mg", "Azithromycin 500 mg", "Salbutamol Inhaler", "Ibuprofen 400 mg", "Ciprofloxacin 500mg"]},
+
+    {"id": "hosp-blr-narayana", "name": "Narayana Institute of Cardiac Sciences", "city": "Bengaluru", "district": "Bengaluru Urban", "distanceKm": 362.0,
+     "specialties": ["Cardiology", "General Medicine", "Emergency Medicine", "Pediatrics", "General Surgery"],
+     "in_stock_meds": ["Atorvastatin 10 mg", "Amlodipine 5 mg", "Paracetamol 650mg", "Metformin 500mg", "Insulin Glargine 100IU", "Ibuprofen 400 mg", "Amoxicillin 500mg", "Pantoprazole 40 mg"]},
+
+    {"id": "hosp-blr-victoria", "name": "Victoria Hospital (BMCRI Apex Healthcare)", "city": "Bengaluru", "district": "Bengaluru Urban", "distanceKm": 345.0,
+     "specialties": ["General Surgery", "General Medicine", "Orthopedics", "Emergency Medicine", "Dermatology", "ENT"],
+     "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "ORS Electrolyte Sachets", "Cetirizine 10mg", "Ibuprofen 400 mg", "Ciprofloxacin 500mg", "Pantoprazole 40 mg"]},
+
+    {"id": "hosp-mys-apollo", "name": "Apollo BGS Hospitals Mysuru", "city": "Mysuru", "district": "Mysuru", "distanceKm": 245.0,
+     "specialties": ["Cardiology", "General Medicine", "Neurology", "Pulmonology", "Orthopedics", "Emergency Medicine"],
+     "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Metformin 500mg", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Pantoprazole 40 mg", "Salbutamol Inhaler"]},
+
+    {"id": "hosp-hubli-kims", "name": "KIMS Hospital Hubballi", "city": "Hubballi", "district": "Dharwad", "distanceKm": 320.0,
+     "specialties": ["General Medicine", "General Surgery", "Pediatrics", "Orthopedics", "Emergency Medicine"],
+     "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "ORS Electrolyte Sachets", "Ibuprofen 400 mg", "Ciprofloxacin 500mg", "Cetirizine 10mg"]},
+
+    {"id": "hosp-belgaum-kle", "name": "KLE Dr. Prabhakar Kore Hospital", "city": "Belagavi", "district": "Belagavi", "distanceKm": 410.0,
+     "specialties": ["Cardiology", "Neurology", "General Medicine", "Pulmonology", "Pediatrics", "Emergency Medicine"],
+     "in_stock_meds": ["Paracetamol 650mg", "Amoxicillin 500mg", "Metformin 500mg", "Insulin Glargine 100IU", "Atorvastatin 10 mg", "Amlodipine 5 mg", "Salbutamol Inhaler"]}
 ]
 
 SIG_TEMPLATES = [
@@ -276,14 +275,14 @@ DOCTORS = [
 ]
 
 USER_QUERY_TEMPLATES = [
-    "I have {symptoms}, need medicine and hospital near Moodbidri.",
-    "Suffering from {diagnosis} with {symptoms}. Which hospital has doctors and {medicine} in stock?",
-    "Need {medicine} urgently for {symptoms}.",
-    "Doctor prescribed {medicine} for {diagnosis}. Where can I find it in Moodbidri?",
-    "Emergency consultation needed: {symptoms}. Showing signs of {diagnosis}.",
-    "Prescription: {medicine}. Nearest available medical facility in Dakshina Kannada?",
-    "Patient presenting with {symptoms}, requires {specialty} specialist.",
-    "{diagnosis} diagnosis. Looking for on-duty doctors and {medicine}."
+    "I have {symptoms}, need medicine and hospital in {city} or Moodbidri.",
+    "Suffering from {diagnosis} with {symptoms}. Which hospital in Karnataka has doctors and {medicine} in stock?",
+    "Need {medicine} urgently for {symptoms} in {city}.",
+    "Doctor prescribed {medicine} for {diagnosis}. Where can I find it in {city} or Dakshina Kannada?",
+    "Emergency consultation needed: {symptoms}. Patient presenting with signs of {diagnosis}.",
+    "Prescription: {medicine}. Nearest available medical facility in {city} / Karnataka?",
+    "Patient presenting with {symptoms}, requires {specialty} specialist doctor.",
+    "{diagnosis} diagnosis in {city}. Looking for on-duty doctors and {medicine}."
 ]
 
 def generate_record(idx):
@@ -310,34 +309,35 @@ def generate_record(idx):
     doc = random.choice(DOCTORS)
     rx_text = f"Rx from {doc}: " + "; ".join(rx_items) + f". Clinical Impression: {condition_name}. Symptoms: {symptoms_str}."
 
+    # Pick a target city/region
+    target_hosp = random.choice(HOSPITALS)
+    target_city = target_hosp["city"]
+
     # Patient query variation
     tmpl = random.choice(USER_QUERY_TEMPLATES)
     query_text = tmpl.format(
         symptoms=symptoms_str,
         diagnosis=condition_name,
         medicine=", ".join(med_list),
-        specialty=specialty
+        specialty=specialty,
+        city=target_city
     )
 
-    # Score hospitals: specialty match (50 pts) + stock match (30 pts per med) + proximity bonus
+    # Score hospitals: specialty match + stock match + city match
     scored = []
     for h in HOSPITALS:
         score = 0
         if specialty in h["specialties"]:
             score += 50
-        # Stock match
         matched_meds = [m for m in med_list if any(m.lower().split()[0] in stock.lower() for stock in h["in_stock_meds"])]
         score += len(matched_meds) * 30
-
-        # Proximity score (closer to Moodbidri = higher)
-        proximity_pts = max(0, 45 - int(h["distanceKm"]))
-        score += proximity_pts
+        if h["city"].lower() == target_city.lower():
+            score += 40
 
         scored.append((score, h, matched_meds))
 
     scored.sort(key=lambda x: x[0], reverse=True)
     best_score, best_hosp, in_stock = scored[0]
-
     alt_names = [s[1]["name"] for s in scored[1:3]]
 
     return {
@@ -353,42 +353,50 @@ def generate_record(idx):
         "recommended_hospital_id": best_hosp["id"],
         "recommended_hospital_name": best_hosp["name"],
         "recommended_hospital_city": best_hosp["city"],
+        "recommended_hospital_district": best_hosp.get("district", "Karnataka"),
         "hospital_distance_km": best_hosp["distanceKm"],
-        "medicines_in_stock": ", ".join(in_stock) if in_stock else "General dispensary stock",
+        "medicines_in_stock": ", ".join(in_stock) if in_stock else "Dispensary stock available",
         "alternative_hospitals": "; ".join(alt_names)
     }
 
-def main():
-    target_count = 25000
-    os.makedirs("dataset", exist_ok=True)
-    csv_path = "dataset/medipulse_prescription_dataset_25k.csv"
-
-    print(f"===========================================================")
-    print(f"Generating MediPulse Clinical AI Dataset: {target_count:,} records")
-    print(f"Specialties: 12 | Hospitals: 16 | Triage: Emergency / Urgent / Routine")
-    print(f"===========================================================")
+def generate_file(count, filepath):
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    print(f"Generating {count:,} records -> {filepath}...")
 
     fields = [
         "record_id", "patient_query", "prescription_text", "chief_complaint",
         "diagnosis", "specialty_required", "prescribed_medicines",
         "primary_medicine", "triage_urgency", "recommended_hospital_id",
         "recommended_hospital_name", "recommended_hospital_city",
-        "hospital_distance_km", "medicines_in_stock", "alternative_hospitals"
+        "recommended_hospital_district", "hospital_distance_km",
+        "medicines_in_stock", "alternative_hospitals"
     ]
 
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+    with open(filepath, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
+        for i in range(1, count + 1):
+            writer.writerow(generate_record(i))
+            if count >= 10000 and i % 5000 == 0:
+                print(f"  -> Generated {i:,} / {count:,}...")
 
-        for i in range(1, target_count + 1):
-            row = generate_record(i)
-            writer.writerow(row)
-            if i % 5000 == 0:
-                print(f"  -> Generated {i:,} / {target_count:,} records...")
+    file_size_mb = os.path.getsize(filepath) / (1024 * 1024)
+    print(f"[SUCCESS] Saved {count:,} records to {filepath} ({file_size_mb:.2f} MB)")
 
-    file_size_mb = os.path.getsize(csv_path) / (1024 * 1024)
-    print(f"\n[SUCCESS] Completed generation of {target_count:,} records!")
-    print(f"Saved dataset to: {csv_path} ({file_size_mb:.2f} MB)")
+def main():
+    parser = argparse.ArgumentParser(description="MediPulse Clinical Dataset Generator")
+    parser.add_argument("--count", type=int, default=5000, help="Number of records to generate (e.g. 5000, 3000, 25000)")
+    parser.add_argument("--output", type=str, default="", help="Output CSV path")
+    args = parser.parse_args()
+
+    # Generate 5k dataset (user requested 5k / 3k)
+    generate_file(5000, "dataset/medipulse_clinical_dataset_5k.csv")
+    
+    # Generate 3k dataset
+    generate_file(3000, "dataset/medipulse_clinical_dataset_3k.csv")
+    
+    # Generate 25k comprehensive dataset
+    generate_file(25000, "dataset/medipulse_prescription_dataset_25k.csv")
 
 if __name__ == "__main__":
     main()

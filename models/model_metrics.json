@@ -1,7 +1,8 @@
 {
-  "dataset_total_records": 25000,
-  "train_samples": 20000,
-  "test_samples": 5000,
+  "dataset_name": "medipulse_clinical_dataset_5k.csv",
+  "dataset_total_records": 5000,
+  "train_samples": 4000,
+  "test_samples": 1000,
   "specialty_accuracy": 1.0,
   "urgency_accuracy": 1.0,
   "specialties_covered": [
@@ -25,97 +26,114 @@
   ],
   "hospitals_covered": [
     "Alva's Health Centre & Multi-Specialty Hospital",
-    "Arogya Hospital",
-    "City Life Hospital",
+    "Apollo BGS Hospitals Mysuru",
+    "City Life Hospital & Clinic",
+    "Coastal Health Centre & District Hospital Udupi",
+    "Father Muller Medical College Hospital",
     "Government Community Health Centre (CHC)",
-    "Kasturba Medical College (KMC) Hospital",
-    "Sunrise Clinic"
+    "KIMS Hospital Hubballi",
+    "KLE Dr. Prabhakar Kore Hospital",
+    "Kasturba Hospital (KMC Manipal)",
+    "Kasturba Medical College (KMC) Hospital Attavar",
+    "Manipal Hospital Old Airport Road",
+    "Narayana Institute of Cardiac Sciences",
+    "Victoria Hospital (BMCRI Apex Healthcare)"
+  ],
+  "cities_covered": [
+    "Belagavi",
+    "Bengaluru",
+    "Hubballi",
+    "Mangaluru",
+    "Manipal",
+    "Moodbidri",
+    "Mysuru",
+    "Udupi"
   ],
   "specialty_classification_report": {
     "Cardiology": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 429.0
+      "support": 83.0
     },
     "Dermatology": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 413.0
+      "support": 87.0
     },
     "ENT": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 416.0
+      "support": 83.0
     },
     "Emergency Medicine": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 419.0
+      "support": 77.0
     },
     "Endocrinology": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 408.0
+      "support": 89.0
     },
     "General Medicine": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 412.0
+      "support": 87.0
     },
     "General Surgery": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 419.0
+      "support": 85.0
     },
     "Neurology": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 414.0
+      "support": 81.0
     },
     "Obstetrics & Gynecology": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 416.0
+      "support": 71.0
     },
     "Orthopedics": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 424.0
+      "support": 83.0
     },
     "Pediatrics": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 401.0
+      "support": 79.0
     },
     "Pulmonology": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 429.0
+      "support": 95.0
     },
     "accuracy": 1.0,
     "macro avg": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 5000.0
+      "support": 1000.0
     },
     "weighted avg": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 5000.0
+      "support": 1000.0
     }
   },
   "urgency_classification_report": {
@@ -123,32 +141,32 @@
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 1140.0
+      "support": 214.0
     },
     "Routine": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 1910.0
+      "support": 395.0
     },
     "Urgent": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 1950.0
+      "support": 391.0
     },
     "accuracy": 1.0,
     "macro avg": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 5000.0
+      "support": 1000.0
     },
     "weighted avg": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 5000.0
+      "support": 1000.0
     }
   }
 }
