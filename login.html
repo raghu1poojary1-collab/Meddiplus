@@ -1196,10 +1196,34 @@
         <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(45, 106, 94, 0.15); color: var(--sage); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <h2 class="recovery-title">Recovery Password Sent!</h2>
+        <h2 class="recovery-title" id="recovery-success-title">Recovery Email Sent!</h2>
         <p class="recovery-subtext" id="recovery-success-desc">
-          We have dispatched a temporary recovery password to <strong id="recovery-target-email">your email</strong>.
+          We dispatched your temporary recovery password to <strong id="recovery-target-email">your email</strong>. Please check your Gmail inbox (and Spam/Updates folder).
         </p>
+
+        <!-- Live Delivery Status Badge -->
+        <div id="recovery-email-sent-badge" style="display: none; align-items: center; gap: 8px; padding: 10px 14px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; font-size: 12.5px; color: #065f46; margin-bottom: 14px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span><strong>Delivered via Gmail SMTP:</strong> Please check your inbox now.</span>
+        </div>
+
+        <div id="recovery-email-notsent-notice" style="display: none; align-items: flex-start; gap: 8px; padding: 10px 13px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; font-size: 11.5px; color: #92400e; margin-bottom: 14px; line-height: 1.45;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>
+            <span><strong>Automatic Gmail dispatch:</strong> Configure <code>SMTP_PASSWORD</code> (Gmail App Password) in <code>.env</code>. You can also click <strong>Open in Gmail</strong> below!</span>
+          </div>
+        </div>
+
+        <!-- Open in Gmail Action Buttons -->
+        <a id="btn-open-gmail-inbox" href="https://mail.google.com/mail/u/0/#search/MediPulse" target="_blank" rel="noopener" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 16px; background: #ea4335; color: #ffffff; font-weight: 600; font-size: 13.5px; border-radius: 10px; text-decoration: none; margin-bottom: 9px; box-shadow: 0 2px 8px rgba(234,67,53,0.22); transition: background 0.15s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.272H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+          <span>Open Gmail Inbox ↗</span>
+        </a>
+
+        <button type="button" id="btn-gmail-compose" onclick="openGmailCompose()" style="display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; padding: 9px 14px; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #334155; font-weight: 600; font-size: 12.5px; border-radius: 10px; cursor: pointer; margin-bottom: 14px; transition: background 0.15s;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>Send / Open in Gmail Web ✉️</span>
+        </button>
 
         <div class="recovery-pass-box">
           <div>
@@ -1621,10 +1645,9 @@
       users.unshift(newUserRecord);
       saveRegisteredUsers(users);
 
-      // Save to PostgreSQL Auth API (live HTTPS cloud tunnel connected to 129.159.230.220:8056/Mediplus)
+      // Save to PostgreSQL Auth API (connected to PostgreSQL 129.159.230.220:8056/Mediplus)
       try {
-        var authApiBase = 'https://club-fwd-discussed-focal.trycloudflare.com';
-        fetch(authApiBase + '/api/auth/signup', {
+        fetch(getAuthApiUrl('/api/auth/signup'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: name, email: email, password: password })
@@ -1633,7 +1656,7 @@
             console.log('✓ Successfully saved user account to PostgreSQL database (129.159.230.220:8056/Mediplus)');
           }
         }).catch(function(err) {
-          console.warn('PostgreSQL cloud relay notice:', err);
+          console.warn('PostgreSQL auth relay notice:', err);
         });
       } catch(_) {}
 
@@ -1932,10 +1955,17 @@
   }
 
   /* ============================================================
-     PASSWORD RECOVERY FLOW (Send Recovery Password to Email)
+     PASSWORD RECOVERY FLOW (Send Recovery Password to Gmail)
      ============================================================ */
   var _lastRecoveryPassword = '';
   var _lastRecoveryEmail = '';
+
+  function getAuthApiUrl(path) {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
+      return 'http://localhost:5002' + path;
+    }
+    return (window.MEDIPULSE_API_BASE || 'http://localhost:5002') + path;
+  }
 
   function openRecoveryModal() {
     clearError();
@@ -1970,63 +2000,124 @@
     }
   }
 
-  function handleSendRecoveryPassword(e) {
-    e.preventDefault();
+  async function handleSendRecoveryPassword(e) {
+    if (e && e.preventDefault) e.preventDefault();
     var email = document.getElementById('recovery-email-input').value.trim();
     var errBox = document.getElementById('recovery-error');
     var errText = document.getElementById('recovery-error-text');
-    errBox.style.display = 'none';
+    if (errBox) errBox.style.display = 'none';
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errText.textContent = 'Please enter a valid registered email address.';
-      errBox.style.display = 'block';
+      if (errText) errText.textContent = 'Please enter a valid registered email address.';
+      if (errBox) errBox.style.display = 'block';
       document.getElementById('recovery-email-input').focus();
       return;
     }
 
     var btn = document.getElementById('btn-send-recovery');
-    btn.classList.add('loading');
+    if (btn) btn.classList.add('loading');
 
-    setTimeout(function() {
-      btn.classList.remove('loading');
-      _lastRecoveryEmail = email;
+    _lastRecoveryEmail = email;
+    var randomNum = Math.floor(1000 + Math.random() * 9000);
+    _lastRecoveryPassword = 'MedPulse#' + randomNum;
+    var emailSent = false;
 
-      var randomNum = Math.floor(1000 + Math.random() * 9000);
-      _lastRecoveryPassword = 'MedPulse#' + randomNum;
+    // Call backend API (scripts/auth_server.py) to update database and dispatch email to Gmail
+    try {
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function() { controller.abort(); }, 7000);
 
-      // Update password in registered users list
-      var users = getRegisteredUsers();
-      var found = users.find(function(u){ return (u.email || '').toLowerCase() === email.toLowerCase(); });
-      if (found) {
-        found.password = _lastRecoveryPassword;
-      } else {
-        users.push({
-          name: email.split('@')[0],
-          email: email,
-          password: _lastRecoveryPassword,
-          registeredAt: new Date().toISOString()
-        });
+      var res = await fetch(getAuthApiUrl('/api/auth/forgot-password'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        var data = await res.json();
+        if (data.recovery_password) {
+          _lastRecoveryPassword = data.recovery_password;
+        }
+        emailSent = !!data.email_sent;
       }
-      saveRegisteredUsers(users);
+    } catch (err) {
+      console.warn('Direct auth server API call note:', err);
+    }
 
-      try {
-        fetch('https://club-fwd-discussed-focal.trycloudflare.com/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: email.split('@')[0], email: email, password: _lastRecoveryPassword })
-        }).catch(function() {});
-      } catch(_) {}
+    // Always update local storage registered users so login works seamlessly offline or online
+    var users = getRegisteredUsers();
+    var found = users.find(function(u){ return (u.email || '').toLowerCase() === email.toLowerCase(); });
+    if (found) {
+      found.password = _lastRecoveryPassword;
+    } else {
+      users.push({
+        name: email.split('@')[0],
+        email: email,
+        password: _lastRecoveryPassword,
+        registeredAt: new Date().toISOString()
+      });
+    }
+    saveRegisteredUsers(users);
 
-      document.getElementById('recovery-target-email').textContent = email;
-      document.getElementById('recovery-generated-pass').textContent = _lastRecoveryPassword;
-      document.getElementById('recovery-step-input').style.display = 'none';
-      document.getElementById('recovery-step-success').style.display = 'block';
+    if (btn) btn.classList.remove('loading');
+
+    // Update Modal UI elements
+    var targetEl = document.getElementById('recovery-target-email');
+    if (targetEl) targetEl.textContent = email;
+    var passEl = document.getElementById('recovery-generated-pass');
+    if (passEl) passEl.textContent = _lastRecoveryPassword;
+
+    var sentBadge = document.getElementById('recovery-email-sent-badge');
+    var notSentNotice = document.getElementById('recovery-email-notsent-notice');
+    var successTitle = document.getElementById('recovery-success-title');
+    var successDesc = document.getElementById('recovery-success-desc');
+
+    if (emailSent) {
+      if (successTitle) successTitle.textContent = 'Recovery Email Sent to Gmail!';
+      if (successDesc) successDesc.innerHTML = 'We dispatched your temporary recovery password directly to <strong id="recovery-target-email">' + email + '</strong>. Please check your Gmail inbox (and Spam/Updates folder).';
+      if (sentBadge) sentBadge.style.display = 'flex';
+      if (notSentNotice) notSentNotice.style.display = 'none';
 
       showInboxToast(
-        'MAIL DISPATCHER · PASSWORD RECOVERY',
-        'Temporary recovery password for ' + email + ' is <strong>' + _lastRecoveryPassword + '</strong>. Valid for 15 mins.'
+        'GMAIL INBOX DISPATCHED',
+        'Recovery email sent to <strong>' + email + '</strong> via Gmail SMTP. Check your inbox!'
       );
-    }, 700);
+    } else {
+      if (successTitle) successTitle.textContent = 'Recovery Passkey Ready';
+      if (successDesc) successDesc.innerHTML = 'Temporary recovery password generated for <strong id="recovery-target-email">' + email + '</strong>.';
+      if (sentBadge) sentBadge.style.display = 'none';
+      if (notSentNotice) notSentNotice.style.display = 'flex';
+
+      showInboxToast(
+        'RECOVERY PASSKEY READY',
+        'Temporary password for ' + email + ' is <strong>' + _lastRecoveryPassword + '</strong>. Valid for 15 mins.'
+      );
+    }
+
+    var targetEl2 = document.getElementById('recovery-target-email');
+    if (targetEl2) targetEl2.textContent = email;
+
+    document.getElementById('recovery-step-input').style.display = 'none';
+    document.getElementById('recovery-step-success').style.display = 'block';
+  }
+
+  function openGmailCompose() {
+    var email = _lastRecoveryEmail || (document.getElementById('recovery-email-input').value || '').trim();
+    var pass = _lastRecoveryPassword || 'MedPulse#3701';
+    var subject = encodeURIComponent('MediPulse Password Recovery Passkey [' + pass + ']');
+    var body = encodeURIComponent(
+      'Hello,\n\n' +
+      'Here is your requested MediPulse account recovery passkey:\n\n' +
+      'TEMPORARY RECOVERY PASSWORD: ' + pass + '\n\n' +
+      'This password is valid for 15 minutes.\n' +
+      'Sign in directly at: ' + window.location.href.split('?')[0] + '\n\n' +
+      'Security Reminder: If you did not request this, your account remains protected.\n\n' +
+      '— MediPulse Healthcare & Emergency Network'
+    );
+    var gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(email) + '&su=' + subject + '&body=' + body;
+    window.open(gmailUrl, '_blank');
   }
 
   function copyRecoveryPassword() {

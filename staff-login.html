@@ -1531,9 +1531,19 @@
 
       <!-- Step 2: Emergency Passcode Dispatched -->
       <div id="recovery-step-2" style="display: none;">
-        <h2 class="recovery-title">Emergency Passkey Generated</h2>
-        <p class="recovery-subtext">An authorization token has been generated for <strong id="recovery-target-id">your
-            account</strong>.</p>
+        <h2 class="recovery-title" id="staff-recovery-title">Emergency Passkey Dispatched</h2>
+        <p class="recovery-subtext">An authorization token has been generated for <strong id="recovery-target-id">your account</strong>. Check your Gmail inbox!</p>
+
+        <!-- Open in Gmail Action Buttons -->
+        <a id="staff-btn-open-gmail" href="https://mail.google.com/mail/u/0/#search/MediPulse" target="_blank" rel="noopener" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 16px; background: #ea4335; color: #ffffff; font-weight: 600; font-size: 13.5px; border-radius: 10px; text-decoration: none; margin-bottom: 9px; box-shadow: 0 2px 8px rgba(234,67,53,0.22);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.272H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+          <span>Open Gmail Inbox ↗</span>
+        </a>
+
+        <button type="button" onclick="openStaffGmailCompose()" style="display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; padding: 9px 14px; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #334155; font-weight: 600; font-size: 12.5px; border-radius: 10px; cursor: pointer; margin-bottom: 14px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>Send / Open in Gmail Web ✉️</span>
+        </button>
 
         <div class="recovery-pass-box">
           <div>
@@ -2210,7 +2220,7 @@
       if (e.target && e.target.id === 'recovery-modal') closeRecoveryModal();
     }
 
-    function dispatchEmergencyPasscode() {
+    async function dispatchEmergencyPasscode() {
       var input = document.getElementById('recovery-input-email').value.trim();
       if (!input) {
         alert('Please enter your Staff ID or Hospital Email.');
@@ -2220,13 +2230,46 @@
       _emergencyTarget = input;
       _emergencyPin = 'STAFF#' + Math.floor(1000 + Math.random() * 9000);
 
+      // If it's an email address, trigger backend recovery to dispatch to Gmail
+      if (input.includes('@')) {
+        try {
+          var apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ? 'http://localhost:5002/api/auth/forgot-password' : (window.MEDIPULSE_API_BASE || 'http://localhost:5002') + '/api/auth/forgot-password';
+          fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: input })
+          }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d && d.recovery_password) {
+              _emergencyPin = d.recovery_password;
+              document.getElementById('recovery-pin-val').textContent = _emergencyPin;
+            }
+          }).catch(function() {});
+        } catch(_) {}
+      }
+
       document.getElementById('recovery-target-id').textContent = input;
       document.getElementById('recovery-pin-val').textContent = _emergencyPin;
 
       document.getElementById('recovery-step-1').style.display = 'none';
       document.getElementById('recovery-step-2').style.display = 'block';
 
-      showToast('Emergency passkey dispatched for ' + input);
+      showToast('Emergency passkey dispatched for ' + input + ' (Check Gmail)');
+    }
+
+    function openStaffGmailCompose() {
+      var email = _emergencyTarget || (document.getElementById('recovery-input-email').value || '').trim();
+      var pass = _emergencyPin || 'STAFF#9281';
+      var subject = encodeURIComponent('MediPulse Staff Access Passkey [' + pass + ']');
+      var body = encodeURIComponent(
+        'MediPulse Clinical Desk Authorization\n\n' +
+        'Staff Identifier: ' + email + '\n' +
+        'Emergency Passkey: ' + pass + '\n\n' +
+        'Valid for 15 minutes.\n' +
+        'Access desk at: ' + window.location.href.split('?')[0] + '\n\n' +
+        '— MediPulse Health & Emergency Network'
+      );
+      var gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(email) + '&su=' + subject + '&body=' + body;
+      window.open(gmailUrl, '_blank');
     }
 
     function copyRecoveryPin() {
