@@ -2499,3 +2499,38 @@ input:checked + .toggle-slider::before {
   border-radius: 4px;
 }
 
+/* Card Google Maps Directions Button */
+.card-directions-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #f0f7f2;
+  border: 1.5px solid rgba(45, 106, 94, 0.3);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s var(--ease-standard);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.card-directions-btn:hover {
+  background: var(--sage);
+  color: var(--paper);
+  border-color: var(--sage);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(18, 49, 46, 0.15);
+}
+
+.card-directions-btn svg {
+  color: var(--sage);
+  transition: color 0.18s var(--ease-standard);
+}
+
+.card-directions-btn:hover svg {
+  color: var(--paper);
+}
+

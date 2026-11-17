@@ -1097,7 +1097,7 @@ class MediPulseApp {
       <div class="map-popup-dist">${this.escapeHtml(sub || 'OpenStreetMap location')}</div>
       ${nearest ? `<div class="map-popup-badges"><div><strong>Nearest MediPulse clinic:</strong> ${this.escapeHtml(nearest.name)} (${nearestKm} km)</div></div>` : ''}
       ${nearest ? `<button type="button" class="map-popup-btn" id="osm-jump-nearest-btn" style="width:100%;margin-bottom:6px;">Open ${this.escapeHtml(nearest.name)}</button>` : ''}
-      <a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=15/${lat}/${lon}" target="_blank" rel="noopener" style="display:block;text-align:center;font-size:11px;color:var(--sage);font-weight:600;text-decoration:none;">View on OpenStreetMap ↗</a>
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}" target="_blank" rel="noopener" style="display:block;text-align:center;font-size:11px;color:var(--sage);font-weight:600;text-decoration:none;">Get Directions in Google Maps ↗</a>
     `;
 
     const jumpBtn = popupEl.querySelector('#osm-jump-nearest-btn');
@@ -1191,13 +1191,18 @@ class MediPulseApp {
     return `
       <div class="map-popup-card">
         <div class="map-popup-title">${hospital.name}</div>
-        <div class="map-popup-dist">${hospital.distanceKm} km from Moodbidri • ${hospital.type}</div>
+        <div class="map-popup-dist">${hospital.distanceKm} km • ${hospital.city || 'Karnataka'} • ${hospital.type}</div>
         <div class="map-popup-badges">
           <div><strong style="color: ${onDutyCount > 0 ? 'var(--pulse)' : 'var(--danger-soft)'};">●</strong> ${onDutyCount} ${window.i18n.get('doctorsCountOnDuty')}</div>
           <div><strong style="color: ${inStockCount > 0 ? 'var(--pulse)' : 'var(--danger-soft)'};">●</strong> ${inStockCount} ${window.i18n.get('medicinesAvailable')}</div>
           <div><strong style="color: ${totalDoses > 0 ? 'var(--pulse)' : 'var(--danger-soft)'};">●</strong> ${totalDoses} ${window.i18n.get('dosesAvailable')}</div>
         </div>
-        <a href="./hospital.html?id=${hospital.id}" class="map-popup-btn" style="text-decoration:none;display:block;">${window.i18n.get('expandDetails')}</a>
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <a href="./hospital.html?id=${hospital.id}" class="map-popup-btn" style="text-decoration:none;flex:1;text-align:center;">${window.i18n.get('expandDetails')}</a>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${hospital.lat},${hospital.lng}" target="_blank" rel="noopener" class="map-popup-btn" style="text-decoration:none;background:#f0f7f2;border:1px solid rgba(45,106,94,0.3);color:var(--ink);padding:6px 10px;display:inline-flex;align-items:center;justify-content:center;gap:4px;" title="Open directions in Google Maps">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Maps
+          </a>
+        </div>
       </div>
     `;
   }
@@ -1637,11 +1642,17 @@ class MediPulseApp {
           <!-- Matched Medicines Banner (when searching for medicines or prescription) -->
           ${matchedMedsHtml}
 
-          <!-- View Full Details Link -->
-          <a href="./hospital.html?id=${h.id}" class="card-view-details-btn" onclick="event.stopPropagation();">
-            <span>${window.i18n.get('expandDetails')}</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-          </a>
+          <!-- View Full Details & Google Maps Directions Link -->
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 14px;">
+            <a href="./hospital.html?id=${h.id}" class="card-view-details-btn" style="margin-top: 0; flex: 1;" onclick="event.stopPropagation();">
+              <span>${window.i18n.get('expandDetails')}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}" target="_blank" rel="noopener" class="card-directions-btn" onclick="event.stopPropagation();" title="Get directions in Google Maps">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Directions</span>
+            </a>
+          </div>
         </article>
       `;
     }).join('');
