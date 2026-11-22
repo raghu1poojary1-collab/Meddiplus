@@ -127,20 +127,32 @@
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
+            <!-- Phosphor Beam Gradient for Realistic Hospital CRT Monitor Sweep -->
+            <linearGradient id="ekgPhosphorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+              <stop offset="50%" stop-color="#fff" stop-opacity="0.15" />
+              <stop offset="85%" stop-color="#fff" stop-opacity="0.8" />
+              <stop offset="100%" stop-color="#fff" stop-opacity="1" />
+            </linearGradient>
+            <mask id="ekgPhosphorMask">
+              <rect x="-320" y="0" width="320" height="48" fill="url(#ekgPhosphorGrad)">
+                <animate attributeName="x" from="-320" to="1200" dur="2.8s" repeatCount="indefinite" />
+              </rect>
+            </mask>
           </defs>
-          <!-- Base Track (subtle underlying EKG path) -->
-          <path class="ekg-track" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
-          <!-- Continuous Traveling Heartbeat Pulse Wave -->
-          <path class="ekg-pulse-wave" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+          <!-- Base Track (subtle underlying EKG path so full cardiogram is always softly visible) -->
+          <path class="ekg-track" d="M 0,24 L 120,24 L 140,20 L 160,24 L 178,28 L 192,4 L 206,44 L 218,24 L 245,17 L 275,24 L 440,24 L 460,20 L 480,24 L 498,28 L 512,4 L 526,44 L 538,24 L 565,17 L 595,24 L 760,24 L 780,20 L 800,24 L 818,28 L 832,4 L 846,44 L 858,24 L 885,17 L 915,24 L 1060,24 L 1080,20 L 1100,24 L 1118,28 L 1132,4 L 1146,44 L 1158,24 L 1185,17 L 1200,24" />
+          <!-- Continuous Traveling Heartbeat Pulse Wave with Phosphor Glow -->
+          <path class="ekg-pulse-wave" mask="url(#ekgPhosphorMask)" d="M 0,24 L 120,24 L 140,20 L 160,24 L 178,28 L 192,4 L 206,44 L 218,24 L 245,17 L 275,24 L 440,24 L 460,20 L 480,24 L 498,28 L 512,4 L 526,44 L 538,24 L 565,17 L 595,24 L 760,24 L 780,20 L 800,24 L 818,28 L 832,4 L 846,44 L 858,24 L 885,17 L 915,24 L 1060,24 L 1080,20 L 1100,24 L 1118,28 L 1132,4 L 1146,44 L 1158,24 L 1185,17 L 1200,24" />
           <!-- Glowing Amber Spark trailing along the pulse peaks -->
-          <path class="ekg-pulse-glow" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+          <path class="ekg-pulse-glow" d="M 0,24 L 120,24 L 140,20 L 160,24 L 178,28 L 192,4 L 206,44 L 218,24 L 245,17 L 275,24 L 440,24 L 460,20 L 480,24 L 498,28 L 512,4 L 526,44 L 538,24 L 565,17 L 595,24 L 760,24 L 780,20 L 800,24 L 818,28 L 832,4 L 846,44 L 858,24 L 885,17 L 915,24 L 1060,24 L 1080,20 L 1100,24 L 1118,28 L 1132,4 L 1146,44 L 1158,24 L 1185,17 L 1200,24" />
           <!-- Traveling Glowing Pulse Beacon (Cardiac Head Dot) -->
           <g class="ekg-beacon">
-            <circle r="7" fill="#E8622C" opacity="0.45" filter="url(#ekgGlow)" />
-            <circle r="4.2" fill="#E8622C" filter="url(#ekgGlow)" />
+            <circle r="7.5" fill="#E8622C" opacity="0.45" filter="url(#ekgGlow)" />
+            <circle r="4.5" fill="#E8622C" filter="url(#ekgGlow)" />
             <circle r="2.2" fill="#FFFFFF" />
             <animateMotion 
-              path="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24"
+              path="M 0,24 L 120,24 L 140,20 L 160,24 L 178,28 L 192,4 L 206,44 L 218,24 L 245,17 L 275,24 L 440,24 L 460,20 L 480,24 L 498,28 L 512,4 L 526,44 L 538,24 L 565,17 L 595,24 L 760,24 L 780,20 L 800,24 L 818,28 L 832,4 L 846,44 L 858,24 L 885,17 L 915,24 L 1060,24 L 1080,20 L 1100,24 L 1118,28 L 1132,4 L 1146,44 L 1158,24 L 1185,17 L 1200,24"
               dur="2.8s" 
               repeatCount="indefinite" />
           </g>
@@ -553,6 +565,7 @@
   <script src="./js/i18n.js"></script>
   <script src="./js/data.js"></script>
   <script src="./js/ai-inference.js"></script>
+  <script src="./js/animations.js"></script>
   <script src="./js/app.js"></script>
 
   <!-- User Session & Logout Handler -->

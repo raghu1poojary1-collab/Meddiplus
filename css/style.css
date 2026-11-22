@@ -423,38 +423,38 @@ small, .text-label {
   stroke-linejoin: round;
 }
 
-/* Continuous traveling heartbeat pulse wave */
+/* Continuous traveling heartbeat pulse wave with authentic medical ECG monitor glow */
 .ekg-pulse-wave {
   fill: none;
   stroke: var(--pulse);
-  stroke-width: 3.2;
+  stroke-width: 3.4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 260 1326;
-  stroke-dashoffset: 260;
+  stroke-dasharray: 280 1427;
+  stroke-dashoffset: 280;
   animation: ekgContinuousFlow 2.8s linear infinite;
-  filter: drop-shadow(0 0 6px rgba(232, 98, 44, 0.75));
+  filter: drop-shadow(0 0 8px rgba(232, 98, 44, 0.85)) drop-shadow(0 0 16px rgba(232, 98, 44, 0.45));
 }
 
 /* Bright traveling pulse highlight / leading spark */
 .ekg-pulse-glow {
   fill: none;
-  stroke: #FFD2B8;
+  stroke: #FFE5D6;
   stroke-width: 3.8;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 70 1516;
+  stroke-dasharray: 70 1637;
   stroke-dashoffset: 70;
   animation: ekgSparkFlow 2.8s linear infinite;
-  filter: drop-shadow(0 0 10px #E8622C);
+  filter: drop-shadow(0 0 12px #E8622C);
 }
 
 @keyframes ekgContinuousFlow {
   0% {
-    stroke-dashoffset: 260;
+    stroke-dashoffset: 280;
   }
   100% {
-    stroke-dashoffset: -1326;
+    stroke-dashoffset: -1427;
   }
 }
 
@@ -463,7 +463,7 @@ small, .text-label {
     stroke-dashoffset: 70;
   }
   100% {
-    stroke-dashoffset: -1326;
+    stroke-dashoffset: -1427;
   }
 }
 
@@ -2564,6 +2564,62 @@ input:checked + .toggle-slider::before {
 
 
 /* ==========================================================================
+   PAGE NAVIGATION TRANSITIONS & UNIVERSAL ANIMATION ENGINE
+   ========================================================================== */
+
+/* Universal Top Page Navigation Loading Indicator */
+.page-loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--sage), var(--pulse));
+  box-shadow: 0 0 10px rgba(232, 98, 44, 0.7);
+  z-index: 99999;
+  pointer-events: none;
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+/* Seamless Page Enter & Exit States (Eliminates White Flashes on Link Clicks) */
+body {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1), transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.page-entering {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+body.page-entered {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.page-exiting {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* Ambient Background Breathing Float */
+@keyframes ambientGlowFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(12px, -10px) scale(1.05);
+  }
+}
+
+body::before,
+body::after {
+  animation: ambientGlowFloat 16s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ==========================================================================
    PAGE ENTRANCE & SCROLL ANIMATIONS
    ========================================================================== */
 
@@ -2581,9 +2637,10 @@ input:checked + .toggle-slider::before {
   transition: width 0.08s ease-out;
 }
 
-/* Header Elevation on Scroll */
-.app-header {
-  transition: padding 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background-color 0.3s var(--ease-out);
+/* Header Glass Elevation on Scroll */
+.app-header,
+.admin-page-header {
+  transition: padding 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background-color 0.3s var(--ease-out), backdrop-filter 0.3s ease;
 }
 .app-header.scrolled {
   box-shadow: 0 4px 20px rgba(18, 49, 46, 0.08);
@@ -2591,8 +2648,14 @@ input:checked + .toggle-slider::before {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
+.admin-page-header.scrolled {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  background-color: rgba(18, 49, 46, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
 
-/* Page Entrance Animations */
+/* Page Entrance Keyframes */
 @keyframes pageFadeIn {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -2633,25 +2696,119 @@ input:checked + .toggle-slider::before {
   animation: heroSlideUp 0.55s var(--ease-out) 0.45s both;
 }
 
-/* Scroll Reveal Elements (IntersectionObserver) */
-.reveal-on-scroll {
+/* ==========================================================================
+   SCROLL REVEAL FRAMEWORK (IntersectionObserver Triggered)
+   ========================================================================== */
+.reveal-on-scroll,
+.scroll-fade-up {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(24px);
   transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
-.reveal-on-scroll.is-revealed {
-  opacity: 1;
-  transform: translateY(0);
+.scroll-slide-left {
+  opacity: 0;
+  transform: translateX(-28px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
-/* Staggered card entrance inside results */
-.hospital-card {
-  animation: cardFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s var(--ease-out), border-color 0.22s ease;
+.scroll-slide-right {
+  opacity: 0;
+  transform: translateX(28px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
+.reveal-on-scroll.is-revealed,
+.scroll-fade-up.is-revealed,
+.scroll-slide-left.is-revealed,
+.scroll-slide-right.is-revealed {
+  opacity: 1 !important;
+  transform: translate(0, 0) !important;
+}
+
+/* Staggered Children Reveal */
+.scroll-stagger > *:nth-child(1) { transition-delay: 0.05s; }
+.scroll-stagger > *:nth-child(2) { transition-delay: 0.12s; }
+.scroll-stagger > *:nth-child(3) { transition-delay: 0.19s; }
+.scroll-stagger > *:nth-child(4) { transition-delay: 0.26s; }
+.scroll-stagger > *:nth-child(5) { transition-delay: 0.33s; }
+.scroll-stagger > *:nth-child(6) { transition-delay: 0.40s; }
+
+/* ==========================================================================
+   HOVER & CLICK MICRO-INTERACTIONS (Buttons, Cards, Links, Badges)
+   ========================================================================== */
+
+/* Universal Button Transitions & Hover Elevations */
+button,
+.btn-primary,
+.btn-secondary,
+.btn-brand,
+.search-submit-btn,
+.reserve-btn,
+.admin-btn-save,
+.btn-reserve-action {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s var(--ease-out),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover,
+.btn-brand:hover,
+.search-submit-btn:hover,
+.reserve-btn:hover,
+.admin-btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(232, 98, 44, 0.35);
+}
+
+.btn-secondary:hover,
+.btn-outline:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(18, 49, 46, 0.08);
+}
+
+/* Tactile Click / Active Press Feedback */
+button:active,
+.btn-primary:active,
+.btn-secondary:active,
+.search-submit-btn:active,
+.chip-btn:active,
+.pill-btn:active,
+.is-pressed {
+  transform: scale(0.97) translateY(0) !important;
+  transition-duration: 0.08s !important;
+}
+
+/* Cards Lift & Depth Hover */
+.hospital-card,
+.step-card,
+.a11y-feature-card,
+.admin-stat-card,
+.admin-facility-selector-card,
+.hospital-hero,
+.doctor-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s var(--ease-out),
+              border-color 0.24s ease;
+}
+
+.hospital-card:hover,
+.step-card:hover,
+.a11y-feature-card:hover,
+.admin-stat-card:hover,
+.doctor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(18, 49, 46, 0.09);
+  border-color: rgba(107, 143, 113, 0.45);
+}
+
+/* Staggered Card Entrance Keyframe inside results */
 @keyframes cardFadeUp {
   from {
     opacity: 0;
@@ -2661,6 +2818,59 @@ input:checked + .toggle-slider::before {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.hospital-card {
+  animation: cardFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Navigation Links Animated Underline */
+.nav-link,
+.footer-col a,
+.brand-tagline-link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.nav-link::after,
+.footer-col a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--pulse);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-link:hover::after,
+.footer-col a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Interactive Brand Logo Box Micro-Bounce */
+.brand-icon-box {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.brand-logo-link:hover .brand-icon-box {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+/* Filter Chips Smooth Hover */
+.chip-btn,
+.pill-btn,
+.filter-chip {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.chip-btn:hover,
+.filter-chip:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(18, 49, 46, 0.08);
 }
 
 /* Floating Back to Top Button */
@@ -2696,10 +2906,37 @@ input:checked + .toggle-slider::before {
   background-color: var(--pulse);
   color: var(--white);
   border-color: var(--pulse);
-  box-shadow: 0 6px 20px rgba(232, 98, 44, 0.3);
-  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(232, 98, 44, 0.35);
+  transform: translateY(-2px) scale(1.06);
 }
 
 .back-to-top-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
+}
+
+/* ==========================================================================
+   ACCESSIBILITY: PREFERS-REDUCED-MOTION OVERRIDE
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-on-scroll,
+  .scroll-fade-up,
+  .scroll-slide-left,
+  .scroll-slide-right {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .ekg-pulse-wave,
+  .ekg-pulse-glow,
+  .ekg-beacon {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
 }
