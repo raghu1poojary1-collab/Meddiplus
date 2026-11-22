@@ -414,56 +414,55 @@ small, .text-label {
   pointer-events: none;
 }
 
-/* Base static track (subtle underlying orange line so cardiogram structure is always visible) */
+/* Base static track (subtle translucent reference line) */
 .ekg-track {
   fill: none;
-  stroke: rgba(232, 98, 44, 0.28);
-  stroke-width: 2.2;
+  stroke: rgba(232, 98, 44, 0.16);
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* Continuous traveling heartbeat pulse wave with authentic medical ECG monitor glow */
+/* Vecteezy Medical Heartbeat Waveform — Continuous Left-to-Right Draw & Erase Cycle */
 .ekg-pulse-wave {
   fill: none;
   stroke: var(--pulse);
-  stroke-width: 3.4;
+  stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 280 1427;
-  stroke-dashoffset: 280;
-  animation: ekgContinuousFlow 2.8s linear infinite;
-  filter: drop-shadow(0 0 8px rgba(232, 98, 44, 0.85)) drop-shadow(0 0 16px rgba(232, 98, 44, 0.45));
+  stroke-dasharray: 1438 1438;
+  stroke-dashoffset: 1438;
+  animation: vecteezyHeartbeatDrawErase 4.6s cubic-bezier(0.22, 0.1, 0.25, 1) infinite;
+  filter: drop-shadow(0 0 6px rgba(232, 98, 44, 0.85)) drop-shadow(0 0 16px rgba(232, 98, 44, 0.45));
 }
 
-/* Bright traveling pulse highlight / leading spark */
+/* Bright inner core highlight line */
 .ekg-pulse-glow {
   fill: none;
-  stroke: #FFE5D6;
-  stroke-width: 3.8;
+  stroke: #FFF1E8;
+  stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 70 1637;
-  stroke-dashoffset: 70;
-  animation: ekgSparkFlow 2.8s linear infinite;
-  filter: drop-shadow(0 0 12px #E8622C);
+  stroke-dasharray: 1438 1438;
+  stroke-dashoffset: 1438;
+  animation: vecteezyHeartbeatDrawErase 4.6s cubic-bezier(0.22, 0.1, 0.25, 1) infinite;
 }
 
-@keyframes ekgContinuousFlow {
+@keyframes vecteezyHeartbeatDrawErase {
   0% {
-    stroke-dashoffset: 280;
+    stroke-dashoffset: 1438;
+  }
+  48% {
+    stroke-dashoffset: 0;
+  }
+  54% {
+    stroke-dashoffset: 0;
+  }
+  98% {
+    stroke-dashoffset: -1438;
   }
   100% {
-    stroke-dashoffset: -1427;
-  }
-}
-
-@keyframes ekgSparkFlow {
-  0% {
-    stroke-dashoffset: 70;
-  }
-  100% {
-    stroke-dashoffset: -1427;
+    stroke-dashoffset: -1438;
   }
 }
 
