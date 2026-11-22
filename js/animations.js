@@ -1,25 +1,108 @@
 /**
  * MediPulse — Unified Animation & Interaction Engine
  * Features:
- *  1. Smooth Seamless Page Navigation Transitions (Eliminating white flashes)
- *  2. High-Performance IntersectionObserver Scroll Reveals & Staggers
- *  3. Dynamic Number Counter Animations for Hospital Statistics & Telemetry
- *  4. Top Scroll Progress Indicator
- *  5. Interactive Micro-Haptic Click Feedback & Ripple
- *  6. Floating Back to Top Button Controller
- *  7. Full Accessibility (prefers-reduced-motion) Respect
+ *  1. Lenis Smooth Inertia Scroll (lerp: 0.08, cinematic momentum physics)
+ *  2. 3D Scroll Perspective Spline (Cards tilt and settle along scroll timeline 0 to 1)
+ *  3. Seamless Page Navigation Transitions (Eliminating white flashes)
+ *  4. High-Performance IntersectionObserver Scroll Reveals & Staggers
+ *  5. Dynamic Number Counter Animations for Hospital Statistics & Telemetry
+ *  6. Top Scroll Progress Indicator driven by scroll timeline
+ *  7. Interactive Micro-Haptic Click Feedback & Ripple
+ *  8. Floating Back-to-Top Button Controller with smooth inertia glide
+ *  9. Full Accessibility (prefers-reduced-motion) Respect
  */
 
 (function () {
   'use strict';
 
   const isReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let lenisInstance = null;
 
   /* ==========================================================================
-     1. SEAMLESS PAGE TRANSITIONS & TOP PROGRESS BAR
+     1. LENIS SMOOTH INERTIA SCROLL (lerp: 0.08) & 3D SCROLL TIMELINE
+     ========================================================================== */
+  function initLenis() {
+    if (isReducedMotion || typeof Lenis === 'undefined') return;
+
+    try {
+      lenisInstance = new Lenis({
+        lerp: 0.08,             // Exact smooth scroll value from the YouTube reference
+        smoothWheel: true,      // Smooth inertia on mouse wheel & trackpad
+        wheelMultiplier: 0.95,  // Controlled, elegant speed
+        touchMultiplier: 1.2,
+        infinite: false,
+      });
+
+      // Expose globally for page actions
+      window.lenis = lenisInstance;
+
+      // Handle map and modal scroll isolation so maps can be zoomed without whole page jumping
+      const preventLenisElements = () => {
+        document.querySelectorAll('#leaflet-map, .leaflet-container, .modal-backdrop, .admin-table-container, .search-mode-tabs').forEach(el => {
+          el.setAttribute('data-lenis-prevent', '');
+        });
+      };
+      preventLenisElements();
+      setTimeout(preventLenisElements, 1000);
+
+      // RAF loop
+      function raf(time) {
+        lenisInstance.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+
+      // Scroll-driven 3D Perspective Timeline
+      initScrollTimeline3D(lenisInstance);
+    } catch (e) {
+      console.warn('Lenis smooth scroll initialization skipped:', e);
+    }
+  }
+
+  /* ==========================================================================
+     2. 3D SCROLL PERSPECTIVE TIMELINE (Cards act as 3D planes along camera spline)
+     ========================================================================== */
+  function initScrollTimeline3D(lenis) {
+    const cardSelectors = '.hospital-card, .step-card, .a11y-feature-card, .admin-stat-card';
+    const cards = Array.from(document.querySelectorAll(cardSelectors));
+
+    // Tag cards for 3D perspective
+    cards.forEach(card => card.classList.add('scroll-3d-plane'));
+
+    const update3DPlanes = ({ scroll, velocity }) => {
+      const vh = window.innerHeight;
+      const tiltVelocity = Math.max(-12, Math.min(12, velocity || 0)) * 0.12;
+
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        // Progress: 0 when top enters viewport, 1 when bottom leaves viewport
+        const cardProgress = 1 - (rect.bottom / (vh + rect.height));
+
+        if (cardProgress > -0.15 && cardProgress < 1.15) {
+          // Spline pitch: starts slightly tilted at bottom, flattens to 0 at center, tilts gently as leaving
+          const enterFactor = Math.max(0, 1 - cardProgress * 2.2); // 1 to 0
+          const rotX = (enterFactor * 9) + tiltVelocity;
+          const translateY = enterFactor * 18;
+          const scale = 0.98 + (1 - enterFactor) * 0.02;
+
+          card.style.transform = `perspective(1200px) rotateX(${rotX.toFixed(2)}deg) translateY(${translateY.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+        }
+      });
+    };
+
+    if (lenis) {
+      lenis.on('scroll', update3DPlanes);
+    } else {
+      window.addEventListener('scroll', () => {
+        update3DPlanes({ scroll: window.scrollY, velocity: 0 });
+      }, { passive: true });
+    }
+  }
+
+  /* ==========================================================================
+     3. SEAMLESS PAGE TRANSITIONS & TOP PROGRESS BAR
      ========================================================================== */
   function initPageTransitions() {
-    // Create top loading indicator if not present
     let loadingBar = document.getElementById('page-loading-bar');
     if (!loadingBar) {
       loadingBar = document.createElement('div');
@@ -29,7 +112,6 @@
       document.body.prepend(loadingBar);
     }
 
-    // Initial page entrance animation
     document.body.classList.add('page-entering');
     if (loadingBar && !isReducedMotion) {
       loadingBar.style.width = '40%';
@@ -50,7 +132,6 @@
       document.body.classList.add('page-entered');
     });
 
-    // Handle internal link navigation clicks for smooth exit
     document.addEventListener('click', function (e) {
       const link = e.target.closest('a');
       if (!link) return;
@@ -58,7 +139,6 @@
       const href = link.getAttribute('href');
       if (!href) return;
 
-      // Ignore anchor jumps, new tabs, javascript, mailto, tel, downloads
       if (
         href.startsWith('#') ||
         href.startsWith('javascript:') ||
@@ -71,12 +151,11 @@
         return;
       }
 
-      // Check same-origin
       try {
         const targetUrl = new URL(link.href, window.location.href);
         if (targetUrl.origin !== window.location.origin) return;
         if (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search) {
-          return; // same page
+          return;
         }
       } catch (err) {
         return;
@@ -100,7 +179,6 @@
       }, 180);
     });
 
-    // Support browser back/forward cache restore (bfcache)
     window.addEventListener('pageshow', function (event) {
       if (event.persisted) {
         document.body.classList.remove('page-exiting');
@@ -114,7 +192,7 @@
   }
 
   /* ==========================================================================
-     2. SCROLL PROGRESS & HEADER ELEVATION
+     4. SCROLL PROGRESS & HEADER ELEVATION & BACK-TO-TOP
      ========================================================================== */
   function initScrollProgress() {
     let progressBar = document.getElementById('scroll-progress-bar');
@@ -137,21 +215,28 @@
       backToTopBtn.setAttribute('aria-label', 'Scroll back to top');
       backToTopBtn.setAttribute('title', 'Scroll back to top');
       backToTopBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>';
-      backToTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
       document.body.appendChild(backToTopBtn);
     }
 
-    const handleScroll = () => {
-      const scrollY = window.scrollY || window.pageYOffset;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    backToTopBtn.onclick = () => {
+      if (lenisInstance) {
+        lenisInstance.scrollTo(0, {
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
 
-      // Top progress bar update
-      if (progressBar && docHeight > 0) {
-        const pct = Math.min(100, Math.max(0, (scrollY / docHeight) * 100));
+    const handleScrollUpdate = (scrollY, progress) => {
+      // 1. Top progress bar
+      if (progressBar) {
+        const pct = progress !== undefined ? progress * 100 : Math.min(100, Math.max(0, (scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100));
         progressBar.style.width = pct + '%';
       }
 
-      // Header glass elevation
+      // 2. Compact header elevation
       if (header) {
         if (scrollY > 30) {
           header.classList.add('scrolled');
@@ -160,7 +245,7 @@
         }
       }
 
-      // Floating Back-to-Top Button
+      // 3. Floating back-to-top button
       if (backToTopBtn) {
         if (scrollY > 300) {
           backToTopBtn.classList.add('visible');
@@ -170,12 +255,20 @@
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    if (lenisInstance) {
+      lenisInstance.on('scroll', ({ scroll, progress }) => {
+        handleScrollUpdate(scroll, progress);
+      });
+    } else {
+      window.addEventListener('scroll', () => {
+        handleScrollUpdate(window.scrollY || window.pageYOffset);
+      }, { passive: true });
+    }
+    handleScrollUpdate(window.scrollY || 0);
   }
 
   /* ==========================================================================
-     3. INTERSECTION OBSERVER FOR SCROLL REVEAL & STAGGERS
+     5. INTERSECTION OBSERVER FOR SCROLL REVEAL & NUMBER COUNTERS
      ========================================================================== */
   function initScrollReveals() {
     if (isReducedMotion) {
@@ -185,7 +278,6 @@
       return;
     }
 
-    // Auto-tag common page containers if not explicitly tagged
     const autoRevealSelectors = [
       '.section-head-center',
       '.how-it-works-section',
@@ -216,10 +308,7 @@
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-revealed');
-
-          // Trigger number counter if target contains counters
           entry.target.querySelectorAll('[data-counter], .stat-counter').forEach(runNumberCounter);
-
           obs.unobserve(entry.target);
         }
       });
@@ -234,7 +323,7 @@
   }
 
   /* ==========================================================================
-     4. STATISTIC & METRIC NUMBER COUNTER ANIMATION
+     6. STATISTIC & METRIC NUMBER COUNTER ANIMATION
      ========================================================================== */
   function runNumberCounter(el) {
     if (!el || el.dataset.counterDone) return;
@@ -252,13 +341,12 @@
 
     const isFloat = numericStr.includes('.');
     const decimals = isFloat ? numericStr.split('.')[1].length : 0;
-    const duration = 1200; // ms
+    const duration = 1200;
     const startTime = performance.now();
 
     function update(now) {
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
-      // easeOutExpo
       const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
       const current = targetVal * ease;
 
@@ -267,7 +355,7 @@
       if (progress < 1) {
         requestAnimationFrame(update);
       } else {
-        el.innerText = raw; // guarantee exact original formatting at end
+        el.innerText = raw;
       }
     }
 
@@ -275,7 +363,7 @@
   }
 
   /* ==========================================================================
-     5. TACTILE CLICK FEEDBACK (Subtle Button & Card Press Interaction)
+     7. TACTILE CLICK FEEDBACK (Subtle Button & Card Press Interaction)
      ========================================================================== */
   function initClickFeedback() {
     const clickableSelectors = 'button, .btn, .chip-btn, .pill-btn, .hospital-card, .admin-stat-card';
@@ -299,6 +387,7 @@
      INITIALIZATION ON DOM READY
      ========================================================================== */
   function init() {
+    initLenis();
     initPageTransitions();
     initScrollProgress();
     initScrollReveals();
@@ -311,9 +400,9 @@
     init();
   }
 
-  // Export to window for global access if needed
   window.MediPulseAnimations = {
     initScrollReveals,
-    runNumberCounter
+    runNumberCounter,
+    getLenis: () => lenisInstance
   };
 })();

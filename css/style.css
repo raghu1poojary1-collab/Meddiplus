@@ -2915,6 +2915,55 @@ button:active,
 }
 
 /* ==========================================================================
+   LENIS SMOOTH INERTIA SCROLL (lerp: 0.08) & 3D SPLINE TIMELINE
+   ========================================================================== */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent],
+.leaflet-container {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* 3D Perspective Plane Containers */
+.cards-column,
+.results-map-layout,
+.how-it-works-grid,
+.admin-stats-grid,
+.main-wrapper {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+/* 3D Scroll Plane Cards */
+.scroll-3d-plane,
+.hospital-card,
+.step-card,
+.a11y-feature-card,
+.admin-stat-card {
+  transform-origin: center top;
+  will-change: transform;
+}
+
+.hospital-card:hover {
+  box-shadow: 0 16px 36px rgba(18, 49, 46, 0.12) !important;
+}
+
+/* ==========================================================================
    ACCESSIBILITY: PREFERS-REDUCED-MOTION OVERRIDE
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
