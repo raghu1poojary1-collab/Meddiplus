@@ -116,44 +116,11 @@
         </p>
       </div>
 
-      <!-- 1. Signature SVG Heartbeat / EKG Line Entrance (Vecteezy Medical Monitor Waveform Draw & Erase Animation) -->
-      <div class="ekg-signature-box" aria-hidden="true">
-        <svg viewBox="0 0 1200 48" preserveAspectRatio="none" style="width: 100%; height: 48px; display: block; overflow: visible;">
-          <defs>
-            <filter id="ekgGlow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="3.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          <!-- Base Track (subtle underlying reference line) -->
-          <path class="ekg-track" d="M 0,24 L 180,24 L 190,18 L 198,24 L 204,28 L 212,10 L 220,38 L 228,24 L 238,19 L 248,24 L 380,24 L 410,24 L 418,18 L 426,24 L 432,30 L 442,7 L 452,41 L 460,24 L 472,16 L 484,24 L 600,24 L 630,24 L 638,16 L 646,24 L 652,32 L 664,4 L 676,44 L 686,24 L 700,15 L 714,24 L 850,24 L 880,24 L 888,19 L 896,24 L 902,28 L 912,9 L 922,39 L 930,24 L 942,17 L 954,24 L 1200,24" />
-          <!-- Active Drawing & Erasing Heartbeat Wave (Vecteezy Motion) -->
-          <path class="ekg-pulse-wave" d="M 0,24 L 180,24 L 190,18 L 198,24 L 204,28 L 212,10 L 220,38 L 228,24 L 238,19 L 248,24 L 380,24 L 410,24 L 418,18 L 426,24 L 432,30 L 442,7 L 452,41 L 460,24 L 472,16 L 484,24 L 600,24 L 630,24 L 638,16 L 646,24 L 652,32 L 664,4 L 676,44 L 686,24 L 700,15 L 714,24 L 850,24 L 880,24 L 888,19 L 896,24 L 902,28 L 912,9 L 922,39 L 930,24 L 942,17 L 954,24 L 1200,24" />
-          <!-- Bright Core Highlight Line -->
-          <path class="ekg-pulse-glow" d="M 0,24 L 180,24 L 190,18 L 198,24 L 204,28 L 212,10 L 220,38 L 228,24 L 238,19 L 248,24 L 380,24 L 410,24 L 418,18 L 426,24 L 432,30 L 442,7 L 452,41 L 460,24 L 472,16 L 484,24 L 600,24 L 630,24 L 638,16 L 646,24 L 652,32 L 664,4 L 676,44 L 686,24 L 700,15 L 714,24 L 850,24 L 880,24 L 888,19 L 896,24 L 902,28 L 912,9 L 922,39 L 930,24 L 942,17 L 954,24 L 1200,24" />
-          <!-- Leading Pen Head / Glowing Pulse Spark tracking the active draw tip -->
-          <g class="ekg-head-spark">
-            <circle r="7" fill="#E8622C" opacity="0.6" filter="url(#ekgGlow)" />
-            <circle r="4" fill="#E8622C" filter="url(#ekgGlow)" />
-            <circle r="2" fill="#FFFFFF" />
-            <animateMotion 
-              path="M 0,24 L 180,24 L 190,18 L 198,24 L 204,28 L 212,10 L 220,38 L 228,24 L 238,19 L 248,24 L 380,24 L 410,24 L 418,18 L 426,24 L 432,30 L 442,7 L 452,41 L 460,24 L 472,16 L 484,24 L 600,24 L 630,24 L 638,16 L 646,24 L 652,32 L 664,4 L 676,44 L 686,24 L 700,15 L 714,24 L 850,24 L 880,24 L 888,19 L 896,24 L 902,28 L 912,9 L 922,39 L 930,24 L 942,17 L 954,24 L 1200,24"
-              dur="4.6s" 
-              keyTimes="0; 0.48; 0.481; 1"
-              keyPoints="0; 1; 1; 1"
-              calcMode="linear"
-              repeatCount="indefinite" />
-            <animate 
-              attributeName="opacity"
-              values="1; 1; 0; 0; 1"
-              keyTimes="0; 0.47; 0.52; 0.98; 1"
-              dur="4.6s"
-              repeatCount="indefinite" />
-          </g>
-        </svg>
+      <!-- Real-Time Heartbeat Pulse Video Animation -->
+      <div class="ekg-video-signature-box" aria-hidden="true">
+        <video class="ekg-video-element" autoplay loop muted playsinline preload="auto" poster="./assets/heartbeat-poster.jpg">
+          <source src="./assets/heartbeat.mp4" type="video/mp4">
+        </video>
       </div>
 
       <!-- SEARCH CARD CONTAINER (Fades/scales in as EKG settles into underline) -->
