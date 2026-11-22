@@ -59,6 +59,7 @@ class MediPulseApp {
     this.setupFilterChips();
     this.setupHowItWorksObserver();
     this.setupAdminDashboard();
+    this.initScrollAnimations();
 
     // 3. Recenter with HTML5 Geolocation (fallback to default Moodbidri coordinates)
     this.setupGeolocation();
@@ -1777,6 +1778,70 @@ class MediPulseApp {
     }, { threshold: 0.25 });
 
     observer.observe(section);
+  }
+
+  /* ==========================================================================
+     SCROLL PROGRESS & REVEAL ANIMATIONS
+     ========================================================================== */
+  initScrollAnimations() {
+    const progressBar = document.getElementById('scroll-progress-bar');
+    const header = document.querySelector('.app-header');
+    const backToTopBtn = document.getElementById('btn-back-to-top');
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+      // 1. Update top scroll progress bar
+      if (progressBar && docHeight > 0) {
+        const pct = Math.min(100, Math.max(0, (scrollY / docHeight) * 100));
+        progressBar.style.width = pct + '%';
+      }
+
+      // 2. Compact header elevation on scroll
+      if (header) {
+        if (scrollY > 35) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      }
+
+      // 3. Floating back-to-top button
+      if (backToTopBtn) {
+        if (scrollY > 320) {
+          backToTopBtn.classList.add('visible');
+        } else {
+          backToTopBtn.classList.remove('visible');
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    // 4. Scroll Reveal via IntersectionObserver
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.08,
+        rootMargin: '0px 0px -30px 0px'
+      });
+
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+        revealObserver.observe(el);
+      });
+    } else {
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+        el.classList.add('is-revealed');
+      });
+    }
   }
 
   /* ==========================================================================
