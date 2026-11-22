@@ -116,11 +116,35 @@
         </p>
       </div>
 
-      <!-- Real-Time Heartbeat Pulse Video Animation -->
-      <div class="ekg-video-signature-box" aria-hidden="true">
-        <video class="ekg-video-element" autoplay loop muted playsinline preload="auto" poster="./assets/heartbeat-poster.jpg">
-          <source src="./assets/heartbeat.mp4" type="video/mp4">
-        </video>
+      <!-- 1. Signature SVG Heartbeat / EKG Line Entrance with Continuous Moving Pulse Animation -->
+      <div class="ekg-signature-box" aria-hidden="true">
+        <svg viewBox="0 0 1200 48" preserveAspectRatio="none" style="width: 100%; height: 48px; display: block; overflow: visible;">
+          <defs>
+            <filter id="ekgGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Base Track (subtle underlying EKG path) -->
+          <path class="ekg-track" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+          <!-- Continuous Traveling Heartbeat Pulse Wave -->
+          <path class="ekg-pulse-wave" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+          <!-- Glowing Amber Spark trailing along the pulse peaks -->
+          <path class="ekg-pulse-glow" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+          <!-- Traveling Glowing Pulse Beacon (Cardiac Head Dot) -->
+          <g class="ekg-beacon">
+            <circle r="7" fill="#E8622C" opacity="0.45" filter="url(#ekgGlow)" />
+            <circle r="4.2" fill="#E8622C" filter="url(#ekgGlow)" />
+            <circle r="2.2" fill="#FFFFFF" />
+            <animateMotion 
+              path="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24"
+              dur="2.8s" 
+              repeatCount="indefinite" />
+          </g>
+        </svg>
       </div>
 
       <!-- SEARCH CARD CONTAINER (Fades/scales in as EKG settles into underline) -->
