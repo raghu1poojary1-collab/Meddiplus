@@ -496,6 +496,112 @@ def ai_predict():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/hospitals', methods=['GET'])
+def get_hospitals():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("SELECT id, name, address, city, latitude, longitude, contact_number, created_at FROM hospital ORDER BY id;")
+        hospitals = cur.fetchall()
+        for h in hospitals:
+            if h.get('created_at'):
+                h['created_at'] = h['created_at'].isoformat()
+            hid = h['id']
+            cur.execute("SELECT id, name, specialization, on_duty, queue_count, consulting_hours FROM doctor WHERE hospital_id = %s;", (hid,))
+            h['doctors'] = cur.fetchall()
+            cur.execute("SELECT id, name, category, stock_level, stock_status, unit, price FROM medicine WHERE hospital_id = %s;", (hid,))
+            h['medicines'] = cur.fetchall()
+            cur.execute("SELECT id, name, batch_no, doses_available, cold_chain_status FROM vaccine WHERE hospital_id = %s;", (hid,))
+            h['vaccines'] = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify({"count": len(hospitals), "hospitals": hospitals}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/doctors', methods=['GET'])
+def get_doctors():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT d.id, d.name, d.specialization, d.on_duty, d.queue_count, d.consulting_hours, h.name as hospital_name, h.city
+            FROM doctor d
+            LEFT JOIN hospital h ON d.hospital_id = h.id
+            ORDER BY d.id;
+        """)
+        doctors = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify({"count": len(doctors), "doctors": doctors}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/medicines', methods=['GET'])
+def get_medicines():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT m.id, m.name, m.category, m.stock_level, m.stock_status, m.unit, m.price, h.name as hospital_name, h.city
+            FROM medicine m
+            LEFT JOIN hospital h ON m.hospital_id = h.id
+            ORDER BY m.id;
+        """)
+        medicines = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify({"count": len(medicines), "medicines": medicines}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/vaccines', methods=['GET'])
+def get_vaccines():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT v.id, v.name, v.batch_no, v.doses_available, v.cold_chain_status, h.name as hospital_name, h.city
+            FROM vaccine v
+            LEFT JOIN hospital h ON v.hospital_id = h.id
+            ORDER BY v.id;
+        """)
+        vaccines = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify({"count": len(vaccines), "vaccines": vaccines}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/stats', methods=['GET'])
+def get_stats():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT count(*) FROM hospital;")
+        h_cnt = cur.fetchone()[0]
+        cur.execute("SELECT count(*) FROM doctor;")
+        d_cnt = cur.fetchone()[0]
+        cur.execute("SELECT count(*) FROM doctor WHERE on_duty = true;")
+        d_duty = cur.fetchone()[0]
+        cur.execute("SELECT count(*) FROM medicine;")
+        m_cnt = cur.fetchone()[0]
+        cur.execute("SELECT coalesce(sum(doses_available), 0) FROM vaccine;")
+        v_doses = cur.fetchone()[0]
+        cur.close()
+        conn.close()
+        return jsonify({
+            "hospitals_count": h_cnt,
+            "doctors_total": d_cnt,
+            "doctors_on_duty": d_duty,
+            "medicines_count": m_cnt,
+            "vaccine_doses": v_doses,
+            "database": "PostgreSQL 16 (Mediplus)",
+            "status": "connected"
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get("AUTH_PORT", 5002))
     print(f"Starting MediPulse PostgreSQL Auth API Server on port {port}...")
