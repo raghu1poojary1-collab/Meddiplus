@@ -10,6 +10,8 @@ Copy-Item "$src\staff-login.html" -Destination $dest
 Copy-Item "$src\signup.html" -Destination $dest
 Copy-Item "$src\privacy.html" -Destination $dest
 Copy-Item "$src\terms.html" -Destination $dest
+if (Test-Path "$src\favicon.png") { Copy-Item "$src\favicon.png" -Destination $dest }
+if (Test-Path "$src\public") { Copy-Item "$src\public" -Destination "$dest\public" -Recurse }
 Copy-Item "$src\css" -Destination "$dest\css" -Recurse
 Copy-Item "$src\js" -Destination "$dest\js" -Recurse
 Copy-Item "$src\data" -Destination "$dest\data" -Recurse
