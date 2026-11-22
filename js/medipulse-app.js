@@ -593,54 +593,9 @@ function LoginPage({
   const [showPassword, setShowPassword] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [closing, setClosing] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [recoveryOpen, setRecoveryOpen] = useState(false);
-  const [recoveryStep, setRecoveryStep] = useState('input');
-  const [recoveryEmail, setRecoveryEmail] = useState('raghu1poojary1@gmail.com');
-  const [recoveryPass, setRecoveryPass] = useState('');
-  const [recoveryLoading, setRecoveryLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
   const closePage = () => {
     setClosing(true);
     window.setTimeout(onClose, 650);
-  };
-  const handleSendRecovery = async e => {
-    e.preventDefault();
-    setRecoveryLoading(true);
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    let generatedPass = `MedPulse#${randomNum}`;
-    try {
-      const resp = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: recoveryEmail
-        })
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data.recovery_password) generatedPass = data.recovery_password;
-      }
-    } catch (err) {
-      console.log('Recovery mailer notice:', err);
-    }
-    setRecoveryPass(generatedPass);
-    setRecoveryStep('sent');
-    setRecoveryLoading(false);
-  };
-  const handleFillAndSignIn = () => {
-    setPassword(recoveryPass);
-    if (recoveryEmail) setEmail(recoveryEmail);
-    setRecoveryOpen(false);
-    setRecoveryStep('input');
-  };
-  const copyCode = () => {
-    navigator.clipboard.writeText(recoveryPass);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
   };
   return /*#__PURE__*/React.createElement("section", {
     className: `login-page ${closing ? 'page-closing' : ''}`,
@@ -713,8 +668,6 @@ function LoginPage({
   }), /*#__PURE__*/React.createElement("input", {
     type: "text",
     placeholder: "staff@hospital.org",
-    value: email,
-    onChange: e => setEmail(e.target.value),
     required: true,
     autoFocus: true
   }))), /*#__PURE__*/React.createElement("label", null, /*#__PURE__*/React.createElement("span", null, "Password"), /*#__PURE__*/React.createElement("div", {
@@ -725,8 +678,6 @@ function LoginPage({
   }), /*#__PURE__*/React.createElement("input", {
     type: showPassword ? 'text' : 'password',
     placeholder: "Enter your password",
-    value: password,
-    onChange: e => setPassword(e.target.value),
     required: true,
     minLength: 4
   }), /*#__PURE__*/React.createElement("button", {
@@ -737,11 +688,7 @@ function LoginPage({
   }, /*#__PURE__*/React.createElement("label", null, /*#__PURE__*/React.createElement("input", {
     type: "checkbox"
   }), " ", /*#__PURE__*/React.createElement("span", null, "Keep me signed in")), /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    onClick: () => {
-      setRecoveryEmail(email || 'raghu1poojary1@gmail.com');
-      setRecoveryOpen(true);
-    }
+    type: "button"
   }, "Forgot password?")), /*#__PURE__*/React.createElement("button", {
     className: "login-submit",
     type: "submit"
@@ -773,146 +720,7 @@ function LoginPage({
     onClick: closePage
   }, "Enter MediPulse ", /*#__PURE__*/React.createElement("span", null, "→"))), /*#__PURE__*/React.createElement("div", {
     className: "login-footer"
-  }, /*#__PURE__*/React.createElement("span", null, "Privacy"), /*#__PURE__*/React.createElement("span", null, "Security"), /*#__PURE__*/React.createElement("span", null, "Support"), /*#__PURE__*/React.createElement("small", null, "© MediPulse Network"))), recoveryOpen && /*#__PURE__*/React.createElement("div", {
-    className: "recovery-backdrop visible",
-    role: "dialog",
-    "aria-modal": "true",
-    onClick: e => {
-      if (e.target === e.currentTarget) setRecoveryOpen(false);
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "recovery-card"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "recovery-header-row"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "recovery-icon-badge"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "lock",
-    size: 20
-  })), /*#__PURE__*/React.createElement("button", {
-    className: "modal-close",
-    onClick: () => setRecoveryOpen(false),
-    "aria-label": "Close",
-    style: {
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      padding: 4
-    }
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "close",
-    size: 18
-  }))), recoveryStep === 'input' ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
-    className: "recovery-title"
-  }, "Recover Account Password"), /*#__PURE__*/React.createElement("p", {
-    className: "recovery-subtext"
-  }, "Enter your registered email address. We'll generate a secure temporary recovery password and dispatch it directly to your Gmail inbox."), /*#__PURE__*/React.createElement("form", {
-    onSubmit: handleSendRecovery
-  }, /*#__PURE__*/React.createElement("label", {
-    style: {
-      display: 'block',
-      marginBottom: '14px',
-      fontSize: '12px',
-      fontWeight: 600
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      display: 'block',
-      marginBottom: '6px'
-    }
-  }, "Registered Email Address"), /*#__PURE__*/React.createElement("div", {
-    className: "login-input"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "user",
-    size: 18
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "email",
-    value: recoveryEmail,
-    onChange: e => setRecoveryEmail(e.target.value),
-    placeholder: "you@gmail.com",
-    required: true,
-    autoFocus: true
-  }))), /*#__PURE__*/React.createElement("button", {
-    type: "submit",
-    className: "login-submit",
-    disabled: recoveryLoading,
-    style: {
-      width: '100%'
-    }
-  }, recoveryLoading ? 'Dispatching Recovery Email...' : 'Send Recovery Password →'))) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: 44,
-      height: 44,
-      borderRadius: '50%',
-      background: '#d1fae5',
-      color: '#059669',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("svg", {
-    width: "22",
-    height: "22",
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2.5"
-  }, /*#__PURE__*/React.createElement("polyline", {
-    points: "20 6 9 17 4 12"
-  }))), /*#__PURE__*/React.createElement("h2", {
-    className: "recovery-title"
-  }, "Recovery Password Sent!"), /*#__PURE__*/React.createElement("p", {
-    className: "recovery-subtext"
-  }, "We have dispatched a temporary recovery password to ", /*#__PURE__*/React.createElement("strong", null, recoveryEmail), "."), /*#__PURE__*/React.createElement("div", {
-    className: "recovery-pass-box"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: '10px',
-      color: 'var(--slate)',
-      textTransform: 'uppercase',
-      fontWeight: 700,
-      letterSpacing: '0.05em',
-      marginBottom: '3px'
-    }
-  }, "TEMPORARY RECOVERY PASSWORD"), /*#__PURE__*/React.createElement("div", {
-    className: "recovery-pass-text"
-  }, recoveryPass)), /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "btn-copy-code",
-    onClick: copyCode
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "shield",
-    size: 14
-  }), /*#__PURE__*/React.createElement("span", null, copied ? 'Copied!' : 'Copy'))), /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "login-submit",
-    onClick: handleFillAndSignIn,
-    style: {
-      width: '100%',
-      marginBottom: '10px'
-    }
-  }, "✓ Fill & Sign In Now"), /*#__PURE__*/React.createElement("a", {
-    href: `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recoveryEmail)}&su=${encodeURIComponent('MediPulse Recovery Password')}&body=${encodeURIComponent('Your temporary recovery password: ' + recoveryPass)}`,
-    target: "_blank",
-    rel: "noreferrer",
-    style: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '7px',
-      width: '100%',
-      padding: '9px 14px',
-      background: '#f8fafc',
-      border: '1.5px solid #cbd5e1',
-      color: '#334155',
-      fontWeight: 600,
-      fontSize: '12px',
-      borderRadius: '10px',
-      textDecoration: 'none',
-      marginBottom: '8px'
-    }
-  }, "Open in Gmail Web ✉️")))));
+  }, /*#__PURE__*/React.createElement("span", null, "Privacy"), /*#__PURE__*/React.createElement("span", null, "Security"), /*#__PURE__*/React.createElement("span", null, "Support"), /*#__PURE__*/React.createElement("small", null, "© MediPulse Network"))));
 }
 function FacilityActionPage({
   hospital,

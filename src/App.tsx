@@ -265,56 +265,9 @@ function LoginPage({ onClose }: { onClose: () => void }) {
   const [showPassword, setShowPassword] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
   const [closing, setClosing] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [recoveryOpen, setRecoveryOpen] = useState(false)
-  const [recoveryStep, setRecoveryStep] = useState<'input' | 'sent'>('input')
-  const [recoveryEmail, setRecoveryEmail] = useState('raghu1poojary1@gmail.com')
-  const [recoveryPass, setRecoveryPass] = useState('')
-  const [recoveryLoading, setRecoveryLoading] = useState(false)
-  const [copied, setCopied] = useState(false)
-
   const closePage = () => {
     setClosing(true)
     window.setTimeout(onClose, 650)
-  }
-
-  const handleSendRecovery = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setRecoveryLoading(true)
-    const randomNum = Math.floor(1000 + Math.random() * 9000)
-    let generatedPass = `MedPulse#${randomNum}`
-
-    try {
-      const resp = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: recoveryEmail })
-      })
-      if (resp.ok) {
-        const data = await resp.json()
-        if (data.recovery_password) generatedPass = data.recovery_password
-      }
-    } catch (err) {
-      console.log('Recovery mailer notice:', err)
-    }
-
-    setRecoveryPass(generatedPass)
-    setRecoveryStep('sent')
-    setRecoveryLoading(false)
-  }
-
-  const handleFillAndSignIn = () => {
-    setPassword(recoveryPass)
-    if (recoveryEmail) setEmail(recoveryEmail)
-    setRecoveryOpen(false)
-    setRecoveryStep('input')
-  }
-
-  const copyCode = () => {
-    navigator.clipboard.writeText(recoveryPass)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -352,15 +305,15 @@ function LoginPage({ onClose }: { onClose: () => void }) {
             <form onSubmit={(event) => { event.preventDefault(); setSignedIn(true) }}>
               <label>
                 <span>Work email or staff ID</span>
-                <div className="login-input"><Icon name="user" size={18} /><input type="text" placeholder="staff@hospital.org" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus /></div>
+                <div className="login-input"><Icon name="user" size={18} /><input type="text" placeholder="staff@hospital.org" required autoFocus /></div>
               </label>
               <label>
                 <span>Password</span>
-                <div className="login-input"><Icon name="lock" size={18} /><input type={showPassword ? 'text' : 'password'} placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={4} /><button type="button" onClick={() => setShowPassword((value) => !value)}>{showPassword ? 'Hide' : 'Show'}</button></div>
+                <div className="login-input"><Icon name="lock" size={18} /><input type={showPassword ? 'text' : 'password'} placeholder="Enter your password" required minLength={4} /><button type="button" onClick={() => setShowPassword((value) => !value)}>{showPassword ? 'Hide' : 'Show'}</button></div>
               </label>
               <div className="login-options">
                 <label><input type="checkbox" /> <span>Keep me signed in</span></label>
-                <button type="button" onClick={() => { setRecoveryEmail(email || 'raghu1poojary1@gmail.com'); setRecoveryOpen(true) }}>Forgot password?</button>
+                <button type="button">Forgot password?</button>
               </div>
               <button className="login-submit" type="submit">Sign in securely <span>→</span></button>
             </form>
@@ -380,75 +333,6 @@ function LoginPage({ onClose }: { onClose: () => void }) {
         )}
         <div className="login-footer"><span>Privacy</span><span>Security</span><span>Support</span><small>© MediPulse Network</small></div>
       </div>
-
-      {recoveryOpen && (
-        <div className="recovery-backdrop visible" role="dialog" aria-modal="true" onClick={(e) => { if (e.target === e.currentTarget) setRecoveryOpen(false) }}>
-          <div className="recovery-card">
-            <div className="recovery-header-row">
-              <div className="recovery-icon-badge"><Icon name="lock" size={20} /></div>
-              <button className="modal-close" onClick={() => setRecoveryOpen(false)} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}><Icon name="close" size={18} /></button>
-            </div>
-
-            {recoveryStep === 'input' ? (
-              <div>
-                <h2 className="recovery-title">Recover Account Password</h2>
-                <p className="recovery-subtext">Enter your registered email address. We'll generate a secure temporary recovery password and dispatch it directly to your Gmail inbox.</p>
-                <form onSubmit={handleSendRecovery}>
-                  <label style={{ display: 'block', marginBottom: '14px', fontSize: '12px', fontWeight: 600 }}>
-                    <span style={{ display: 'block', marginBottom: '6px' }}>Registered Email Address</span>
-                    <div className="login-input">
-                      <Icon name="user" size={18} />
-                      <input
-                        type="email"
-                        value={recoveryEmail}
-                        onChange={(e) => setRecoveryEmail(e.target.value)}
-                        placeholder="you@gmail.com"
-                        required
-                        autoFocus
-                      />
-                    </div>
-                  </label>
-                  <button type="submit" className="login-submit" disabled={recoveryLoading} style={{ width: '100%' }}>
-                    {recoveryLoading ? 'Dispatching Recovery Email...' : 'Send Recovery Password →'}
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div>
-                <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#d1fae5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                <h2 className="recovery-title">Recovery Password Sent!</h2>
-                <p className="recovery-subtext">We have dispatched a temporary recovery password to <strong>{recoveryEmail}</strong>.</p>
-                
-                <div className="recovery-pass-box">
-                  <div>
-                    <div style={{ fontSize: '10px', color: 'var(--slate)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '3px' }}>TEMPORARY RECOVERY PASSWORD</div>
-                    <div className="recovery-pass-text">{recoveryPass}</div>
-                  </div>
-                  <button type="button" className="btn-copy-code" onClick={copyCode}>
-                    <Icon name="shield" size={14} />
-                    <span>{copied ? 'Copied!' : 'Copy'}</span>
-                  </button>
-                </div>
-
-                <button type="button" className="login-submit" onClick={handleFillAndSignIn} style={{ width: '100%', marginBottom: '10px' }}>
-                  ✓ Fill & Sign In Now
-                </button>
-
-                <a
-                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recoveryEmail)}&su=${encodeURIComponent('MediPulse Recovery Password')}&body=${encodeURIComponent('Your temporary recovery password: ' + recoveryPass)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', width: '100%', padding: '9px 14px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#334155', fontWeight: 600, fontSize: '12px', borderRadius: '10px', textDecoration: 'none', marginBottom: '8px' }}
-                >
-                  Open in Gmail Web ✉️
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </section>
   )
 }
