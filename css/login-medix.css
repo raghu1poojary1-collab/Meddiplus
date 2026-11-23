@@ -71,16 +71,87 @@ html, body {
   z-index: 1;
 }
 
-/* Decorative background heartbeat wave line in top dark area */
-.medix-top-pulse-line {
-  position: absolute;
-  top: 48px;
-  left: 360px;
-  width: 140px;
-  height: 36px;
-  opacity: 0.8;
+/* =========================================================================
+   TOP ANIMATED TRAVELING EKG HEARTBEAT PULSE (Matching user video)
+   ========================================================================= */
+.medix-top-pulse-container {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  height: 48px;
+  position: relative;
+  overflow: visible;
   pointer-events: none;
-  z-index: 1;
+  z-index: 5;
+  padding: 12px 48px 0;
+  box-sizing: border-box;
+}
+
+.medix-top-pulse-svg {
+  width: 100%;
+  height: 48px;
+  display: block;
+  overflow: visible;
+}
+
+.medix-pulse-track {
+  fill: none;
+  stroke: rgba(232, 98, 44, 0.22);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.medix-pulse-flow {
+  fill: none;
+  stroke: #E8622C;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 260 1326;
+  stroke-dashoffset: 260;
+  animation: medixEkgFlow 2.8s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(232, 98, 44, 0.85));
+}
+
+.medix-pulse-glow {
+  fill: none;
+  stroke: #FFD2B8;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 70 1516;
+  stroke-dashoffset: 70;
+  animation: medixEkgSpark 2.8s linear infinite;
+  filter: drop-shadow(0 0 12px #E8622C);
+}
+
+@keyframes medixEkgFlow {
+  0% {
+    stroke-dashoffset: 260;
+  }
+  100% {
+    stroke-dashoffset: -1326;
+  }
+}
+
+@keyframes medixEkgSpark {
+  0% {
+    stroke-dashoffset: 70;
+  }
+  100% {
+    stroke-dashoffset: -1326;
+  }
+}
+
+@media (max-width: 1024px) {
+  .medix-top-pulse-container {
+    padding: 10px 20px 0;
+    height: 40px;
+  }
+  .medix-top-pulse-svg {
+    height: 40px;
+  }
 }
 
 /* =========================================================================

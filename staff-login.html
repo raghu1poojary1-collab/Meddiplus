@@ -16,16 +16,8 @@
 
   <!-- Medix Login CSS -->
   <link rel="stylesheet" href="./css/login-medix.css" />
-
-  <!-- Google Identity Services (Sign In with Google SDK) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-
-  <!-- Background Decorative Pulse Wave in Top Green Area -->
-  <svg class="medix-top-pulse-line" viewBox="0 0 140 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M0 18 H45 L52 4 L60 32 L68 12 L74 24 L80 18 H140" stroke="#144B38" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
 
   <!-- Staff Alert Toast -->
   <div class="inbox-alert-toast" id="staff-inbox-toast" style="position: fixed; top: 20px; right: 20px; background: #0A3323; color: #FFFFFF; padding: 12px 18px; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.3); display: none; z-index: 99999; max-width: 380px;">
@@ -40,6 +32,37 @@
   </div>
 
   <div class="medix-page-wrap">
+    <!-- Top Animated Traveling EKG Pulse Wave (Matching user video) -->
+    <div class="medix-top-pulse-container" aria-hidden="true">
+      <svg viewBox="0 0 1200 48" preserveAspectRatio="none" class="medix-top-pulse-svg">
+        <defs>
+          <filter id="medixStaffPulseGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <!-- Base Track (subtle underlying EKG path) -->
+        <path class="medix-pulse-track" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+        <!-- Continuous Traveling Heartbeat Pulse Wave -->
+        <path class="medix-pulse-flow" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+        <!-- Glowing Amber Spark trailing along the pulse peaks -->
+        <path class="medix-pulse-glow" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+        <!-- Traveling Glowing Pulse Beacon (Cardiac Head Dot) -->
+        <g class="medix-pulse-beacon">
+          <circle r="7" fill="#E8622C" opacity="0.45" filter="url(#medixStaffPulseGlow)" />
+          <circle r="4.2" fill="#E8622C" filter="url(#medixStaffPulseGlow)" />
+          <circle r="2.2" fill="#FFFFFF" />
+          <animateMotion
+            path="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24"
+            dur="2.8s"
+            repeatCount="indefinite" />
+        </g>
+      </svg>
+    </div>
+
     <!-- Main 2-Column Split Container -->
     <main class="medix-split-container">
       
@@ -75,22 +98,6 @@
           <div class="medix-tabs" role="tablist">
             <button type="button" class="medix-tab-btn active" id="tab-staff-signin" onclick="setStaffMode('signin')" role="tab">Staff Sign In</button>
             <button type="button" class="medix-tab-btn" id="tab-staff-signup" onclick="setStaffMode('signup')" role="tab">Register Desk</button>
-          </div>
-
-          <!-- Google Workspace Auth -->
-          <button type="button" class="medix-btn-google" id="btn-google-staff" onclick="handleGoogleSignIn()">
-            <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-            </svg>
-            <span id="google-btn-label">Continue with Hospital Google Workspace</span>
-          </button>
-
-          <!-- Divider -->
-          <div class="medix-divider">
-            <span>or authenticate with staff credentials</span>
           </div>
 
           <!-- Error Alert Banner -->
@@ -433,38 +440,6 @@
           <span>&#10003; Fill &amp; Authenticate Now</span>
         </button>
       </div>
-    </div>
-  </div>
-
-  <!-- =========================================================================
-       GOOGLE ACCOUNT CHOOSER MODAL
-       ========================================================================= -->
-  <div class="medix-modal-backdrop g-chooser-backdrop" id="google-chooser-modal" onclick="handleChooserBackdropClick(event)">
-    <div class="medix-modal-card g-chooser-modal" role="dialog" aria-modal="true" aria-labelledby="g-chooser-title">
-      <button type="button" class="medix-modal-close g-chooser-close" onclick="closeGoogleChooser()" aria-label="Close dialog">&times;</button>
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-        <svg width="22" height="22" viewBox="0 0 48 48">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-        </svg>
-        <span style="font-size: 13px; font-weight: 600; color: #536B5E;">Hospital Workspace Auth</span>
-      </div>
-      <h2 class="medix-modal-title" id="g-chooser-title">Choose an account</h2>
-      <p class="medix-modal-sub">to access <strong>Medix Hospital Desk Management</strong></p>
-      
-      <div id="g-account-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;"></div>
-      
-      <div id="g-custom-box" style="display: none; margin-bottom: 12px; background: #F4EFE3; padding: 12px; border-radius: 12px;">
-        <input type="text" id="g-custom-name" class="medix-input staff-input" placeholder="Physician / Staff Name (e.g. Dr. Ramesh Bhat)" style="margin-bottom: 8px; height: 42px;" />
-        <input type="email" id="g-custom-email" class="medix-input staff-input" placeholder="Hospital Google Email (e.g. doctor@alvashealth.org)" style="margin-bottom: 8px; height: 42px;" />
-        <button type="button" class="medix-btn-submit g-custom-btn-submit" onclick="submitCustomGoogleAccount()" style="height: 40px; font-size: 13.5px;">Continue with this account</button>
-      </div>
-
-      <button type="button" class="g-action-row" onclick="toggleCustomAccountInput()" style="width: 100%; padding: 10px; background: #FFFFFF; border: 1.5px solid #E3D9C5; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #0A3323;">
-        <span>&#65291;</span> Use another Hospital Workspace account
-      </button>
     </div>
   </div>
 

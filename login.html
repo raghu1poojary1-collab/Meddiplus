@@ -22,11 +22,6 @@
 </head>
 <body>
 
-  <!-- Background Decorative Pulse Wave in Top Green Area -->
-  <svg class="medix-top-pulse-line" viewBox="0 0 140 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M0 18 H45 L52 4 L60 32 L68 12 L74 24 L80 18 H140" stroke="#144B38" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-
   <!-- Inbox Alert Toast -->
   <div class="inbox-alert-toast" id="inbox-toast" style="position: fixed; top: 20px; right: 20px; background: #0A3323; color: #FFFFFF; padding: 12px 18px; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.3); display: none; z-index: 99999; max-width: 380px;">
     <div style="display: flex; align-items: flex-start; gap: 10px;">
@@ -40,6 +35,37 @@
   </div>
 
   <div class="medix-page-wrap">
+    <!-- Top Animated Traveling EKG Pulse Wave (Matching user video) -->
+    <div class="medix-top-pulse-container" aria-hidden="true">
+      <svg viewBox="0 0 1200 48" preserveAspectRatio="none" class="medix-top-pulse-svg">
+        <defs>
+          <filter id="medixPulseGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <!-- Base Track (subtle underlying EKG path) -->
+        <path class="medix-pulse-track" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+        <!-- Continuous Traveling Heartbeat Pulse Wave -->
+        <path class="medix-pulse-flow" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+        <!-- Glowing Amber Spark trailing along the pulse peaks -->
+        <path class="medix-pulse-glow" fill="none" d="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24" />
+        <!-- Traveling Glowing Pulse Beacon (Cardiac Head Dot) -->
+        <g class="medix-pulse-beacon">
+          <circle r="7" fill="#E8622C" opacity="0.45" filter="url(#medixPulseGlow)" />
+          <circle r="4.2" fill="#E8622C" filter="url(#medixPulseGlow)" />
+          <circle r="2.2" fill="#FFFFFF" />
+          <animateMotion
+            path="M 0,24 L 280,24 L 310,24 L 320,6 L 332,42 L 344,12 L 356,36 L 366,24 L 400,24 L 620,24 L 632,10 L 644,38 L 654,16 L 664,30 L 674,24 L 1200,24"
+            dur="2.8s"
+            repeatCount="indefinite" />
+        </g>
+      </svg>
+    </div>
+
     <!-- Main 2-Column Split Container -->
     <main class="medix-split-container">
       
