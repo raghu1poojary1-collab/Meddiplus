@@ -148,71 +148,53 @@ html, body {
   margin-left: 4px;
 }
 
-/* Headline & Subtitle */
-.medix-headline {
-  font-size: 42px;
-  font-weight: 850;
-  line-height: 1.14;
-  letter-spacing: -1.2px;
-  color: #07251B;
-  margin-bottom: 14px;
-}
-
-.medix-subhead {
-  font-size: 15.5px;
-  line-height: 1.5;
-  color: #4A6356;
-  margin-bottom: 24px;
-  max-width: 520px;
-}
-
-/* Feature Badges Row */
-.medix-badges-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-
-.medix-badge-item {
+/* =========================================================================
+   LEFT HERO COLUMN (Complete 3D Healthcare Scene matching original mockup)
+   ========================================================================= */
+.medix-hero-col {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 12px 14px;
-  min-width: 86px;
-  background: #E8EFE3;
-  border: 1px solid #D6E4CD;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(7, 37, 27, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: center;
+  padding: 12px 0;
+  width: 100%;
 }
 
-.medix-badge-item:hover {
+.medix-scene-wrap {
+  width: 100%;
+  max-width: 660px;
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px -12px rgba(4, 25, 17, 0.4);
+  position: relative;
+  background: #FAF6ED;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.medix-scene-wrap:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(7, 37, 27, 0.1);
+  box-shadow: 0 28px 70px -12px rgba(4, 25, 17, 0.5);
 }
 
-.medix-badge-icon {
-  width: 22px;
-  height: 22px;
-  margin-bottom: 6px;
-  color: #07251B;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.medix-scene-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
-.medix-badge-text {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #07251B;
-  line-height: 1.25;
+.medix-logo-hotspot {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  width: 160px;
+  height: 50px;
+  z-index: 10;
+  border-radius: 12px;
+  cursor: pointer;
 }
 
-/* 3D Hospital & Doctor Visual */
+/* Fallback / secondary visual styles */
 .medix-hero-visual {
   width: 100%;
   max-width: 600px;
@@ -226,12 +208,7 @@ html, body {
   width: 100%;
   height: auto;
   display: block;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.medix-hero-visual:hover img {
-  transform: scale(1.02);
+  object-fit: contain;
 }
 
 /* =========================================================================
@@ -981,7 +958,7 @@ html, body {
   .medix-split-container {
     grid-template-columns: 1fr;
     gap: 32px;
-    padding: 24px 24px 32px;
+    padding: 24px 20px 32px;
   }
   
   .medix-hero-col {
@@ -990,20 +967,8 @@ html, body {
     text-align: center;
   }
 
-  .medix-headline {
-    font-size: 34px;
-  }
-
-  .medix-subhead {
-    max-width: 100%;
-  }
-
-  .medix-badges-row {
-    justify-content: center;
-  }
-
-  .medix-hero-visual {
-    max-width: 480px;
+  .medix-scene-wrap {
+    max-width: 520px;
     margin: 0 auto;
   }
 
@@ -1017,34 +982,17 @@ html, body {
 
 @media (max-width: 600px) {
   .medix-split-container {
-    padding: 16px 16px 24px;
+    padding: 16px 14px 24px;
     gap: 20px;
   }
 
-  .medix-headline {
-    font-size: 28px;
-    line-height: 1.2;
-  }
-
-  .medix-subhead {
-    font-size: 14px;
+  .medix-scene-wrap {
+    max-width: 100%;
+    border-radius: 18px;
   }
 
   .medix-card {
     padding: 28px 20px 24px;
     border-radius: 22px;
-  }
-
-  .medix-badge-item {
-    min-width: 76px;
-    padding: 8px 10px;
-  }
-
-  .medix-badge-text {
-    font-size: 10.5px;
-  }
-
-  .medix-hero-visual {
-    display: none; /* Keep clean on small phones to keep form front & center */
   }
 }
