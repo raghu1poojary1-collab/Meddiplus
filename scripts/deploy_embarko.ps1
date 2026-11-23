@@ -13,6 +13,7 @@ Copy-Item "$src\terms.html" -Destination $dest
 Copy-Item "$src\css" -Destination "$dest\css" -Recurse
 Copy-Item "$src\js" -Destination "$dest\js" -Recurse
 Copy-Item "$src\data" -Destination "$dest\data" -Recurse
+if (Test-Path "$src\images") { Copy-Item "$src\images" -Destination "$dest\images" -Recurse }
 tar -czf C:\Users\raghu\AppData\Local\Temp\medflow-static.tar.gz -C $dest .
 & "C:\Windows\System32\curl.exe" -sS -X POST "https://ship.embarko.ai/apps" `
   -H "X-App-Name: medipulse-live" `
