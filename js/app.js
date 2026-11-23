@@ -1575,7 +1575,7 @@ class MediPulseApp {
       }
 
       return `
-        <article class="hospital-card" data-id="${h.id}" style="animation-delay: ${idx * 60}ms;">
+        <article class="hospital-card" data-id="${h.id}" style="animation-delay: ${Math.min(idx, 4) * 30}ms;">
           <div class="card-top-row">
             <div>
               <h2 class="card-hospital-title">${h.name}</h2>
@@ -1830,12 +1830,17 @@ class MediPulseApp {
           }
         });
       }, {
-        threshold: 0.08,
-        rootMargin: '0px 0px -30px 0px'
+        threshold: 0.01,
+        rootMargin: '120px 0px 80px 0px'
       });
 
       document.querySelectorAll('.reveal-on-scroll').forEach(el => {
-        revealObserver.observe(el);
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 100) {
+          el.classList.add('is-revealed');
+        } else {
+          revealObserver.observe(el);
+        }
       });
     } else {
       document.querySelectorAll('.reveal-on-scroll').forEach(el => {

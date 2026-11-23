@@ -224,12 +224,18 @@
         }
       });
     }, {
-      threshold: 0.08,
-      rootMargin: '0px 0px -30px 0px'
+      threshold: 0.01,
+      rootMargin: '120px 0px 80px 0px'
     });
 
     document.querySelectorAll('.reveal-on-scroll, .scroll-fade-up, .scroll-slide-left, .scroll-slide-right').forEach(el => {
-      observer.observe(el);
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 100) {
+        el.classList.add('is-revealed');
+        el.querySelectorAll('[data-counter], .stat-counter').forEach(runNumberCounter);
+      } else {
+        observer.observe(el);
+      }
     });
   }
 

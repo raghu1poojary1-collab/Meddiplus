@@ -865,6 +865,8 @@ small, .text-label {
   grid-template-columns: 1fr;
   gap: 24px;
   margin-top: 24px;
+  opacity: 1;
+  visibility: visible;
 }
 
 @media (min-width: 960px) {
@@ -2702,22 +2704,22 @@ body::after {
 .reveal-on-scroll,
 .scroll-fade-up {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(16px);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
 .scroll-slide-left {
   opacity: 0;
-  transform: translateX(-28px);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-20px);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
 .scroll-slide-right {
   opacity: 0;
-  transform: translateX(28px);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(20px);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -2812,7 +2814,7 @@ button:active,
 @keyframes cardFadeUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -2821,7 +2823,7 @@ button:active,
 }
 
 .hospital-card {
-  animation: cardFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: cardFadeUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Navigation Links Animated Underline */
