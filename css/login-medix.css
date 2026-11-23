@@ -96,7 +96,7 @@ html, body {
 
 .medix-pulse-track {
   fill: none;
-  stroke: rgba(232, 98, 44, 0.22);
+  stroke: rgba(16, 185, 129, 0.28);
   stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -104,26 +104,26 @@ html, body {
 
 .medix-pulse-flow {
   fill: none;
-  stroke: #E8622C;
+  stroke: #10B981;
   stroke-width: 3.4;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 260 1326;
   stroke-dashoffset: 260;
   animation: medixEkgFlow 2.8s linear infinite;
-  filter: drop-shadow(0 0 8px rgba(232, 98, 44, 0.85));
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.85));
 }
 
 .medix-pulse-glow {
   fill: none;
-  stroke: #FFD2B8;
+  stroke: #A7F3D0;
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 70 1516;
   stroke-dashoffset: 70;
   animation: medixEkgSpark 2.8s linear infinite;
-  filter: drop-shadow(0 0 12px #E8622C);
+  filter: drop-shadow(0 0 12px #10B981);
 }
 
 @keyframes medixEkgFlow {
