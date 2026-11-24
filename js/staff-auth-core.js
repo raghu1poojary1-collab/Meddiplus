@@ -85,21 +85,21 @@
       var subtext = document.getElementById('staff-subtext');
 
       if (mode === 'signup') {
-        tabSignUp.classList.add('active');
-        tabSignIn.classList.remove('active');
+        if (tabSignUp) tabSignUp.classList.add('active');
+        if (tabSignIn) tabSignIn.classList.remove('active');
         formSignUp.style.display = 'block';
         formSignIn.style.display = 'none';
-        heading.textContent = 'Request Staff & Doctor Desk Access';
-        subtext.textContent = 'Register your medical council credentials to manage hospital inventories and shift schedules.';
-        document.title = 'Staff Registration — MediPulse';
+        heading.textContent = 'Register Clinic Desk';
+        subtext.textContent = 'Register your credentials for hospital management';
+        document.title = 'Register Desk — Medipulse Staff';
       } else {
-        tabSignIn.classList.add('active');
-        tabSignUp.classList.remove('active');
+        if (tabSignIn) tabSignIn.classList.add('active');
+        if (tabSignUp) tabSignUp.classList.remove('active');
         formSignIn.style.display = 'block';
         formSignUp.style.display = 'none';
-        heading.textContent = 'Staff & Doctor Sign In';
-        subtext.textContent = 'Access real-time doctor rosters, update medicine supplies, and manage cold-chain vaccine batches.';
-        document.title = 'Staff & Doctor Clinical Portal — MediPulse';
+        heading.textContent = 'Welcome Back';
+        subtext.textContent = 'Sign in to your Hospital Desk account';
+        document.title = 'Staff Portal — Medipulse';
       }
     }
 

@@ -86,22 +86,22 @@
     var subtext = document.getElementById('auth-subtext');
 
     if (mode === 'signup') {
-      tabSignUp.classList.add('active');
-      tabSignIn.classList.remove('active');
+      if (tabSignUp) tabSignUp.classList.add('active');
+      if (tabSignIn) tabSignIn.classList.remove('active');
       formSignUp.style.display = 'block';
       formSignIn.style.display = 'none';
-      heading.textContent = 'Create your MediPulse Account';
-      subtext.textContent = 'Sign up with your email and password to track live hospital availability and book slots.';
-      document.title = 'Create Account — MediPulse';
+      heading.textContent = 'Create your Account';
+      subtext.textContent = 'Sign up for your Medipulse account';
+      document.title = 'Create Account — Medipulse';
       setTimeout(function() { document.getElementById('signup-name').focus(); }, 100);
     } else {
-      tabSignIn.classList.add('active');
-      tabSignUp.classList.remove('active');
+      if (tabSignIn) tabSignIn.classList.add('active');
+      if (tabSignUp) tabSignUp.classList.remove('active');
       formSignIn.style.display = 'block';
       formSignUp.style.display = 'none';
-      heading.textContent = 'Sign In to MediPulse';
-      subtext.textContent = 'Access real-time doctor rosters, live medicine inventories & emergency hospital beds.';
-      document.title = 'Sign In — MediPulse';
+      heading.textContent = 'Welcome Back';
+      subtext.textContent = 'Sign in to your Medipulse account';
+      document.title = 'Welcome Back — Medipulse';
       setTimeout(function() { document.getElementById('signin-email').focus(); }, 100);
     }
   }

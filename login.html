@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Welcome Back — Medix</title>
-  <meta name="description" content="Sign in to your Medix healthcare account. Manage patients, doctors and appointments with ease and efficiency." />
+  <title>Welcome Back — Medipulse</title>
+  <meta name="description" content="Sign in to your Medipulse healthcare account. Manage patients, doctors and appointments with ease and efficiency." />
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230A3323'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>" />
@@ -72,15 +72,15 @@
       <!-- Left Column: Complete 3D Healthcare Scene (Doctor with full head, hospital & branding) -->
       <section class="medix-hero-col">
         <div class="medix-scene-wrap">
-          <a href="./index.html" class="medix-logo-hotspot" aria-label="Medix Homepage" title="Medix Homepage"></a>
+          <a href="./index.html" class="medix-logo-hotspot" aria-label="Medipulse Homepage" title="Medipulse Homepage"></a>
           <img
             src="./images/login-left-scene-2x.jpg"
-            alt="Healthcare Management Made Smarter - Medix"
+            alt="Healthcare Management Made Smarter - Medipulse"
             class="medix-scene-img"
             loading="eager"
           />
         </div>
-        <h1 style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;">Healthcare Management Made Smarter - Medix</h1>
+        <h1 style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;">Healthcare Management Made Smarter - Medipulse</h1>
         <p style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;">Manage patients, doctors and appointments with ease and efficiency.</p>
       </section>
 
@@ -90,33 +90,17 @@
           
           <!-- Floating 3D Heart with Stethoscope Badge -->
           <div class="medix-heart-badge-wrap">
-            <img src="./images/login-heart-badge-trans.png" alt="Medix Heart Stethoscope Badge" class="medix-heart-badge" />
+            <img src="./images/login-heart-badge-trans.png" alt="Medipulse Heart Stethoscope Badge" class="medix-heart-badge" />
           </div>
 
           <!-- Title & Subtitle -->
           <h2 class="medix-card-title" id="auth-heading">Welcome Back</h2>
-          <p class="medix-card-subtitle" id="auth-subtext">Sign in to your Medix account</p>
+          <p class="medix-card-subtitle" id="auth-subtext">Sign in to your Medipulse account</p>
 
-          <!-- Sign In / Sign Up Mode Switch Tabs -->
-          <div class="medix-tabs" role="tablist">
+          <!-- Hidden Mode Switch Tabs (Preserved for JS functionality) -->
+          <div class="medix-tabs" role="tablist" style="display: none;">
             <button type="button" class="medix-tab-btn active" id="tab-signin" onclick="setAuthMode('signin')" role="tab">Sign In</button>
             <button type="button" class="medix-tab-btn" id="tab-signup" onclick="setAuthMode('signup')" role="tab">Sign Up</button>
-          </div>
-
-          <!-- Google One-Click Sign-In Button -->
-          <button type="button" class="medix-btn-google" id="btn-google" onclick="handleGoogleSignIn()">
-            <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-            </svg>
-            <span id="google-btn-label">Continue with Google</span>
-          </button>
-
-          <!-- Divider -->
-          <div class="medix-divider" id="auth-divider">
-            <span>or with email &amp; password</span>
           </div>
 
           <!-- Error Alert Banner -->
@@ -200,13 +184,26 @@
             </button>
 
             <!-- Switch to Sign Up Prompt -->
-            <div class="medix-switch-prompt">
-              Don't have an account? <button type="button" onclick="setAuthMode('signup')">Sign Up</button>
+            <div class="medix-switch-prompt" style="text-align: center; margin-top: 14px; font-size: 13.5px; color: #4A6356;">
+              Don't have an account? <button type="button" onclick="setAuthMode('signup')" style="background:none; border:none; color:#07251B; font-weight:700; cursor:pointer; text-decoration:underline;">Sign Up</button>
+            </div>
+
+            <!-- Google One-Click Sign-In Option -->
+            <div style="margin-top: 14px;">
+              <button type="button" class="medix-btn-google" id="btn-google" onclick="handleGoogleSignIn()" style="height: 42px; border-radius: 21px; margin-bottom: 0;">
+                <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" style="width: 17px; height: 17px;">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span id="google-btn-label">Continue with Google</span>
+              </button>
             </div>
 
             <!-- Switch to Staff Login Portal -->
-            <div class="medix-sub-switch">
-              Hospital Staff or Doctor? <a href="./staff-login.html">Staff Desk Login &rarr;</a>
+            <div class="medix-sub-switch" style="text-align: center; margin-top: 12px; font-size: 12px; color: #6A8275;">
+              Hospital Staff or Doctor? <a href="./staff-login.html" style="color: #0A3323; font-weight: 600;">Staff Desk Login &rarr;</a>
             </div>
           </form>
 
@@ -352,7 +349,7 @@
     <!-- Bottom Footer (Matching Mockup) -->
     <footer class="medix-footer">
       <div class="medix-footer-left">
-        &copy; 2025 Medix. All rights reserved.
+        &copy; 2025 Medipulse. All rights reserved.
       </div>
       <div class="medix-footer-right">
         <span class="medix-footer-heart">&#9825;</span> Better Care. A Healthier Tomorrow.

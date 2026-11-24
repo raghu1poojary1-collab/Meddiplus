@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Staff Portal — Medix</title>
-  <meta name="description" content="Sign in to Medix Hospital Desk. Coordinate emergency admissions, live bed rosters, and patient care." />
+  <title>Staff Portal — Medipulse</title>
+  <meta name="description" content="Sign in to Medipulse Hospital Desk. Coordinate emergency admissions, live bed rosters, and patient care." />
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230A3323'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>" />
@@ -69,15 +69,15 @@
       <!-- Left Column: Complete 3D Healthcare Scene (Doctor with full head, hospital & branding) -->
       <section class="medix-hero-col">
         <div class="medix-scene-wrap">
-          <a href="./index.html" class="medix-logo-hotspot" aria-label="Medix Homepage" title="Medix Homepage"></a>
+          <a href="./index.html" class="medix-logo-hotspot" aria-label="Medipulse Homepage" title="Medipulse Homepage"></a>
           <img
             src="./images/login-left-scene-2x.jpg"
-            alt="Healthcare Management Made Smarter - Medix Staff Portal"
+            alt="Healthcare Management Made Smarter - Medipulse Staff Portal"
             class="medix-scene-img"
             loading="eager"
           />
         </div>
-        <h1 style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;">Healthcare Management Made Smarter - Medix Staff Portal</h1>
+        <h1 style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;">Healthcare Management Made Smarter - Medipulse Staff Portal</h1>
         <p style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;">Clinical staff management: coordinate real-time doctor rosters, emergency admissions, and patient beds.</p>
       </section>
 
@@ -87,15 +87,15 @@
           
           <!-- Floating 3D Heart with Stethoscope Badge -->
           <div class="medix-heart-badge-wrap">
-            <img src="./images/login-heart-badge-trans.png" alt="Medix Heart Stethoscope Badge" class="medix-heart-badge" />
+            <img src="./images/login-heart-badge-trans.png" alt="Medipulse Heart Stethoscope Badge" class="medix-heart-badge" />
           </div>
 
           <!-- Title & Subtitle -->
-          <h2 class="medix-card-title" id="staff-heading">Staff Portal</h2>
+          <h2 class="medix-card-title" id="staff-heading">Welcome Back</h2>
           <p class="medix-card-subtitle" id="staff-subtext">Sign in to your Hospital Desk account</p>
 
-          <!-- Mode Switch Tabs -->
-          <div class="medix-tabs" role="tablist">
+          <!-- Mode Switch Tabs (Hidden for design match, preserved for JS) -->
+          <div class="medix-tabs" role="tablist" style="display: none;">
             <button type="button" class="medix-tab-btn active" id="tab-staff-signin" onclick="setStaffMode('signin')" role="tab">Staff Sign In</button>
             <button type="button" class="medix-tab-btn" id="tab-staff-signup" onclick="setStaffMode('signup')" role="tab">Register Desk</button>
           </div>
@@ -199,9 +199,18 @@
                   <polyline points="10 17 15 12 10 7"></polyline>
                   <line x1="15" y1="12" x2="3" y2="12"></line>
                 </svg>
-                Sign In to Desk
+                Sign In
               </span>
             </button>
+
+            <!-- Switch prompts matching design -->
+            <div class="medix-switch-prompt" style="text-align: center; margin-top: 14px; font-size: 13.5px; color: #4A6356;">
+              New Hospital or Clinic? <button type="button" onclick="setStaffMode('signup')" style="background:none; border:none; color:#07251B; font-weight:700; cursor:pointer; text-decoration:underline;">Register Desk</button>
+            </div>
+
+            <div class="medix-sub-switch" style="text-align: center; margin-top: 10px; font-size: 12px; color: #6A8275;">
+              Patient or General User? <a href="./login.html" style="color: #0A3323; font-weight: 600;">User Sign In &rarr;</a>
+            </div>
 
             <!-- Quick Demo Credentials Chips for convenient testing -->
             <div class="medix-demo-chips">
@@ -389,7 +398,7 @@
     <!-- Bottom Footer (Matching Mockup) -->
     <footer class="medix-footer">
       <div class="medix-footer-left">
-        &copy; 2025 Medix. All rights reserved.
+        &copy; 2025 Medipulse. All rights reserved.
       </div>
       <div class="medix-footer-right">
         <span class="medix-footer-heart">&#9825;</span> Better Care. A Healthier Tomorrow.
